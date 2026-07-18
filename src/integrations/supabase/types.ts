@@ -14,7 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string
+          id: string
+          onboarding_completed: boolean
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string
+          id: string
+          onboarding_completed?: boolean
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          onboarding_completed?: boolean
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          daily_study_goal_minutes: number
+          id: string
+          pomodoro_cycles: number
+          pomodoro_focus_minutes: number
+          pomodoro_long_break_minutes: number
+          pomodoro_short_break_minutes: number
+          sidebar_collapsed: boolean
+          theme: string
+          updated_at: string
+          user_id: string
+          week_starts_on: number
+        }
+        Insert: {
+          created_at?: string
+          daily_study_goal_minutes?: number
+          id?: string
+          pomodoro_cycles?: number
+          pomodoro_focus_minutes?: number
+          pomodoro_long_break_minutes?: number
+          pomodoro_short_break_minutes?: number
+          sidebar_collapsed?: boolean
+          theme?: string
+          updated_at?: string
+          user_id: string
+          week_starts_on?: number
+        }
+        Update: {
+          created_at?: string
+          daily_study_goal_minutes?: number
+          id?: string
+          pomodoro_cycles?: number
+          pomodoro_focus_minutes?: number
+          pomodoro_long_break_minutes?: number
+          pomodoro_short_break_minutes?: number
+          sidebar_collapsed?: boolean
+          theme?: string
+          updated_at?: string
+          user_id?: string
+          week_starts_on?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
