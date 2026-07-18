@@ -16,6 +16,15 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppQuestoesRouteImport } from './routes/app.questoes'
+import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
+import { Route as AppFlashcardsRouteImport } from './routes/app.flashcards'
+import { Route as AppFaculdadeRouteImport } from './routes/app.faculdade'
+import { Route as AppEstudosRouteImport } from './routes/app.estudos'
+import { Route as AppEstudarRouteImport } from './routes/app.estudar'
+import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
+import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
+import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
 
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
@@ -52,6 +61,51 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppQuestoesRoute = AppQuestoesRouteImport.update({
+  id: '/questoes',
+  path: '/questoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
+  id: '/planejamento',
+  path: '/planejamento',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFlashcardsRoute = AppFlashcardsRouteImport.update({
+  id: '/flashcards',
+  path: '/flashcards',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFaculdadeRoute = AppFaculdadeRouteImport.update({
+  id: '/faculdade',
+  path: '/faculdade',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEstudosRoute = AppEstudosRouteImport.update({
+  id: '/estudos',
+  path: '/estudos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEstudarRoute = AppEstudarRouteImport.update({
+  id: '/estudar',
+  path: '/estudar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDesempenhoRoute = AppDesempenhoRouteImport.update({
+  id: '/desempenho',
+  path: '/desempenho',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +114,15 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/desempenho': typeof AppDesempenhoRoute
+  '/app/estudar': typeof AppEstudarRoute
+  '/app/estudos': typeof AppEstudosRoute
+  '/app/faculdade': typeof AppFaculdadeRoute
+  '/app/flashcards': typeof AppFlashcardsRoute
+  '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/questoes': typeof AppQuestoesRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
@@ -68,6 +131,15 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/desempenho': typeof AppDesempenhoRoute
+  '/app/estudar': typeof AppEstudarRoute
+  '/app/estudos': typeof AppEstudosRoute
+  '/app/faculdade': typeof AppFaculdadeRoute
+  '/app/flashcards': typeof AppFlashcardsRoute
+  '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/questoes': typeof AppQuestoesRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -78,6 +150,15 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/desempenho': typeof AppDesempenhoRoute
+  '/app/estudar': typeof AppEstudarRoute
+  '/app/estudos': typeof AppEstudosRoute
+  '/app/faculdade': typeof AppFaculdadeRoute
+  '/app/flashcards': typeof AppFlashcardsRoute
+  '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/questoes': typeof AppQuestoesRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -89,6 +170,15 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/app/biblioteca'
+    | '/app/configuracoes'
+    | '/app/desempenho'
+    | '/app/estudar'
+    | '/app/estudos'
+    | '/app/faculdade'
+    | '/app/flashcards'
+    | '/app/planejamento'
+    | '/app/questoes'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -97,6 +187,15 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/app/biblioteca'
+    | '/app/configuracoes'
+    | '/app/desempenho'
+    | '/app/estudar'
+    | '/app/estudos'
+    | '/app/faculdade'
+    | '/app/flashcards'
+    | '/app/planejamento'
+    | '/app/questoes'
     | '/app'
   id:
     | '__root__'
@@ -106,6 +205,15 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/app/biblioteca'
+    | '/app/configuracoes'
+    | '/app/desempenho'
+    | '/app/estudar'
+    | '/app/estudos'
+    | '/app/faculdade'
+    | '/app/flashcards'
+    | '/app/planejamento'
+    | '/app/questoes'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -169,14 +277,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/questoes': {
+      id: '/app/questoes'
+      path: '/questoes'
+      fullPath: '/app/questoes'
+      preLoaderRoute: typeof AppQuestoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/planejamento': {
+      id: '/app/planejamento'
+      path: '/planejamento'
+      fullPath: '/app/planejamento'
+      preLoaderRoute: typeof AppPlanejamentoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/flashcards': {
+      id: '/app/flashcards'
+      path: '/flashcards'
+      fullPath: '/app/flashcards'
+      preLoaderRoute: typeof AppFlashcardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/faculdade': {
+      id: '/app/faculdade'
+      path: '/faculdade'
+      fullPath: '/app/faculdade'
+      preLoaderRoute: typeof AppFaculdadeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/estudos': {
+      id: '/app/estudos'
+      path: '/estudos'
+      fullPath: '/app/estudos'
+      preLoaderRoute: typeof AppEstudosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/estudar': {
+      id: '/app/estudar'
+      path: '/estudar'
+      fullPath: '/app/estudar'
+      preLoaderRoute: typeof AppEstudarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/desempenho': {
+      id: '/app/desempenho'
+      path: '/desempenho'
+      fullPath: '/app/desempenho'
+      preLoaderRoute: typeof AppDesempenhoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/configuracoes': {
+      id: '/app/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/app/configuracoes'
+      preLoaderRoute: typeof AppConfiguracoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/biblioteca': {
+      id: '/app/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/app/biblioteca'
+      preLoaderRoute: typeof AppBibliotecaRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppBibliotecaRoute: typeof AppBibliotecaRoute
+  AppConfiguracoesRoute: typeof AppConfiguracoesRoute
+  AppDesempenhoRoute: typeof AppDesempenhoRoute
+  AppEstudarRoute: typeof AppEstudarRoute
+  AppEstudosRoute: typeof AppEstudosRoute
+  AppFaculdadeRoute: typeof AppFaculdadeRoute
+  AppFlashcardsRoute: typeof AppFlashcardsRoute
+  AppPlanejamentoRoute: typeof AppPlanejamentoRoute
+  AppQuestoesRoute: typeof AppQuestoesRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBibliotecaRoute: AppBibliotecaRoute,
+  AppConfiguracoesRoute: AppConfiguracoesRoute,
+  AppDesempenhoRoute: AppDesempenhoRoute,
+  AppEstudarRoute: AppEstudarRoute,
+  AppEstudosRoute: AppEstudosRoute,
+  AppFaculdadeRoute: AppFaculdadeRoute,
+  AppFlashcardsRoute: AppFlashcardsRoute,
+  AppPlanejamentoRoute: AppPlanejamentoRoute,
+  AppQuestoesRoute: AppQuestoesRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
