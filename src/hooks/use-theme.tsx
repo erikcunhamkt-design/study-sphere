@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import { usePreferences, useUpdatePreferences, type ThemeChoice } from "./use-preferences";
 import { useAuth } from "./use-auth";
@@ -47,6 +55,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const initial = readStoredTheme();
     setThemeState(initial);
   }, []);
+
+  // ThemeProvider é montado uma única vez na raiz e sobrevive a login/logout
+  // (troca de rota client-side, sem reload) — sem isso, o tema explícito do
+  // usuário que acabou de sair ficaria visível (na tela de login, e por um
+  // instante na sessão do próximo usuário até as preferências dele
+  // carregarem). Só reseta numa transição real logado→deslogado, nunca no
+  // mount inicial (onde `user` também começa null, mas aí o valor do
+  // localStorage É o bootstrap legítimo pré-autenticação).
+  const prevUserIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    const prevUserId = prevUserIdRef.current;
+    prevUserIdRef.current = user?.id ?? null;
+    if (prevUserId && !user) {
+      if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
+      setThemeState("system");
+    }
+  }, [user]);
 
   useEffect(() => {
     if (prefs?.theme) {

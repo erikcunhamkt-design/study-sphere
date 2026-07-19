@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, useSignOut } from "@/hooks/use-auth";
 import { useProfile, useUpdatePreferences, usePreferences } from "@/hooks/use-preferences";
 
 type NavItem = {
@@ -165,7 +165,8 @@ function SidebarFooter({
   collapsed: boolean;
   settingsActive: boolean;
 }) {
-  const { signOut, user } = useAuth();
+  const { user } = useAuth();
+  const signOut = useSignOut();
   const { data: profile } = useProfile();
   const initials = getInitials(profile?.full_name || user?.email || "?");
 
@@ -206,6 +207,7 @@ function SidebarFooter({
             <button
               type="button"
               onClick={() => signOut()}
+              aria-label={collapsed ? "Sair" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/80 hover:text-destructive hover:bg-destructive/10",
                 collapsed && "justify-center px-0",
@@ -287,7 +289,7 @@ function MobileMenuTrigger() {
 }
 
 function MobileFooter() {
-  const { signOut } = useAuth();
+  const signOut = useSignOut();
   return (
     <div className="flex flex-col gap-1">
       <Link
@@ -308,7 +310,8 @@ function MobileFooter() {
 }
 
 export function UserMenu() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const signOut = useSignOut();
   const { data: profile } = useProfile();
   const initials = getInitials(profile?.full_name || user?.email || "?");
   return (
