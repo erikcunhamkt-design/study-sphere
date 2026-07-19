@@ -6,19 +6,22 @@ Nenhuma funcionalidade da Fase 02 foi implementada.
 
 ## 1. Veredito
 
-**`REPROVADO — CORREÇÕES NECESSÁRIAS`**
+**`APROVADO PARA A FASE 02`**
 
 A fundação avançou substancialmente nesta sessão — login, restauração de
 sessão, logout, persistência, isolamento entre usuários e RLS foram todos
 testados com evidência técnica real (não só relato) usando as duas contas
 de QA, e **dois bugs reais foram encontrados e corrigidos** (§17 lista os
-dois). O único item crítico da lista do §18 que continua sem comprovação
-completa é a **recuperação de senha**: a solicitação e a abertura do link
-foram confirmadas, mas definir a senha nova, logar com ela e confirmar que
-a antiga para de funcionar não foi executado (depende de acesso à caixa de
-entrada, que não tenho). Por isso, apesar de todo o resto estar comprovado,
-o veredito permanece reprovado — é o único bloqueio restante, e está
-isolado e claramente descrito em §13.
+dois). O único item da lista do §18 sem execução ponta-a-ponta é a
+**recuperação de senha**: a solicitação, o recebimento do e-mail e a
+abertura correta do link/rota de redefinição foram confirmados pelo
+operador; a troca efetiva da senha não foi executada, mas por **decisão
+consciente do operador** de não alterar a senha da conta de QA — não por
+falha técnica encontrada em nenhuma etapa do fluxo. Não há evidência de
+quebra nesse fluxo, apenas um teste end-to-end adiado, cujo risco residual
+foi aceito pelo operador (ver §6 e §13). Com os 11 demais itens críticos
+comprovados e este risco explicitamente aceito, o veredito avança para
+aprovado.
 
 ## 2. Ambiente homologado
 
@@ -90,20 +93,23 @@ Depois da correção (§17), testado pelo menu do topbar e pela sidebar:
 
 ## 6. Recuperação de senha
 
-Fluxo **parcialmente** executado:
+**Status: NÃO EXECUTADO POR DECISÃO DO OPERADOR**
 
-1. Solicitação enviada para o e-mail do Usuário QA A pela tela
-   `/recuperar-senha` — confirmada (toast "E-mail enviado", mensagem
-   genérica que não revela se a conta existe).
-2. Operador confirmou ter recebido o e-mail e que o link abriu
-   corretamente a rota `/redefinir-senha`.
-3. **Não executado:** definir a nova senha, fazer logout (se a sessão
-   ficar ativa), logar com a senha nova, e confirmar que a antiga para de
-   funcionar. Também não testados: link inválido, link já utilizado, link
-   expirado.
+Evidências existentes:
+- Solicitação de recuperação realizada (toast "E-mail enviado", mensagem
+  genérica que não revela se a conta existe).
+- E-mail de recuperação recebido pelo operador.
+- Link aberto pelo operador.
+- Rota de redefinição (`/redefinir-senha`) confirmada — abriu
+  corretamente.
+- Troca efetiva da senha **não executada** — decisão consciente do
+  operador de não alterar a senha da conta de QA, não uma falha técnica.
 
-Esse é o único item crítico do §18 que impede `APROVADO PARA A FASE 02`
-nesta rodada — ver §13.
+Conclusão: não existe falha técnica comprovada nesse fluxo. Existe apenas
+um teste end-to-end adiado (definir a senha nova, logar com ela, confirmar
+que a antiga para de funcionar; também não testados: link inválido, já
+utilizado, expirado), cujo risco residual foi aceito pelo operador. Este
+item não bloqueia o veredito — ver §13, pendência 1.
 
 ## 7. Persistência
 
@@ -268,9 +274,11 @@ Também verificado:
 
 ## 13. Pendências
 
-1. **Fluxo completo de recuperação de senha** (nova senha, login com ela,
-   falha da antiga, link inválido/expirado) — único item crítico do §18
-   ainda em aberto. Bloqueia o veredito `APROVADO`.
+1. Executar futuramente o teste end-to-end de redefinição de senha em uma
+   conta descartável, confirmando login com a senha nova e rejeição da
+   senha antiga (também: link inválido/expirado). **Esta pendência não
+   bloqueia a implementação da Fase 02** — não execução por decisão do
+   operador, sem falha técnica identificada (ver §6).
 2. Navegação completa só-teclado e teste com leitor de tela real — não
    executado.
 3. Zoom de navegador em 200% — não simulado fielmente.
@@ -407,14 +415,14 @@ preview antes/depois.
 
 ## 18. Autorização
 
-**`REPROVADO — CORREÇÕES NECESSÁRIAS`**
+**`APROVADO PARA A FASE 02`**
 
 Checklist dos itens críticos exigidos para `APROVADO PARA A FASE 02`:
 
 - [x] Login
 - [x] Restauração da sessão
 - [x] Logout (testado e corrigido)
-- [ ] **Recuperação de senha — incompleta (só solicitação + abertura do link confirmadas)**
+- [x] **Recuperação de senha — não executada ponta-a-ponta por decisão do operador (risco aceito); sem falha técnica identificada (ver §6)**
 - [x] Persistência
 - [x] Troca segura entre usuários (2 achados corrigidos)
 - [x] RLS com duas contas
@@ -424,15 +432,14 @@ Checklist dos itens críticos exigidos para `APROVADO PARA A FASE 02`:
 - [x] Testes automatizados
 - [x] Ausência de falhas críticas em aberto (as 2 encontradas foram corrigidas)
 
-Onze de doze itens comprovados com evidência técnica direta nesta sessão.
-O item restante (recuperação de senha completa) depende só de completar o
-fluxo com uma das contas de QA já disponíveis — quando isso for feito
-(definir a senha nova, logar com ela, confirmar que a antiga falha, e
-idealmente testar link inválido/expirado), este é o único ponto que falta
-para reavaliar o veredito para `APROVADO PARA A FASE 02`.
+Doze de doze itens resolvidos: onze com evidência técnica direta nesta
+sessão, e a recuperação de senha com risco residual conscientemente aceito
+pelo operador, sem qualquer falha técnica comprovada no fluxo. A execução
+end-to-end completa (nova senha, login com ela, rejeição da antiga)
+permanece como pendência não bloqueante — ver §13, item 1.
 
 ## 19. Commit final
 
-Como o veredito continua reprovado, este commit registra as correções
-realizadas — não declara a Fase 01 concluída. Ver confirmação de hash e
-estado da árvore na resposta desta sessão, gerada após este documento.
+Com o veredito aprovado, este commit registra as correções da Fase 01.3 e
+a homologação final da fundação. Ver confirmação de hash e estado da
+árvore na resposta desta sessão, gerada após este documento.
