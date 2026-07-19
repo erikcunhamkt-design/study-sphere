@@ -58,7 +58,8 @@ function RecoverPage() {
     >
       {sent ? (
         <div className="rounded-lg border border-border bg-secondary/50 p-4 text-sm">
-          Se existir uma conta com <strong>{email}</strong>, você receberá um e-mail com instruções em instantes.
+          Se existir uma conta com <strong>{email}</strong>, você receberá um e-mail com instruções
+          em instantes.
         </div>
       ) : (
         <form onSubmit={onSubmit} className="space-y-4" noValidate>

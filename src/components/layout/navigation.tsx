@@ -18,12 +18,7 @@ import type { ComponentType, SVGProps } from "react";
 
 import { APP_CONFIG } from "@/lib/app-config";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -57,9 +52,10 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 const ROUTE_LABELS: Record<string, string> = Object.fromEntries(
-  [...NAV_ITEMS, { to: "/app/configuracoes", label: "Configurações", icon: Settings }].map(
-    (i) => [i.to, i.label],
-  ),
+  [...NAV_ITEMS, { to: "/app/configuracoes", label: "Configurações", icon: Settings }].map((i) => [
+    i.to,
+    i.label,
+  ]),
 );
 
 export function useCurrentPath() {
@@ -107,7 +103,13 @@ export function SidebarNav({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-export function DesktopSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+export function DesktopSidebar({
+  collapsed,
+  onToggle,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
   const path = useCurrentPath();
   return (
     <aside
@@ -116,13 +118,20 @@ export function DesktopSidebar({ collapsed, onToggle }: { collapsed: boolean; on
         collapsed ? "w-16" : "w-64",
       )}
     >
-      <div className={cn("flex items-center gap-2 p-4 border-b border-sidebar-border", collapsed && "justify-center")}>
+      <div
+        className={cn(
+          "flex items-center gap-2 p-4 border-b border-sidebar-border",
+          collapsed && "justify-center",
+        )}
+      >
         <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground font-bold">
           S
         </span>
         {!collapsed && (
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold tracking-tight text-sidebar-foreground">{APP_CONFIG.name}</p>
+            <p className="text-sm font-semibold tracking-tight text-sidebar-foreground">
+              {APP_CONFIG.name}
+            </p>
             <p className="text-xs text-muted-foreground truncate">{APP_CONFIG.tagline}</p>
           </div>
         )}
@@ -149,7 +158,13 @@ export function DesktopSidebar({ collapsed, onToggle }: { collapsed: boolean; on
   );
 }
 
-function SidebarFooter({ collapsed, settingsActive }: { collapsed: boolean; settingsActive: boolean }) {
+function SidebarFooter({
+  collapsed,
+  settingsActive,
+}: {
+  collapsed: boolean;
+  settingsActive: boolean;
+}) {
   const { signOut, user } = useAuth();
   const { data: profile } = useProfile();
   const initials = getInitials(profile?.full_name || user?.email || "?");
@@ -318,7 +333,10 @@ export function UserMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
+        <DropdownMenuItem
+          onClick={() => signOut()}
+          className="text-destructive focus:text-destructive"
+        >
           <LogOut className="mr-2 h-4 w-4" aria-hidden /> Sair
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RouteLoading } from "@/components/route-loading";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
+import { friendlyAuthError } from "@/lib/auth-errors";
+import { redirectIfAuthenticated } from "@/lib/route-guards";
 
-const schema = z
+export const signupSchema = z
   .object({
     fullName: z.string().trim().min(2, "Informe seu nome").max(100),
     email: z.string().trim().email("E-mail inválido").max(255),
@@ -30,11 +32,14 @@ const schema = z
   });
 
 export const Route = createFileRoute("/cadastro")({
+  // Mesma razão de /app e /: a checagem de sessão só é confiável no cliente.
+  ssr: false,
+  beforeLoad: ({ context }) => redirectIfAuthenticated(context.auth),
+  pendingComponent: RouteLoading,
   component: SignupPage,
 });
 
 function SignupPage() {
-  const { session, loading } = useAuth();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -44,13 +49,9 @@ function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!loading && session) navigate({ to: "/app", replace: true });
-  }, [session, loading, navigate]);
-
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = schema.safeParse({ fullName, email, password, confirm, terms });
+    const parsed = signupSchema.safeParse({ fullName, email, password, confirm, terms });
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       for (const issue of parsed.error.issues) errs[String(issue.path[0])] = issue.message;
@@ -69,7 +70,10 @@ function SignupPage() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error("Não foi possível criar a conta", { description: error.message });
+      console.error("[signUp]", error);
+      toast.error("Não foi possível criar a conta", {
+        description: friendlyAuthError(error.message),
+      });
       return;
     }
     toast.success("Conta criada!", {
@@ -109,7 +113,12 @@ function SignupPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </Field>
-        <Field label="Senha" id="password" error={errors.password} hint="Mínimo 8 caracteres com letra e número">
+        <Field
+          label="Senha"
+          id="password"
+          error={errors.password}
+          hint="Mínimo 8 caracteres com letra e número"
+        >
           <Input
             id="password"
             type="password"
@@ -134,9 +143,7 @@ function SignupPage() {
             <Label htmlFor="terms" className="text-sm font-normal">
               Aceito os termos de uso e a política de privacidade
             </Label>
-            {errors.terms ? (
-              <p className="text-xs text-destructive mt-1">{errors.terms}</p>
-            ) : null}
+            {errors.terms ? <p className="text-xs text-destructive mt-1">{errors.terms}</p> : null}
           </div>
         </div>
 

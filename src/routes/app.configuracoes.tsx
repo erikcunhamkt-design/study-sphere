@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { PageHeader, Section } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -86,7 +87,8 @@ function ProfileSection() {
     try {
       await updateProfile.mutateAsync({ full_name: fullName.trim(), timezone });
       toast.success("Perfil atualizado");
-    } catch {
+    } catch (err) {
+      console.error("[updateProfile]", err);
       toast.error("Não foi possível salvar o perfil");
     }
   }
@@ -121,7 +123,11 @@ function ProfileSection() {
           </div>
           <div>
             <Button onClick={save} disabled={updateProfile.isPending}>
-              {updateProfile.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar perfil"}
+              {updateProfile.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Salvar perfil"
+              )}
             </Button>
           </div>
         </div>
@@ -172,6 +178,39 @@ function AppearanceSection() {
   );
 }
 
+// Mesmos limites impostos pelos CHECKs de user_preferences no banco
+// (ver supabase/migrations/20260719000000_fase01_1_hardening_constraints.sql)
+// — validados aqui também para dar feedback imediato, sem depender só do
+// atributo HTML min/max nem de o Postgres rejeitar no fim da viagem.
+export const prefsSchema = z.object({
+  daily_study_goal_minutes: z
+    .number()
+    .int("Use um número inteiro")
+    .min(1, "Mínimo de 1 minuto")
+    .max(1440, "Máximo de 1440 minutos (24h)"),
+  week_starts_on: z.number().int().min(0).max(6),
+  pomodoro_focus_minutes: z
+    .number()
+    .int("Use um número inteiro")
+    .min(1, "Mínimo de 1 minuto")
+    .max(240, "Máximo de 240 minutos"),
+  pomodoro_short_break_minutes: z
+    .number()
+    .int("Use um número inteiro")
+    .min(1, "Mínimo de 1 minuto")
+    .max(120, "Máximo de 120 minutos"),
+  pomodoro_long_break_minutes: z
+    .number()
+    .int("Use um número inteiro")
+    .min(1, "Mínimo de 1 minuto")
+    .max(240, "Máximo de 240 minutos"),
+  pomodoro_cycles: z
+    .number()
+    .int("Use um número inteiro")
+    .min(1, "Mínimo de 1 ciclo")
+    .max(20, "Máximo de 20 ciclos"),
+});
+
 function StudyPreferencesSection() {
   const { data: prefs, isLoading } = usePreferences();
   const updatePrefs = useUpdatePreferences();
@@ -183,6 +222,7 @@ function StudyPreferencesSection() {
     pomodoro_long_break_minutes: 15,
     pomodoro_cycles: 4,
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (prefs) {
@@ -198,11 +238,22 @@ function StudyPreferencesSection() {
   }, [prefs]);
 
   async function save() {
+    const parsed = prefsSchema.safeParse(form);
+    if (!parsed.success) {
+      const errs: Record<string, string> = {};
+      for (const issue of parsed.error.issues) errs[String(issue.path[0])] = issue.message;
+      setErrors(errs);
+      return;
+    }
+    setErrors({});
     try {
-      await updatePrefs.mutateAsync(form);
+      await updatePrefs.mutateAsync(parsed.data);
       toast.success("Preferências salvas");
-    } catch {
-      toast.error("Não foi possível salvar as preferências");
+    } catch (err) {
+      console.error("[updatePreferences]", err);
+      toast.error("Não foi possível salvar as preferências", {
+        description: "Verifique se os valores estão dentro dos limites permitidos.",
+      });
     }
   }
 
@@ -219,7 +270,9 @@ function StudyPreferencesSection() {
             id="goal"
             label="Meta diária (min)"
             value={form.daily_study_goal_minutes}
-            min={0}
+            min={1}
+            max={1440}
+            error={errors.daily_study_goal_minutes}
             onChange={(v) => set("daily_study_goal_minutes", v)}
           />
           <div className="space-y-2">
@@ -245,6 +298,8 @@ function StudyPreferencesSection() {
             label="Foco (min)"
             value={form.pomodoro_focus_minutes}
             min={1}
+            max={240}
+            error={errors.pomodoro_focus_minutes}
             onChange={(v) => set("pomodoro_focus_minutes", v)}
           />
           <NumField
@@ -252,6 +307,8 @@ function StudyPreferencesSection() {
             label="Pausa curta (min)"
             value={form.pomodoro_short_break_minutes}
             min={1}
+            max={120}
+            error={errors.pomodoro_short_break_minutes}
             onChange={(v) => set("pomodoro_short_break_minutes", v)}
           />
           <NumField
@@ -259,6 +316,8 @@ function StudyPreferencesSection() {
             label="Pausa longa (min)"
             value={form.pomodoro_long_break_minutes}
             min={1}
+            max={240}
+            error={errors.pomodoro_long_break_minutes}
             onChange={(v) => set("pomodoro_long_break_minutes", v)}
           />
           <NumField
@@ -266,11 +325,17 @@ function StudyPreferencesSection() {
             label="Ciclos"
             value={form.pomodoro_cycles}
             min={1}
+            max={20}
+            error={errors.pomodoro_cycles}
             onChange={(v) => set("pomodoro_cycles", v)}
           />
           <div className="sm:col-span-2">
             <Button onClick={save} disabled={updatePrefs.isPending}>
-              {updatePrefs.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar preferências"}
+              {updatePrefs.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Salvar preferências"
+              )}
             </Button>
           </div>
         </div>
@@ -284,12 +349,16 @@ function NumField({
   label,
   value,
   min,
+  max,
+  error,
   onChange,
 }: {
   id: string;
   label: string;
   value: number;
   min: number;
+  max: number;
+  error?: string;
   onChange: (v: number) => void;
 }) {
   return (
@@ -299,9 +368,17 @@ function NumField({
         id={id}
         type="number"
         min={min}
+        max={max}
         value={value}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-err` : undefined}
         onChange={(e) => onChange(Number(e.target.value))}
       />
+      {error ? (
+        <p id={`${id}-err`} className="text-xs text-destructive">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

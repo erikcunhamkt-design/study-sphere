@@ -15,6 +15,7 @@ import { APP_CONFIG } from "@/lib/app-config";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { Toaster } from "@/components/ui/sonner";
+import type { AuthStore } from "@/lib/auth-store";
 
 function NotFoundComponent() {
   return (
@@ -76,7 +77,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient; auth: AuthStore }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -106,11 +107,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+// Aplica a classe .dark (e color-scheme) ANTES do primeiro paint, lendo o
+// mesmo localStorage["studyos.theme"] que ThemeProvider usa (src/hooks/use-
+// theme.tsx). Sem isso, o tema só é aplicado depois de hidratar (useEffect),
+// causando um flash do tema errado em cada carregamento — sobretudo para
+// quem prefere escuro. Mantenha a STORAGE_KEY abaixo em sincronia manual com
+// a de use-theme.tsx (não dá para importar uma constante dentro de um
+// <script> inline).
+const THEME_BOOTSTRAP_SCRIPT = `
+(function () {
+  try {
+    var stored = window.localStorage.getItem("studyos.theme");
+    var theme = stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
+    var isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var root = document.documentElement;
+    root.classList.toggle("dark", isDark);
+    root.style.colorScheme = isDark ? "dark" : "light";
+  } catch (e) {}
+})();
+`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
+        />
       </head>
       <body>
         {children}

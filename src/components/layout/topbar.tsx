@@ -10,12 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -111,8 +106,8 @@ export function TopBar() {
             </DialogDescription>
           </DialogHeader>
           <div className="text-sm text-muted-foreground">
-            Atalho: <kbd className="rounded border border-border px-1">Ctrl</kbd>{" "}
-            + <kbd className="rounded border border-border px-1">K</kbd>
+            Atalho: <kbd className="rounded border border-border px-1">Ctrl</kbd> +{" "}
+            <kbd className="rounded border border-border px-1">K</kbd>
           </div>
         </DialogContent>
       </Dialog>
@@ -134,7 +129,9 @@ function QuickCreate() {
         {["Anotação", "Curso", "Flashcard", "Questão", "Sessão de estudo"].map((item) => (
           <DropdownMenuItem key={item} disabled>
             <span className="flex-1">{item}</span>
-            <Badge variant="secondary" className="ml-2 text-[10px]">Em breve</Badge>
+            <Badge variant="secondary" className="ml-2 text-[10px]">
+              Em breve
+            </Badge>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

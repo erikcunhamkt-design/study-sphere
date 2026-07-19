@@ -1,31 +1,21 @@
-import { createFileRoute, Outlet, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import { DesktopSidebar, MobileNav } from "@/components/layout/navigation";
 import { TopBar } from "@/components/layout/topbar";
-import { useAuth } from "@/hooks/use-auth";
+import { RouteLoading } from "@/components/route-loading";
 import { usePreferences, useUpdatePreferences } from "@/hooks/use-preferences";
+import { requireAuth } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/app")({
+  // O layout autenticado nunca é renderizado no servidor: a sessão do
+  // Supabase vive em localStorage e não existe durante o SSR, então essa
+  // decisão de acesso só pode ser tomada com segurança no cliente.
   ssr: false,
-  component: AppLayout,
+  beforeLoad: ({ context, location }) => requireAuth(context.auth, location.href),
+  pendingComponent: RouteLoading,
+  component: AppShell,
 });
-
-function AppLayout() {
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center bg-background">
-        <div className="text-sm text-muted-foreground">Carregando…</div>
-      </div>
-    );
-  }
-
-  if (!session) return <Navigate to="/login" replace />;
-
-  return <AppShell />;
-}
 
 function AppShell() {
   const { data: prefs } = usePreferences();

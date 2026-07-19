@@ -72,8 +72,9 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.01 280);
 
-  /* Magenta */
-  --primary: oklch(0.60 0.24 340);
+  /* Magenta — L 0.58 (não 0.60) para manter contraste AA (4.5:1) do texto
+     branco em cima; em 0.60 media 4.39:1, abaixo do mínimo WCAG. */
+  --primary: oklch(0.58 0.24 340);
   --primary-foreground: oklch(0.99 0 0);
 
   --secondary: oklch(0.955 0.005 280);
@@ -100,7 +101,7 @@
 
   --sidebar: oklch(0.98 0.003 280);
   --sidebar-foreground: oklch(0.2 0.01 280);
-  --sidebar-primary: oklch(0.60 0.24 340);
+  --sidebar-primary: oklch(0.58 0.24 340);
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.94 0.02 340);
   --sidebar-accent-foreground: oklch(0.25 0.05 340);

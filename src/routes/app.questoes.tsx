@@ -5,10 +5,7 @@ import { EmptyState, PageHeader } from "@/components/layout/page-shell";
 export const Route = createFileRoute("/app/questoes")({
   component: () => (
     <div className="space-y-6">
-      <PageHeader
-        title="Questões"
-        description="Resolva questões, simulados e revise seus erros."
-      />
+      <PageHeader title="Questões" description="Resolva questões, simulados e revise seus erros." />
       <EmptyState
         icon={<ListChecks className="h-5 w-5" aria-hidden />}
         title="Sem questões disponíveis"

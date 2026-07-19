@@ -1,26 +1,14 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { useAuth } from "@/hooks/use-auth";
-import { APP_CONFIG } from "@/lib/app-config";
+import { RouteLoading } from "@/components/route-loading";
 
 export const Route = createFileRoute("/")({
-  component: Landing,
+  // Assim como /app, a decisão depende da sessão em localStorage —
+  // indisponível no servidor — então essa rota nunca renderiza via SSR.
+  ssr: false,
+  beforeLoad: async ({ context }) => {
+    const session = await context.auth.ensureInitialized();
+    throw redirect({ to: session ? "/app" : "/login", replace: true });
+  },
+  pendingComponent: RouteLoading,
 });
-
-function Landing() {
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center bg-background">
-        <div className="text-sm text-muted-foreground">Carregando…</div>
-      </div>
-    );
-  }
-
-  if (session) return <Navigate to="/app" replace />;
-  return <Navigate to="/login" replace />;
-}
-
-// keep name referenced
-void APP_CONFIG;

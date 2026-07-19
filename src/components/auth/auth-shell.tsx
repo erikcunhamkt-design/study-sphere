@@ -25,19 +25,18 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
             Um ambiente completo para estudar com foco.
           </h2>
           <p className="text-sm text-muted-foreground">
-            Áreas de conhecimento, anotações, flashcards, questões e revisão espaçada — reunidos
-            em um único fluxo.
+            Áreas de conhecimento, anotações, flashcards, questões e revisão espaçada — reunidos em
+            um único fluxo.
           </p>
         </div>
-        <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} {APP_CONFIG.name}</p>
+        <p className="text-xs text-muted-foreground">
+          © {new Date().getFullYear()} {APP_CONFIG.name}
+        </p>
       </aside>
 
       <main className="flex flex-col justify-center px-6 py-10 sm:px-10">
         <div className="mx-auto w-full max-w-sm">
-          <Link
-            to="/"
-            className="lg:hidden mb-8 inline-flex items-center gap-2 text-foreground"
-          >
+          <Link to="/" className="lg:hidden mb-8 inline-flex items-center gap-2 text-foreground">
             <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground font-bold text-sm">
               S
             </span>

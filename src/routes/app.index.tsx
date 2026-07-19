@@ -13,15 +13,13 @@ export const Route = createFileRoute("/app/")({
 function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
-  const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
+  const displayName =
+    profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
   const greeting = greetingForNow(profile?.timezone);
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title={`${greeting}, ${displayName}.`}
-        description="O que vamos aprender hoje?"
-      />
+      <PageHeader title={`${greeting}, ${displayName}.`} description="O que vamos aprender hoje?" />
 
       {/* Destaque principal */}
       <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/15 via-surface to-surface p-6 md:p-8">
@@ -96,9 +94,21 @@ function DashboardPage() {
 
       <Section title="Atalhos">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <ShortcutCard to="/app/questoes" title="Resolver questões" icon={<ListChecks className="h-4 w-4" aria-hidden />} />
-          <ShortcutCard to="/app/planejamento" title="Planejar semana" icon={<Target className="h-4 w-4" aria-hidden />} />
-          <ShortcutCard to="/app/biblioteca" title="Abrir biblioteca" icon={<BookOpen className="h-4 w-4" aria-hidden />} />
+          <ShortcutCard
+            to="/app/questoes"
+            title="Resolver questões"
+            icon={<ListChecks className="h-4 w-4" aria-hidden />}
+          />
+          <ShortcutCard
+            to="/app/planejamento"
+            title="Planejar semana"
+            icon={<Target className="h-4 w-4" aria-hidden />}
+          />
+          <ShortcutCard
+            to="/app/biblioteca"
+            title="Abrir biblioteca"
+            icon={<BookOpen className="h-4 w-4" aria-hidden />}
+          />
         </div>
       </Section>
     </div>
@@ -114,7 +124,9 @@ function ShortcutCard({ to, title, icon }: { to: string; title: string; icon: Re
       <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
         {icon}
       </span>
-      <span className="text-sm font-medium text-foreground group-hover:text-foreground">{title}</span>
+      <span className="text-sm font-medium text-foreground group-hover:text-foreground">
+        {title}
+      </span>
     </Link>
   );
 }
@@ -123,7 +135,9 @@ function greetingForNow(timezone?: string): string {
   const tz = timezone || "America/Sao_Paulo";
   try {
     const hour = Number(
-      new Intl.DateTimeFormat("pt-BR", { hour: "numeric", hour12: false, timeZone: tz }).format(new Date()),
+      new Intl.DateTimeFormat("pt-BR", { hour: "numeric", hour12: false, timeZone: tz }).format(
+        new Date(),
+      ),
     );
     if (hour < 5) return "Boa madrugada";
     if (hour < 12) return "Bom dia";
