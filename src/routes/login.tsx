@@ -19,12 +19,23 @@ const schema = z.object({
 });
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" ? s.next : "",
+  }),
   component: LoginPage,
 });
+
+function safeNext(next: string): string {
+  // Only allow same-origin relative paths (start with "/" and not "//").
+  if (!next.startsWith("/") || next.startsWith("//")) return "/app";
+  return next;
+}
 
 function LoginPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const target = safeNext(next);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -32,8 +43,14 @@ function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app", replace: true });
-  }, [session, loading, navigate]);
+    if (!loading && session) {
+      if (target.startsWith("/") && !target.startsWith("//")) {
+        window.location.replace(target);
+      } else {
+        navigate({ to: "/app", replace: true });
+      }
+    }
+  }, [session, loading, navigate, target]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -53,17 +70,19 @@ function LoginPage() {
       return;
     }
     toast.success("Bem-vindo de volta!");
-    navigate({ to: "/app", replace: true });
+    window.location.replace(target);
   }
 
   async function onGoogle() {
+    const redirectUri = `${window.location.origin}${target}`;
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: redirectUri,
     });
     if (result.error) {
       toast.error("Falha ao entrar com Google");
     }
   }
+
 
   return (
     <AuthShell
