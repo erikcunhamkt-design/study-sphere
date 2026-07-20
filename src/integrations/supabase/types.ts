@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_archived: boolean
+          is_favorite: boolean
+          name: string
+          position: number
+          status: string
+          study_area_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          is_favorite?: boolean
+          name: string
+          position: number
+          status?: string
+          study_area_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          is_favorite?: boolean
+          name?: string
+          position?: number
+          status?: string
+          study_area_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_study_area_user_fkey"
+            columns: ["study_area_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "study_areas"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "courses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -43,6 +100,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      study_areas: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          is_archived: boolean
+          name: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_archived?: boolean
+          name: string
+          position: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_archived?: boolean
+          name?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_areas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_preferences: {
         Row: {
@@ -102,7 +206,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reorder_courses: {
+        Args: { p_ids: string[]; p_study_area_id: string }
+        Returns: undefined
+      }
+      reorder_study_areas: { Args: { p_ids: string[] }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
