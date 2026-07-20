@@ -98,11 +98,12 @@ function SignupPage() {
       footer={
         <span>
           Já tem conta?{" "}
-          <Link to="/login" className="text-primary font-medium hover:underline">
+          <Link to="/login" search={{ next: target }} className="text-primary font-medium hover:underline">
             Entrar
           </Link>
         </span>
       }
+
     >
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <Field label="Nome" id="fullName" error={errors.fullName}>
