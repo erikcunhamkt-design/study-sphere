@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "@tanstack/react-router";
 import { Search, Sparkles, Sun, Moon, MonitorSmartphone, Target } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { StudyAreaFormDialog } from "@/features/studies/components/study-area-form-dialog";
+import { CourseFormDialog } from "@/features/studies/components/course-form-dialog";
 
 export function TopBar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -115,27 +118,46 @@ export function TopBar() {
   );
 }
 
+const QUICK_CREATE_UNAVAILABLE = ["Anotação", "Flashcard", "Questão", "Sessão de estudo"];
+
 function QuickCreate() {
+  const [areaFormOpen, setAreaFormOpen] = useState(false);
+  const [courseFormOpen, setCourseFormOpen] = useState(false);
+  const params = useParams({ strict: false });
+  const currentAreaId = (params as { areaId?: string }).areaId;
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Criação rápida">
-          <Sparkles className="h-4 w-4" aria-hidden />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Criar rapidamente</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {["Anotação", "Curso", "Flashcard", "Questão", "Sessão de estudo"].map((item) => (
-          <DropdownMenuItem key={item} disabled>
-            <span className="flex-1">{item}</span>
-            <Badge variant="secondary" className="ml-2 text-[10px]">
-              Em breve
-            </Badge>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label="Criação rápida">
+            <Sparkles className="h-4 w-4" aria-hidden />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>Criar rapidamente</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setAreaFormOpen(true)}>Nova área</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setCourseFormOpen(true)}>Novo curso</DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {QUICK_CREATE_UNAVAILABLE.map((item) => (
+            <DropdownMenuItem key={item} disabled>
+              <span className="flex-1">{item}</span>
+              <Badge variant="secondary" className="ml-2 text-[10px]">
+                Em breve
+              </Badge>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <StudyAreaFormDialog open={areaFormOpen} onOpenChange={setAreaFormOpen} />
+      <CourseFormDialog
+        open={courseFormOpen}
+        onOpenChange={setCourseFormOpen}
+        defaultAreaId={currentAreaId}
+      />
+    </>
   );
 }
 

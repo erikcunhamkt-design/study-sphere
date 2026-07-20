@@ -2,9 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Clock, Layers, ListChecks, PlayCircle, Sparkles, Target } from "lucide-react";
 
 import { EmptyState, PageHeader, Section } from "@/components/layout/page-shell";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/use-preferences";
 import { useAuth } from "@/hooks/use-auth";
+import { useAllCourses } from "@/features/studies/hooks/use-courses";
+import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
+import { COURSE_STATUS_LABELS } from "@/features/studies/utils";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
@@ -13,9 +18,36 @@ export const Route = createFileRoute("/app/")({
 function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
+  const { data: areas, isLoading: areasLoading } = useStudyAreas();
+  const { data: courses, isLoading: coursesLoading } = useAllCourses();
   const displayName =
     profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
   const greeting = greetingForNow(profile?.timezone);
+
+  const hasAreas = (areas?.length ?? 0) > 0;
+  const activeCourses = (courses ?? []).filter((c) => !c.is_archived);
+  const hasCourses = activeCourses.length > 0;
+  const inProgressCourses = activeCourses.filter((c) => c.status === "in_progress");
+
+  const hero = !hasAreas
+    ? {
+        title: "Comece organizando seus estudos",
+        description:
+          "Crie áreas de conhecimento, cadastre seus cursos e traga suas anotações — o restante do StudyOS conecta tudo automaticamente.",
+        cta: "Criar primeira área",
+      }
+    : !hasCourses
+      ? {
+          title: "Cadastre seu primeiro curso",
+          description:
+            "Você já tem áreas de conhecimento — agora crie um curso dentro de uma delas.",
+          cta: "Ir para Estudos",
+        }
+      : {
+          title: "Continue de onde parou",
+          description: "Acompanhe seus cursos em andamento e continue organizando seus estudos.",
+          cta: "Ir para Estudos",
+        };
 
   return (
     <div className="space-y-8">
@@ -28,17 +60,12 @@ function DashboardPage() {
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Comece por aqui
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-            Comece organizando seus estudos
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Crie áreas de conhecimento, cadastre seus cursos e traga suas anotações — o restante do
-            StudyOS conecta tudo automaticamente.
-          </p>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">{hero.title}</h2>
+          <p className="text-sm text-muted-foreground">{hero.description}</p>
           <div className="pt-2">
             <Button asChild size="lg">
               <Link to="/app/estudos">
-                <BookOpen className="mr-2 h-4 w-4" aria-hidden /> Ir para Estudos
+                <BookOpen className="mr-2 h-4 w-4" aria-hidden /> {hero.cta}
               </Link>
             </Button>
           </div>
@@ -71,16 +98,45 @@ function DashboardPage() {
         </Section>
 
         <Section title="Cursos em andamento">
-          <EmptyState
-            icon={<BookOpen className="h-5 w-5" aria-hidden />}
-            title="Nenhum curso iniciado ainda"
-            description="Crie seu primeiro curso em Estudos para acompanhar o progresso."
-            action={
-              <Button asChild variant="outline" size="sm">
-                <Link to="/app/estudos">Abrir Estudos</Link>
-              </Button>
-            }
-          />
+          {areasLoading || coursesLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+            </div>
+          ) : inProgressCourses.length === 0 ? (
+            <EmptyState
+              icon={<BookOpen className="h-5 w-5" aria-hidden />}
+              title="Nenhum curso em andamento."
+              description={
+                hasCourses
+                  ? "Marque um curso como 'Em andamento' em Estudos para vê-lo aqui."
+                  : "Crie seu primeiro curso em Estudos para acompanhar o progresso."
+              }
+              action={
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/app/estudos">Abrir Estudos</Link>
+                </Button>
+              }
+            />
+          ) : (
+            <div className="space-y-2">
+              {inProgressCourses.slice(0, 5).map((course) => (
+                <Link
+                  key={course.id}
+                  to="/app/estudos/$areaId/cursos/$courseId"
+                  params={{ areaId: course.study_area_id, courseId: course.id }}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-primary/40 hover:bg-surface"
+                >
+                  <span className="truncate text-sm font-medium text-foreground">
+                    {course.name}
+                  </span>
+                  <Badge variant="default" className="shrink-0 text-[10px]">
+                    {COURSE_STATUS_LABELS[course.status]}
+                  </Badge>
+                </Link>
+              ))}
+            </div>
+          )}
         </Section>
       </div>
 
