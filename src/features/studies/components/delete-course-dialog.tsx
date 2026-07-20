@@ -19,6 +19,8 @@ interface DeleteCourseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   course: Course | null;
+  moduleCount: number;
+  lessonCount: number;
   onDeleted?: () => void;
 }
 
@@ -26,6 +28,8 @@ export function DeleteCourseDialog({
   open,
   onOpenChange,
   course,
+  moduleCount,
+  lessonCount,
   onDeleted,
 }: DeleteCourseDialogProps) {
   const deleteCourse = useDeleteCourse(course?.study_area_id);
@@ -49,7 +53,11 @@ export function DeleteCourseDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Excluir "{course.name}" permanentemente?</AlertDialogTitle>
-          <AlertDialogDescription>Essa ação não pode ser desfeita.</AlertDialogDescription>
+          <AlertDialogDescription>
+            {moduleCount > 0
+              ? `Esta ação excluirá permanentemente o curso, ${moduleCount === 1 ? "1 módulo" : `${moduleCount} módulos`} e ${lessonCount === 1 ? "1 aula" : `${lessonCount} aulas`} vinculadas. Essa ação não pode ser desfeita.`
+              : "Essa ação não pode ser desfeita."}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>

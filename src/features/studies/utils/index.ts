@@ -14,7 +14,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { ArchiveFilter, Course, CourseStatus, StudyArea, StudyAreaColor } from "../types";
+import type {
+  ArchiveFilter,
+  Course,
+  CourseModule,
+  CourseProgress,
+  CourseStatus,
+  Lesson,
+  ModuleProgress,
+  StudyArea,
+  StudyAreaColor,
+} from "../types";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   BookOpen,
@@ -250,4 +260,112 @@ export function searchCourses<T extends Pick<Course, "name" | "description">>(
   return courses.filter(
     (c) => matchesSearch(c.name, query) || matchesSearch(c.description ?? "", query),
   );
+}
+
+export function searchModules<T extends Pick<CourseModule, "name" | "description">>(
+  modules: T[],
+  query: string,
+): T[] {
+  if (!query.trim()) return modules;
+  return modules.filter(
+    (m) => matchesSearch(m.name, query) || matchesSearch(m.description ?? "", query),
+  );
+}
+
+export function searchLessons<T extends Pick<Lesson, "title" | "description">>(
+  lessons: T[],
+  query: string,
+): T[] {
+  if (!query.trim()) return lessons;
+  return lessons.filter(
+    (l) => matchesSearch(l.title, query) || matchesSearch(l.description ?? "", query),
+  );
+}
+
+/**
+ * Um módulo só é válido dentro da rota do curso se existir E pertencer ao
+ * curso da própria URL — mesma lógica de `isCourseOutsideArea`.
+ */
+export function isModuleOutsideCourse(
+  courseModule: Pick<CourseModule, "course_id"> | null | undefined,
+  courseId: string,
+): boolean {
+  return !courseModule || courseModule.course_id !== courseId;
+}
+
+/** Mesma lógica, um nível abaixo: aula precisa pertencer ao módulo da URL. */
+export function isLessonOutsideModule(
+  lesson: Pick<Lesson, "module_id"> | null | undefined,
+  moduleId: string,
+): boolean {
+  return !lesson || lesson.module_id !== moduleId;
+}
+
+/** Espelha a regra de confirmação de exclusão de módulo: só exige digitar o nome quando há aulas. */
+export function canConfirmModuleDeletion(
+  moduleName: string,
+  lessonCount: number,
+  confirmText: string,
+): boolean {
+  if (lessonCount <= 0) return true;
+  return confirmText.trim() === moduleName;
+}
+
+export type LessonCompletionFilter = "all" | "completed" | "pending";
+
+export function filterByCompletion<T extends { is_completed: boolean }>(
+  items: T[],
+  filter: LessonCompletionFilter,
+): T[] {
+  if (filter === "completed") return items.filter((i) => i.is_completed);
+  if (filter === "pending") return items.filter((i) => !i.is_completed);
+  return items;
+}
+
+/**
+ * A reordenação (de módulos ou aulas) só é segura enquanto a lista visível
+ * é o conjunto ativo completo, sem recorte — busca, filtro de arquivadas
+ * fora de "Ativas" e filtro de conclusão fora de "Todas" tornam a visão
+ * parcial, então a UI deve desabilitar os botões de mover nesses casos
+ * (nunca mandar um subconjunto filtrado para o RPC).
+ */
+export function isTreeFiltering(
+  archiveFilter: ArchiveFilter,
+  search: string,
+  completionFilter: LessonCompletionFilter,
+): boolean {
+  return archiveFilter !== "active" || !!search.trim() || completionFilter !== "all";
+}
+
+/**
+ * Progresso de um módulo: só conta aulas ATIVAS (arquivadas nunca
+ * contam, nem no numerador nem no denominador). Sem aulas ativas = 0%,
+ * nunca divisão por zero.
+ */
+export function calculateModuleProgress(
+  lessons: Pick<Lesson, "is_archived" | "is_completed">[],
+): ModuleProgress {
+  const active = lessons.filter((l) => !l.is_archived);
+  const completedCount = active.filter((l) => l.is_completed).length;
+  const totalCount = active.length;
+  const percent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
+  return { completedCount, totalCount, percent };
+}
+
+/**
+ * Progresso de um curso: só conta módulos ativos, e dentro deles só
+ * aulas ativas — uma aula ativa dentro de um módulo ARQUIVADO não conta
+ * em lugar nenhum (nem no numerador, nem no denominador), mesmo que a
+ * aula em si não esteja arquivada.
+ */
+export function calculateCourseProgress(
+  modules: Pick<CourseModule, "id" | "is_archived">[],
+  lessons: Pick<Lesson, "module_id" | "is_archived" | "is_completed">[],
+): CourseProgress {
+  const activeModuleIds = new Set(modules.filter((m) => !m.is_archived).map((m) => m.id));
+  const activeLessons = lessons.filter((l) => !l.is_archived && activeModuleIds.has(l.module_id));
+  const completedCount = activeLessons.filter((l) => l.is_completed).length;
+  const lessonCount = activeLessons.length;
+  const percent = lessonCount === 0 ? 0 : Math.round((completedCount / lessonCount) * 100);
+  return { moduleCount: activeModuleIds.size, lessonCount, completedCount, percent };
 }

@@ -51,6 +51,8 @@ import {
   useRestoreStudyArea,
   useStudyArea,
 } from "@/features/studies/hooks/use-study-areas";
+import { useAllCourseModules, useCourseModules } from "@/features/studies/hooks/use-course-modules";
+import { useAllLessons, useLessonsByCourse } from "@/features/studies/hooks/use-lessons";
 import type { ArchiveFilter, Course, CourseStatus } from "@/features/studies/types";
 import {
   filterByArchiveState,
@@ -126,6 +128,16 @@ function AreaContent({
   const [courseFormOpen, setCourseFormOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | undefined>(undefined);
   const [deletingCourse, setDeletingCourse] = useState<Course | null>(null);
+
+  // Contagens reais para as confirmações de exclusão (área inteira e curso
+  // individual) — nunca inventadas, sempre derivadas dos dados carregados.
+  const { data: allModules } = useAllCourseModules();
+  const { data: allLessons } = useAllLessons();
+  const areaCourseIds = new Set((courses ?? []).map((c) => c.id));
+  const areaModuleCount = (allModules ?? []).filter((m) => areaCourseIds.has(m.course_id)).length;
+  const areaLessonCount = (allLessons ?? []).filter((l) => areaCourseIds.has(l.course_id)).length;
+  const { data: deletingCourseModules } = useCourseModules(deletingCourse?.id);
+  const { data: deletingCourseLessons } = useLessonsByCourse(deletingCourse?.id);
 
   const Icon = resolveAreaIcon(area.icon);
   const tokens = resolveAreaColorTokens(area.color);
@@ -365,6 +377,8 @@ function AreaContent({
         onOpenChange={setAreaDeleteOpen}
         area={area}
         courseCount={activeCourseCount}
+        moduleCount={areaModuleCount}
+        lessonCount={areaLessonCount}
         onDeleted={() => navigate({ to: "/app/estudos" })}
       />
       <CourseFormDialog
@@ -377,6 +391,8 @@ function AreaContent({
         open={!!deletingCourse}
         onOpenChange={(open) => !open && setDeletingCourse(null)}
         course={deletingCourse}
+        moduleCount={deletingCourseModules?.length ?? 0}
+        lessonCount={deletingCourseLessons?.length ?? 0}
       />
     </div>
   );

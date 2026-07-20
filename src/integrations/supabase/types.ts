@@ -8,6 +8,50 @@ export type Database = {
   };
   public: {
     Tables: {
+      course_modules: {
+        Row: {
+          course_id: string;
+          created_at: string;
+          description: string | null;
+          id: string;
+          is_archived: boolean;
+          name: string;
+          position: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          course_id: string;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          name: string;
+          position: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          course_id?: string;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          name?: string;
+          position?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "course_modules_course_user_fkey";
+            columns: ["course_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "courses";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
       courses: {
         Row: {
           created_at: string;
@@ -62,6 +106,59 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+        ];
+      };
+      lessons: {
+        Row: {
+          completed_at: string | null;
+          course_id: string;
+          created_at: string;
+          description: string | null;
+          id: string;
+          is_archived: boolean;
+          is_completed: boolean;
+          module_id: string;
+          position: number;
+          title: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          course_id: string;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          is_completed?: boolean;
+          module_id: string;
+          position: number;
+          title: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          course_id?: string;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          is_completed?: boolean;
+          module_id?: string;
+          position?: number;
+          title?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lessons_module_course_user_fkey";
+            columns: ["module_id", "course_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "course_modules";
+            referencedColumns: ["id", "course_id", "user_id"];
           },
         ];
       };
@@ -200,8 +297,16 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      reorder_course_modules: {
+        Args: { p_course_id: string; p_ids: string[] };
+        Returns: undefined;
+      };
       reorder_courses: {
         Args: { p_ids: string[]; p_study_area_id: string };
+        Returns: undefined;
+      };
+      reorder_lessons: {
+        Args: { p_ids: string[]; p_module_id: string };
         Returns: undefined;
       };
       reorder_study_areas: {

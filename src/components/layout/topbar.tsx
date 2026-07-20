@@ -33,6 +33,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { StudyAreaFormDialog } from "@/features/studies/components/study-area-form-dialog";
 import { CourseFormDialog } from "@/features/studies/components/course-form-dialog";
+import { CourseModuleFormDialog } from "@/features/studies/components/course-module-form-dialog";
+import { LessonFormDialog } from "@/features/studies/components/lesson-form-dialog";
 
 export function TopBar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -123,8 +125,17 @@ const QUICK_CREATE_UNAVAILABLE = ["Anotação", "Flashcard", "Questão", "Sessã
 function QuickCreate() {
   const [areaFormOpen, setAreaFormOpen] = useState(false);
   const [courseFormOpen, setCourseFormOpen] = useState(false);
-  const params = useParams({ strict: false });
-  const currentAreaId = (params as { areaId?: string }).areaId;
+  const [moduleFormOpen, setModuleFormOpen] = useState(false);
+  const [lessonFormOpen, setLessonFormOpen] = useState(false);
+  const params = useParams({ strict: false }) as {
+    areaId?: string;
+    courseId?: string;
+    moduleId?: string;
+  };
+  const currentAreaId = params.areaId;
+  const currentCourseId = params.courseId;
+  const currentModuleId = params.moduleId;
+  const hasModuleContext = !!currentCourseId && !!currentModuleId;
 
   return (
     <>
@@ -139,6 +150,8 @@ function QuickCreate() {
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setAreaFormOpen(true)}>Nova área</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setCourseFormOpen(true)}>Novo curso</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setModuleFormOpen(true)}>Novo módulo</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setLessonFormOpen(true)}>Nova aula</DropdownMenuItem>
           <DropdownMenuSeparator />
           {QUICK_CREATE_UNAVAILABLE.map((item) => (
             <DropdownMenuItem key={item} disabled>
@@ -156,6 +169,17 @@ function QuickCreate() {
         open={courseFormOpen}
         onOpenChange={setCourseFormOpen}
         defaultAreaId={currentAreaId}
+      />
+      <CourseModuleFormDialog
+        open={moduleFormOpen}
+        onOpenChange={setModuleFormOpen}
+        fixedCourseId={currentCourseId}
+      />
+      <LessonFormDialog
+        open={lessonFormOpen}
+        onOpenChange={setLessonFormOpen}
+        fixedCourseId={hasModuleContext ? currentCourseId : undefined}
+        fixedModuleId={hasModuleContext ? currentModuleId : undefined}
       />
     </>
   );

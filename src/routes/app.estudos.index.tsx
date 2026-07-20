@@ -17,6 +17,9 @@ import {
   useReorderStudyAreas,
   useStudyAreasWithCounts,
 } from "@/features/studies/hooks/use-study-areas";
+import { useAllCourses } from "@/features/studies/hooks/use-courses";
+import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
+import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import { moveId } from "@/features/studies/components/reorder-buttons";
 import type { ArchiveFilter, StudyArea, StudyAreaWithCounts } from "@/features/studies/types";
 import { filterByArchiveState, searchStudyAreas } from "@/features/studies/utils";
@@ -36,6 +39,21 @@ function EstudosPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingArea, setEditingArea] = useState<StudyArea | undefined>(undefined);
   const [deletingArea, setDeletingArea] = useState<StudyAreaWithCounts | null>(null);
+
+  // Contagens reais de módulos/aulas para a confirmação de exclusão — nunca
+  // inventadas, derivadas dos dados já carregados para este usuário.
+  const { data: allCourses } = useAllCourses();
+  const { data: allModules } = useAllCourseModules();
+  const { data: allLessons } = useAllLessons();
+  const deletingAreaCourseIds = new Set(
+    (allCourses ?? []).filter((c) => c.study_area_id === deletingArea?.id).map((c) => c.id),
+  );
+  const deletingAreaModuleCount = (allModules ?? []).filter((m) =>
+    deletingAreaCourseIds.has(m.course_id),
+  ).length;
+  const deletingAreaLessonCount = (allLessons ?? []).filter((l) =>
+    deletingAreaCourseIds.has(l.course_id),
+  ).length;
 
   const filtered = useMemo(() => {
     if (!areas) return [];
@@ -178,6 +196,8 @@ function EstudosPage() {
         onOpenChange={(open) => !open && setDeletingArea(null)}
         area={deletingArea}
         courseCount={deletingArea?.courseCount ?? 0}
+        moduleCount={deletingAreaModuleCount}
+        lessonCount={deletingAreaLessonCount}
       />
     </div>
   );

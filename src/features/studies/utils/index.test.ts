@@ -2,14 +2,23 @@ import { describe, expect, it } from "vitest";
 
 import { STUDY_AREA_ICONS, type CourseStatus } from "../types";
 import {
+  calculateCourseProgress,
+  calculateModuleProgress,
   canConfirmAreaDeletion,
+  canConfirmModuleDeletion,
   COURSE_STATUS_LABELS,
   filterByArchiveState,
+  filterByCompletion,
   isCourseOutsideArea,
+  isLessonOutsideModule,
+  isModuleOutsideCourse,
+  isTreeFiltering,
   nextActivePosition,
   resolveAreaColorTokens,
   resolveAreaIcon,
   searchCourses,
+  searchLessons,
+  searchModules,
   searchStudyAreas,
   sortByPosition,
   validateReorderIds,
@@ -243,5 +252,266 @@ describe("validateReorderIds (mesma validação de conjunto completo do banco)",
       valid: false,
       reason: "empty-but-not-empty",
     });
+  });
+
+  it("rejeita módulo de outro usuário (fora do conjunto esperado)", () => {
+    expect(validateReorderIds(["m1", "modulo-de-outro-usuario"], ["m1", "m2"])).toEqual({
+      valid: false,
+      reason: "invalid-ids",
+    });
+  });
+
+  it("rejeita aula de outro módulo (fora do conjunto esperado deste módulo)", () => {
+    expect(validateReorderIds(["a1", "aula-de-outro-modulo"], ["a1", "a2"])).toEqual({
+      valid: false,
+      reason: "invalid-ids",
+    });
+  });
+});
+
+describe("isModuleOutsideCourse", () => {
+  it("true quando o módulo é null/undefined", () => {
+    expect(isModuleOutsideCourse(null, "curso-1")).toBe(true);
+    expect(isModuleOutsideCourse(undefined, "curso-1")).toBe(true);
+  });
+
+  it("true quando o módulo pertence a outro curso", () => {
+    expect(isModuleOutsideCourse({ course_id: "curso-2" }, "curso-1")).toBe(true);
+  });
+
+  it("false quando o módulo pertence ao curso da URL", () => {
+    expect(isModuleOutsideCourse({ course_id: "curso-1" }, "curso-1")).toBe(false);
+  });
+});
+
+describe("isLessonOutsideModule", () => {
+  it("true quando a aula é null/undefined", () => {
+    expect(isLessonOutsideModule(null, "modulo-1")).toBe(true);
+    expect(isLessonOutsideModule(undefined, "modulo-1")).toBe(true);
+  });
+
+  it("true quando a aula pertence a outro módulo", () => {
+    expect(isLessonOutsideModule({ module_id: "modulo-2" }, "modulo-1")).toBe(true);
+  });
+
+  it("false quando a aula pertence ao módulo da URL", () => {
+    expect(isLessonOutsideModule({ module_id: "modulo-1" }, "modulo-1")).toBe(false);
+  });
+});
+
+describe("canConfirmModuleDeletion", () => {
+  it("permite confirmar sem digitar nada quando o módulo não tem aulas", () => {
+    expect(canConfirmModuleDeletion("Módulo 1", 0, "")).toBe(true);
+  });
+
+  it("exige o nome exato quando o módulo tem aulas", () => {
+    expect(canConfirmModuleDeletion("Módulo 1", 3, "")).toBe(false);
+    expect(canConfirmModuleDeletion("Módulo 1", 3, "modulo 1")).toBe(false);
+    expect(canConfirmModuleDeletion("Módulo 1", 3, "Módulo 1")).toBe(true);
+  });
+});
+
+describe("searchModules / searchLessons", () => {
+  const modules = [
+    { name: "Fundamentos", description: "Conceitos básicos do tema" },
+    { name: "Avançado", description: null },
+  ];
+
+  it("busca vazia retorna tudo", () => {
+    expect(searchModules(modules, "")).toHaveLength(2);
+  });
+
+  it("busca por nome do módulo (case-insensitive)", () => {
+    expect(searchModules(modules, "fundamentos")).toHaveLength(1);
+  });
+
+  it("busca por descrição do módulo", () => {
+    expect(searchModules(modules, "básicos")).toHaveLength(1);
+  });
+
+  it("searchLessons busca por título e tolera description null", () => {
+    const lessons = [{ title: "Introdução", description: null }];
+    expect(searchLessons(lessons, "intro")).toHaveLength(1);
+    expect(searchLessons(lessons, "inexistente")).toHaveLength(0);
+  });
+});
+
+describe("filterByCompletion", () => {
+  const lessons = [
+    { id: "1", is_completed: true },
+    { id: "2", is_completed: false },
+    { id: "3", is_completed: true },
+  ];
+
+  it("'all' retorna todas", () => {
+    expect(filterByCompletion(lessons, "all")).toHaveLength(3);
+  });
+
+  it("'completed' retorna só as concluídas", () => {
+    expect(filterByCompletion(lessons, "completed").map((l) => l.id)).toEqual(["1", "3"]);
+  });
+
+  it("'pending' retorna só as pendentes", () => {
+    expect(filterByCompletion(lessons, "pending").map((l) => l.id)).toEqual(["2"]);
+  });
+});
+
+describe("isTreeFiltering", () => {
+  it("false quando ativas, sem busca e sem filtro de conclusão", () => {
+    expect(isTreeFiltering("active", "", "all")).toBe(false);
+  });
+
+  it("true com filtro de arquivamento diferente de 'active'", () => {
+    expect(isTreeFiltering("archived", "", "all")).toBe(true);
+    expect(isTreeFiltering("all", "", "all")).toBe(true);
+  });
+
+  it("true com busca não vazia", () => {
+    expect(isTreeFiltering("active", "aula 1", "all")).toBe(true);
+  });
+
+  it("true com busca só de espaços é tratada como vazia (trim)", () => {
+    expect(isTreeFiltering("active", "   ", "all")).toBe(false);
+  });
+
+  it("true com filtro de conclusão diferente de 'all'", () => {
+    expect(isTreeFiltering("active", "", "completed")).toBe(true);
+    expect(isTreeFiltering("active", "", "pending")).toBe(true);
+  });
+});
+
+describe("calculateModuleProgress", () => {
+  it("sem aulas retorna 0%", () => {
+    expect(calculateModuleProgress([])).toEqual({ completedCount: 0, totalCount: 0, percent: 0 });
+  });
+
+  it("todas pendentes", () => {
+    const lessons = [
+      { is_archived: false, is_completed: false },
+      { is_archived: false, is_completed: false },
+    ];
+    expect(calculateModuleProgress(lessons)).toEqual({
+      completedCount: 0,
+      totalCount: 2,
+      percent: 0,
+    });
+  });
+
+  it("parte concluída", () => {
+    const lessons = [
+      { is_archived: false, is_completed: true },
+      { is_archived: false, is_completed: false },
+      { is_archived: false, is_completed: false },
+      { is_archived: false, is_completed: false },
+    ];
+    expect(calculateModuleProgress(lessons)).toEqual({
+      completedCount: 1,
+      totalCount: 4,
+      percent: 25,
+    });
+  });
+
+  it("todas concluídas", () => {
+    const lessons = [
+      { is_archived: false, is_completed: true },
+      { is_archived: false, is_completed: true },
+    ];
+    expect(calculateModuleProgress(lessons)).toEqual({
+      completedCount: 2,
+      totalCount: 2,
+      percent: 100,
+    });
+  });
+
+  it("aula arquivada não conta nem no numerador nem no denominador", () => {
+    const lessons = [
+      { is_archived: false, is_completed: true },
+      { is_archived: true, is_completed: true },
+      { is_archived: true, is_completed: false },
+    ];
+    expect(calculateModuleProgress(lessons)).toEqual({
+      completedCount: 1,
+      totalCount: 1,
+      percent: 100,
+    });
+  });
+
+  it("aula reaberta reduz o progresso", () => {
+    const before = calculateModuleProgress([
+      { is_archived: false, is_completed: true },
+      { is_archived: false, is_completed: true },
+    ]);
+    const after = calculateModuleProgress([
+      { is_archived: false, is_completed: false },
+      { is_archived: false, is_completed: true },
+    ]);
+    expect(before.percent).toBe(100);
+    expect(after.percent).toBe(50);
+  });
+
+  it("aula restaurada volta a contar", () => {
+    const archived = calculateModuleProgress([
+      { is_archived: true, is_completed: true },
+      { is_archived: false, is_completed: false },
+    ]);
+    const restored = calculateModuleProgress([
+      { is_archived: false, is_completed: true },
+      { is_archived: false, is_completed: false },
+    ]);
+    expect(archived).toEqual({ completedCount: 0, totalCount: 1, percent: 0 });
+    expect(restored).toEqual({ completedCount: 1, totalCount: 2, percent: 50 });
+  });
+});
+
+describe("calculateCourseProgress", () => {
+  it("sem módulos retorna 0%", () => {
+    expect(calculateCourseProgress([], [])).toEqual({
+      moduleCount: 0,
+      lessonCount: 0,
+      completedCount: 0,
+      percent: 0,
+    });
+  });
+
+  it("módulo arquivado: nenhuma aula dele conta, mesmo se a aula não estiver arquivada", () => {
+    const modules = [
+      { id: "m1", is_archived: false },
+      { id: "m2", is_archived: true },
+    ];
+    const lessons = [
+      { module_id: "m1", is_archived: false, is_completed: true },
+      { module_id: "m2", is_archived: false, is_completed: true },
+      { module_id: "m2", is_archived: false, is_completed: false },
+    ];
+    expect(calculateCourseProgress(modules, lessons)).toEqual({
+      moduleCount: 1,
+      lessonCount: 1,
+      completedCount: 1,
+      percent: 100,
+    });
+  });
+
+  it("aula arquivada em módulo ativo não conta", () => {
+    const modules = [{ id: "m1", is_archived: false }];
+    const lessons = [
+      { module_id: "m1", is_archived: false, is_completed: true },
+      { module_id: "m1", is_archived: true, is_completed: true },
+    ];
+    expect(calculateCourseProgress(modules, lessons)).toEqual({
+      moduleCount: 1,
+      lessonCount: 1,
+      completedCount: 1,
+      percent: 100,
+    });
+  });
+
+  it("percentual sem arredondamento inconsistente (1 de 3 = 33%)", () => {
+    const modules = [{ id: "m1", is_archived: false }];
+    const lessons = [
+      { module_id: "m1", is_archived: false, is_completed: true },
+      { module_id: "m1", is_archived: false, is_completed: false },
+      { module_id: "m1", is_archived: false, is_completed: false },
+    ];
+    expect(calculateCourseProgress(modules, lessons).percent).toBe(33);
   });
 });

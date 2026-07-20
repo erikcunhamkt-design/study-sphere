@@ -100,3 +100,74 @@ export interface UpdateCourseInput {
   /** Só usado ao restaurar (ver useRestoreCourse) — reposiciona no final da lista ativa da área. */
   position?: number;
 }
+
+export interface CourseModule {
+  id: string;
+  user_id: string;
+  course_id: string;
+  name: string;
+  description: string | null;
+  position: number;
+  is_archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Lesson {
+  id: string;
+  user_id: string;
+  course_id: string;
+  module_id: string;
+  title: string;
+  description: string | null;
+  position: number;
+  is_completed: boolean;
+  completed_at: string | null;
+  is_archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCourseModuleInput {
+  course_id: string;
+  name: string;
+  description?: string | null;
+}
+
+export interface UpdateCourseModuleInput {
+  name?: string;
+  description?: string | null;
+  is_archived?: boolean;
+  /** Só usado ao restaurar — reposiciona no final da lista ativa do curso. */
+  position?: number;
+}
+
+export interface CreateLessonInput {
+  module_id: string;
+  course_id: string;
+  title: string;
+  description?: string | null;
+  is_completed?: boolean;
+}
+
+export interface UpdateLessonInput {
+  title?: string;
+  description?: string | null;
+  is_completed?: boolean;
+  is_archived?: boolean;
+  /** Só usado ao restaurar — reposiciona no final da lista ativa do módulo. */
+  position?: number;
+}
+
+export interface ModuleProgress {
+  completedCount: number;
+  totalCount: number;
+  percent: number;
+}
+
+export interface CourseProgress {
+  moduleCount: number;
+  lessonCount: number;
+  completedCount: number;
+  percent: number;
+}

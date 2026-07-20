@@ -8,8 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/use-preferences";
 import { useAuth } from "@/hooks/use-auth";
 import { useAllCourses } from "@/features/studies/hooks/use-courses";
+import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
+import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
-import { COURSE_STATUS_LABELS } from "@/features/studies/utils";
+import { calculateCourseProgress, COURSE_STATUS_LABELS } from "@/features/studies/utils";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
@@ -20,6 +22,8 @@ function DashboardPage() {
   const { user } = useAuth();
   const { data: areas, isLoading: areasLoading } = useStudyAreas();
   const { data: courses, isLoading: coursesLoading } = useAllCourses();
+  const { data: allModules } = useAllCourseModules();
+  const { data: allLessons } = useAllLessons();
   const displayName =
     profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
   const greeting = greetingForNow(profile?.timezone);
@@ -120,21 +124,35 @@ function DashboardPage() {
             />
           ) : (
             <div className="space-y-2">
-              {inProgressCourses.slice(0, 5).map((course) => (
-                <Link
-                  key={course.id}
-                  to="/app/estudos/$areaId/cursos/$courseId"
-                  params={{ areaId: course.study_area_id, courseId: course.id }}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-primary/40 hover:bg-surface"
-                >
-                  <span className="truncate text-sm font-medium text-foreground">
-                    {course.name}
-                  </span>
-                  <Badge variant="default" className="shrink-0 text-[10px]">
-                    {COURSE_STATUS_LABELS[course.status]}
-                  </Badge>
-                </Link>
-              ))}
+              {inProgressCourses.slice(0, 5).map((course) => {
+                const courseModules = (allModules ?? []).filter((m) => m.course_id === course.id);
+                const courseLessons = (allLessons ?? []).filter((l) => l.course_id === course.id);
+                const progress = calculateCourseProgress(courseModules, courseLessons);
+                return (
+                  <Link
+                    key={course.id}
+                    to="/app/estudos/$areaId/cursos/$courseId"
+                    params={{ areaId: course.study_area_id, courseId: course.id }}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-primary/40 hover:bg-surface"
+                  >
+                    <div className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-foreground">
+                        {course.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {progress.moduleCount === 1
+                          ? "1 módulo"
+                          : `${progress.moduleCount} módulos`}{" "}
+                        · {progress.completedCount}/{progress.lessonCount} aulas ·{" "}
+                        {progress.percent}%
+                      </span>
+                    </div>
+                    <Badge variant="default" className="shrink-0 text-[10px]">
+                      {COURSE_STATUS_LABELS[course.status]}
+                    </Badge>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </Section>

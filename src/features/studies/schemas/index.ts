@@ -35,3 +35,22 @@ export const courseSchema = z.object({
 });
 
 export type CourseFormValues = z.infer<typeof courseSchema>;
+
+const title = z.string().trim().min(1, "Informe um título").max(160, "Máximo de 160 caracteres");
+
+export const courseModuleSchema = z.object({
+  course_id: z.string().uuid("Selecione um curso"),
+  name,
+  description,
+});
+
+export type CourseModuleFormValues = z.infer<typeof courseModuleSchema>;
+
+export const lessonSchema = z.object({
+  module_id: z.string().uuid("Selecione um módulo"),
+  course_id: z.string().uuid("Selecione um curso"),
+  title,
+  description,
+});
+
+export type LessonFormValues = z.infer<typeof lessonSchema>;

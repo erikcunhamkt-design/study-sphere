@@ -27,6 +27,8 @@ import { Route as AppQuestoesRouteImport } from './routes/app.questoes'
 import { Route as AppEstudosIndexRouteImport } from './routes/app.estudos.index'
 import { Route as AppEstudosAreaIdIndexRouteImport } from './routes/app.estudos.$areaId.index'
 import { Route as AppEstudosAreaIdCursosCourseIdRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId'
+import { Route as AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.modulos.$moduleId'
+import { Route as AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.modulos.$moduleId.aulas.$lessonId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -119,6 +121,18 @@ const AppEstudosAreaIdCursosCourseIdRoute =
     path: '/estudos/$areaId/cursos/$courseId',
     getParentRoute: () => AppRoute,
   } as any)
+const AppEstudosAreaIdCursosCourseIdModulosModuleIdRoute =
+  AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteImport.update({
+    id: '/modulos/$moduleId',
+    path: '/modulos/$moduleId',
+    getParentRoute: () => AppEstudosAreaIdCursosCourseIdRoute,
+  } as any)
+const AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute =
+  AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport.update({
+    id: '/aulas/$lessonId',
+    path: '/aulas/$lessonId',
+    getParentRoute: () => AppEstudosAreaIdCursosCourseIdModulosModuleIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,7 +152,9 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/estudos/': typeof AppEstudosIndexRoute
   '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdRoute
+  '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdRouteWithChildren
+  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteWithChildren
+  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -157,7 +173,9 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/app/estudos': typeof AppEstudosIndexRoute
   '/app/estudos/$areaId': typeof AppEstudosAreaIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdRoute
+  '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdRouteWithChildren
+  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteWithChildren
+  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,7 +196,9 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/app/estudos/': typeof AppEstudosIndexRoute
   '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdRoute
+  '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdRouteWithChildren
+  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteWithChildren
+  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -201,6 +221,8 @@ export interface FileRouteTypes {
     | '/app/estudos/'
     | '/app/estudos/$areaId/'
     | '/app/estudos/$areaId/cursos/$courseId'
+    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId'
+    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -220,6 +242,8 @@ export interface FileRouteTypes {
     | '/app/estudos'
     | '/app/estudos/$areaId'
     | '/app/estudos/$areaId/cursos/$courseId'
+    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId'
+    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
   id:
     | '__root__'
     | '/'
@@ -240,6 +264,8 @@ export interface FileRouteTypes {
     | '/app/estudos/'
     | '/app/estudos/$areaId/'
     | '/app/estudos/$areaId/cursos/$courseId'
+    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId'
+    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -379,8 +405,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEstudosAreaIdCursosCourseIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId': {
+      id: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId'
+      path: '/modulos/$moduleId'
+      fullPath: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId'
+      preLoaderRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteImport
+      parentRoute: typeof AppEstudosAreaIdCursosCourseIdRoute
+    }
+    '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': {
+      id: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+      path: '/aulas/$lessonId'
+      fullPath: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+      preLoaderRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport
+      parentRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdRoute
+    }
   }
 }
+
+interface AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteChildren {
+  AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
+}
+
+const AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteChildren: AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteChildren =
+  {
+    AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute:
+      AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute,
+  }
+
+const AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteWithChildren =
+  AppEstudosAreaIdCursosCourseIdModulosModuleIdRoute._addFileChildren(
+    AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteChildren,
+  )
+
+interface AppEstudosAreaIdCursosCourseIdRouteChildren {
+  AppEstudosAreaIdCursosCourseIdModulosModuleIdRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteWithChildren
+}
+
+const AppEstudosAreaIdCursosCourseIdRouteChildren: AppEstudosAreaIdCursosCourseIdRouteChildren =
+  {
+    AppEstudosAreaIdCursosCourseIdModulosModuleIdRoute:
+      AppEstudosAreaIdCursosCourseIdModulosModuleIdRouteWithChildren,
+  }
+
+const AppEstudosAreaIdCursosCourseIdRouteWithChildren =
+  AppEstudosAreaIdCursosCourseIdRoute._addFileChildren(
+    AppEstudosAreaIdCursosCourseIdRouteChildren,
+  )
 
 interface AppRouteChildren {
   AppBibliotecaRoute: typeof AppBibliotecaRoute
@@ -394,7 +464,7 @@ interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppEstudosIndexRoute: typeof AppEstudosIndexRoute
   AppEstudosAreaIdIndexRoute: typeof AppEstudosAreaIdIndexRoute
-  AppEstudosAreaIdCursosCourseIdRoute: typeof AppEstudosAreaIdCursosCourseIdRoute
+  AppEstudosAreaIdCursosCourseIdRoute: typeof AppEstudosAreaIdCursosCourseIdRouteWithChildren
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -409,7 +479,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppEstudosIndexRoute: AppEstudosIndexRoute,
   AppEstudosAreaIdIndexRoute: AppEstudosAreaIdIndexRoute,
-  AppEstudosAreaIdCursosCourseIdRoute: AppEstudosAreaIdCursosCourseIdRoute,
+  AppEstudosAreaIdCursosCourseIdRoute:
+    AppEstudosAreaIdCursosCourseIdRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

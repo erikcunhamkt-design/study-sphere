@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { courseSchema, studyAreaSchema } from "./index";
+import { courseModuleSchema, courseSchema, lessonSchema, studyAreaSchema } from "./index";
 
 describe("studyAreaSchema", () => {
   const valid = { name: "Marketing", description: "", icon: "BookOpen", color: "magenta" };
@@ -65,5 +65,78 @@ describe("courseSchema", () => {
 
   it("rejeita nome vazio", () => {
     expect(courseSchema.safeParse({ ...valid, name: "" }).success).toBe(false);
+  });
+});
+
+describe("courseModuleSchema", () => {
+  const valid = {
+    course_id: "11111111-1111-1111-1111-111111111111",
+    name: "Módulo 1 — Fundamentos",
+    description: "",
+  };
+
+  it("aceita um módulo válido", () => {
+    expect(courseModuleSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it("rejeita nome vazio", () => {
+    expect(courseModuleSchema.safeParse({ ...valid, name: "" }).success).toBe(false);
+  });
+
+  it("rejeita nome só com espaços", () => {
+    expect(courseModuleSchema.safeParse({ ...valid, name: "     " }).success).toBe(false);
+  });
+
+  it("rejeita nome acima de 120 caracteres", () => {
+    expect(courseModuleSchema.safeParse({ ...valid, name: "a".repeat(121) }).success).toBe(false);
+  });
+
+  it("rejeita descrição acima de 1000 caracteres", () => {
+    expect(courseModuleSchema.safeParse({ ...valid, description: "a".repeat(1001) }).success).toBe(
+      false,
+    );
+  });
+
+  it("rejeita curso ausente/inválido", () => {
+    expect(courseModuleSchema.safeParse({ ...valid, course_id: "" }).success).toBe(false);
+    expect(courseModuleSchema.safeParse({ ...valid, course_id: "not-a-uuid" }).success).toBe(false);
+  });
+});
+
+describe("lessonSchema", () => {
+  const valid = {
+    module_id: "11111111-1111-1111-1111-111111111111",
+    course_id: "22222222-2222-2222-2222-222222222222",
+    title: "Introdução ao tema",
+    description: "",
+  };
+
+  it("aceita uma aula válida", () => {
+    expect(lessonSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it("rejeita título vazio", () => {
+    expect(lessonSchema.safeParse({ ...valid, title: "" }).success).toBe(false);
+  });
+
+  it("rejeita título só com espaços", () => {
+    expect(lessonSchema.safeParse({ ...valid, title: "   " }).success).toBe(false);
+  });
+
+  it("rejeita título acima de 160 caracteres", () => {
+    expect(lessonSchema.safeParse({ ...valid, title: "a".repeat(161) }).success).toBe(false);
+  });
+
+  it("aceita título com exatamente 160 caracteres", () => {
+    expect(lessonSchema.safeParse({ ...valid, title: "a".repeat(160) }).success).toBe(true);
+  });
+
+  it("rejeita descrição acima de 1000 caracteres", () => {
+    expect(lessonSchema.safeParse({ ...valid, description: "a".repeat(1001) }).success).toBe(false);
+  });
+
+  it("rejeita módulo ausente/inválido", () => {
+    expect(lessonSchema.safeParse({ ...valid, module_id: "" }).success).toBe(false);
+    expect(lessonSchema.safeParse({ ...valid, module_id: "not-a-uuid" }).success).toBe(false);
   });
 });

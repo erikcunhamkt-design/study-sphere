@@ -13,73 +13,70 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { StudyArea } from "../types";
-import { useDeleteStudyArea } from "../hooks/use-study-areas";
-import { canConfirmAreaDeletion } from "../utils";
+import type { CourseModule } from "../types";
+import { useDeleteCourseModule } from "../hooks/use-course-modules";
+import { canConfirmModuleDeletion } from "../utils";
 
-interface DeleteStudyAreaDialogProps {
+interface DeleteModuleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  area: StudyArea | null;
-  courseCount: number;
-  moduleCount: number;
+  courseModule: CourseModule | null;
   lessonCount: number;
   onDeleted?: () => void;
 }
 
-export function DeleteStudyAreaDialog({
+export function DeleteModuleDialog({
   open,
   onOpenChange,
-  area,
-  courseCount,
-  moduleCount,
+  courseModule,
   lessonCount,
   onDeleted,
-}: DeleteStudyAreaDialogProps) {
+}: DeleteModuleDialogProps) {
   const [confirmText, setConfirmText] = useState("");
-  const deleteArea = useDeleteStudyArea();
-  const requiresTyping = courseCount > 0;
+  const deleteModule = useDeleteCourseModule(courseModule?.course_id);
+  const requiresTyping = lessonCount > 0;
 
   useEffect(() => {
     if (open) setConfirmText("");
   }, [open]);
 
-  if (!area) return null;
+  if (!courseModule) return null;
 
-  const canConfirm = canConfirmAreaDeletion(area.name, courseCount, confirmText);
+  const canConfirm = canConfirmModuleDeletion(courseModule.name, lessonCount, confirmText);
 
   async function handleConfirm() {
-    if (!area || !canConfirm) return;
+    if (!courseModule || !canConfirm) return;
     try {
-      await deleteArea.mutateAsync(area.id);
-      toast.success("Área excluída");
+      await deleteModule.mutateAsync(courseModule.id);
+      toast.success("Módulo excluído");
       onOpenChange(false);
       onDeleted?.();
     } catch (err) {
-      console.error("[deleteStudyArea]", err);
-      toast.error("Não foi possível excluir a área");
+      console.error("[deleteCourseModule]", err);
+      toast.error("Não foi possível excluir o módulo");
     }
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={(next) => !deleteArea.isPending && onOpenChange(next)}>
+    <AlertDialog open={open} onOpenChange={(next) => !deleteModule.isPending && onOpenChange(next)}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Excluir "{area.name}" permanentemente?</AlertDialogTitle>
+          <AlertDialogTitle>Excluir "{courseModule.name}" permanentemente?</AlertDialogTitle>
           <AlertDialogDescription>
-            {courseCount > 0
-              ? `Esta ação excluirá permanentemente a área, ${courseCount === 1 ? "1 curso" : `${courseCount} cursos`}, ${moduleCount === 1 ? "1 módulo" : `${moduleCount} módulos`} e ${lessonCount === 1 ? "1 aula" : `${lessonCount} aulas`} vinculados. Essa ação não pode ser desfeita.`
+            {lessonCount > 0
+              ? `Esta ação excluirá permanentemente o módulo e ${lessonCount === 1 ? "a aula" : `as ${lessonCount} aulas`} vinculadas. Essa ação não pode ser desfeita.`
               : "Esta ação não pode ser desfeita."}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         {requiresTyping ? (
           <div className="space-y-2">
-            <Label htmlFor="confirm-area-name">
-              Digite <span className="font-medium text-foreground">{area.name}</span> para confirmar
+            <Label htmlFor="confirm-module-name">
+              Digite <span className="font-medium text-foreground">{courseModule.name}</span> para
+              confirmar
             </Label>
             <Input
-              id="confirm-area-name"
+              id="confirm-module-name"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               autoComplete="off"
@@ -91,7 +88,7 @@ export function DeleteStudyAreaDialog({
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <Button
             variant="destructive"
-            disabled={!canConfirm || deleteArea.isPending}
+            disabled={!canConfirm || deleteModule.isPending}
             onClick={handleConfirm}
           >
             Excluir permanentemente
