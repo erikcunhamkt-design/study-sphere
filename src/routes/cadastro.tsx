@@ -30,12 +30,22 @@ const schema = z
   });
 
 export const Route = createFileRoute("/cadastro")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" ? s.next : "",
+  }),
   component: SignupPage,
 });
+
+function safeNext(next: string): string {
+  if (!next.startsWith("/") || next.startsWith("//")) return "/app";
+  return next;
+}
 
 function SignupPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const target = safeNext(next);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,8 +55,10 @@ function SignupPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app", replace: true });
-  }, [session, loading, navigate]);
+    if (!loading && session) {
+      window.location.replace(target);
+    }
+  }, [session, loading, navigate, target]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -63,7 +75,7 @@ function SignupPage() {
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`,
+        emailRedirectTo: `${window.location.origin}${target}`,
         data: { full_name: parsed.data.fullName },
       },
     });
@@ -75,8 +87,9 @@ function SignupPage() {
     toast.success("Conta criada!", {
       description: "Se necessário, confirme seu e-mail para continuar.",
     });
-    navigate({ to: "/login" });
+    navigate({ to: "/login", search: { next: target } });
   }
+
 
   return (
     <AuthShell
