@@ -91,7 +91,7 @@ function LoginPage() {
       footer={
         <span>
           Ainda não tem conta?{" "}
-          <Link to="/cadastro" className="text-primary font-medium hover:underline">
+          <Link to="/cadastro" search={{ next: target }} className="text-primary font-medium hover:underline">
             Criar conta
           </Link>
         </span>
