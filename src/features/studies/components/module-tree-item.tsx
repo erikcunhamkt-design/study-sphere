@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
   Archive,
   ArchiveRestore,
@@ -119,35 +120,41 @@ export function ModuleTreeItem({
         <CollapsibleTrigger asChild>
           <button
             type="button"
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="shrink-0 rounded-md p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-expanded={isOpen}
+            aria-label={isOpen ? `Recolher ${courseModule.name}` : `Expandir ${courseModule.name}`}
           >
             {isOpen ? (
-              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+              <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden />
             ) : (
-              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+              <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden />
             )}
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="truncate text-sm font-semibold text-foreground">
-                  {courseModule.name}
-                </span>
-                {courseModule.is_archived ? (
-                  <Badge variant="secondary" className="text-[10px]">
-                    Arquivado
-                  </Badge>
-                ) : null}
-                <span className="text-xs text-muted-foreground">
-                  {moduleProgress.completedCount}/{moduleProgress.totalCount} ·{" "}
-                  {moduleProgress.percent}%
-                </span>
-              </div>
-              {courseModule.description ? (
-                <p className="truncate text-xs text-muted-foreground">{courseModule.description}</p>
-              ) : null}
-            </div>
           </button>
         </CollapsibleTrigger>
+
+        <Link
+          to="/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId"
+          params={{ areaId, courseId, moduleId: courseModule.id }}
+          className="min-w-0 flex-1 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="truncate text-sm font-semibold text-foreground">
+              {courseModule.name}
+            </span>
+            {courseModule.is_archived ? (
+              <Badge variant="secondary" className="text-[10px]">
+                Arquivado
+              </Badge>
+            ) : null}
+            <span className="text-xs text-muted-foreground">
+              {moduleProgress.completedCount}/{moduleProgress.totalCount} · {moduleProgress.percent}
+              %
+            </span>
+          </div>
+          {courseModule.description ? (
+            <p className="truncate text-xs text-muted-foreground">{courseModule.description}</p>
+          ) : null}
+        </Link>
 
         <Button
           variant="ghost"
