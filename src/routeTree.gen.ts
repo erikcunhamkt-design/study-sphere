@@ -25,6 +25,7 @@ import { Route as AppFlashcardsRouteImport } from './routes/app.flashcards'
 import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
 import { Route as AppQuestoesRouteImport } from './routes/app.questoes'
 import { Route as AppEstudosIndexRouteImport } from './routes/app.estudos.index'
+import { Route as AppLabEditorRouteImport } from './routes/app.lab.editor'
 import { Route as AppEstudosAreaIdIndexRouteImport } from './routes/app.estudos.$areaId.index'
 import { Route as AppEstudosAreaIdCursosCourseIdIndexRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.index'
 import { Route as AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.modulos.$moduleId.index'
@@ -110,6 +111,11 @@ const AppEstudosIndexRoute = AppEstudosIndexRouteImport.update({
   path: '/estudos/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLabEditorRoute = AppLabEditorRouteImport.update({
+  id: '/lab/editor',
+  path: '/lab/editor',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEstudosAreaIdIndexRoute = AppEstudosAreaIdIndexRouteImport.update({
   id: '/estudos/$areaId/',
   path: '/estudos/$areaId/',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/questoes': typeof AppQuestoesRoute
   '/app/': typeof AppIndexRoute
+  '/app/lab/editor': typeof AppLabEditorRoute
   '/app/estudos/': typeof AppEstudosIndexRoute
   '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
   '/app/estudos/$areaId/cursos/$courseId/': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/questoes': typeof AppQuestoesRoute
   '/app': typeof AppIndexRoute
+  '/app/lab/editor': typeof AppLabEditorRoute
   '/app/estudos': typeof AppEstudosIndexRoute
   '/app/estudos/$areaId': typeof AppEstudosAreaIdIndexRoute
   '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/questoes': typeof AppQuestoesRoute
   '/app/': typeof AppIndexRoute
+  '/app/lab/editor': typeof AppLabEditorRoute
   '/app/estudos/': typeof AppEstudosIndexRoute
   '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
   '/app/estudos/$areaId/cursos/$courseId/': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/questoes'
     | '/app/'
+    | '/app/lab/editor'
     | '/app/estudos/'
     | '/app/estudos/$areaId/'
     | '/app/estudos/$areaId/cursos/$courseId/'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/questoes'
     | '/app'
+    | '/app/lab/editor'
     | '/app/estudos'
     | '/app/estudos/$areaId'
     | '/app/estudos/$areaId/cursos/$courseId'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/questoes'
     | '/app/'
+    | '/app/lab/editor'
     | '/app/estudos/'
     | '/app/estudos/$areaId/'
     | '/app/estudos/$areaId/cursos/$courseId/'
@@ -391,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEstudosIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/lab/editor': {
+      id: '/app/lab/editor'
+      path: '/lab/editor'
+      fullPath: '/app/lab/editor'
+      preLoaderRoute: typeof AppLabEditorRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/estudos/$areaId/': {
       id: '/app/estudos/$areaId/'
       path: '/estudos/$areaId'
@@ -432,6 +451,7 @@ interface AppRouteChildren {
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
   AppQuestoesRoute: typeof AppQuestoesRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppLabEditorRoute: typeof AppLabEditorRoute
   AppEstudosIndexRoute: typeof AppEstudosIndexRoute
   AppEstudosAreaIdIndexRoute: typeof AppEstudosAreaIdIndexRoute
   AppEstudosAreaIdCursosCourseIdIndexRoute: typeof AppEstudosAreaIdCursosCourseIdIndexRoute
@@ -449,6 +469,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPlanejamentoRoute: AppPlanejamentoRoute,
   AppQuestoesRoute: AppQuestoesRoute,
   AppIndexRoute: AppIndexRoute,
+  AppLabEditorRoute: AppLabEditorRoute,
   AppEstudosIndexRoute: AppEstudosIndexRoute,
   AppEstudosAreaIdIndexRoute: AppEstudosAreaIdIndexRoute,
   AppEstudosAreaIdCursosCourseIdIndexRoute:
