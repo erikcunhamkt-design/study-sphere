@@ -5,7 +5,6 @@ import {
   ArchiveRestore,
   CheckCircle2,
   Circle,
-  FileText,
   MoreVertical,
   Pencil,
   Trash2,
@@ -30,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ClientOnlyLessonEditor } from "@/features/lesson-editor/client-only-lesson-editor";
 import { DeleteLessonDialog } from "@/features/studies/components/delete-lesson-dialog";
 import { LessonFormDialog } from "@/features/studies/components/lesson-form-dialog";
 import { useCourseModule } from "@/features/studies/hooks/use-course-modules";
@@ -50,6 +50,11 @@ import {
 export const Route = createFileRoute(
   "/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId",
 )({
+  // O caderno da aula (BlockNote) não pode rodar no servidor — mesmo
+  // motivo do /app/lab/editor (Fase 03.0): acessa window/document na
+  // inicialização. Explícito aqui mesmo já herdando ssr:false de /app,
+  // por segurança e clareza.
+  ssr: false,
   component: LessonDetailPage,
 });
 
@@ -322,20 +327,7 @@ function LessonContent({
         </div>
       </div>
 
-      <div className="rounded-xl border border-dashed border-border bg-surface/40 px-6 py-10 text-center">
-        <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-lg bg-muted text-muted-foreground">
-          <FileText className="h-5 w-5" aria-hidden />
-        </div>
-        <h2 className="text-sm font-medium text-foreground">Anotações da aula</h2>
-        <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-          O editor de anotações em blocos será adicionado na próxima etapa.
-        </p>
-        <div className="mt-4 flex justify-center">
-          <Button variant="outline" size="sm" disabled>
-            Começar anotação — disponível na Fase 03
-          </Button>
-        </div>
-      </div>
+      <ClientOnlyLessonEditor lessonId={lesson.id} />
 
       <LessonFormDialog
         open={formOpen}

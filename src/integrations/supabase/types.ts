@@ -109,6 +109,88 @@ export type Database = {
           },
         ];
       };
+      lesson_document_versions: {
+        Row: {
+          content: Json;
+          created_at: string;
+          document_id: string;
+          id: string;
+          reason: string;
+          schema_version: number;
+          user_id: string;
+          version: number;
+        };
+        Insert: {
+          content: Json;
+          created_at?: string;
+          document_id: string;
+          id?: string;
+          reason: string;
+          schema_version: number;
+          user_id: string;
+          version: number;
+        };
+        Update: {
+          content?: Json;
+          created_at?: string;
+          document_id?: string;
+          id?: string;
+          reason?: string;
+          schema_version?: number;
+          user_id?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lesson_document_versions_document_user_fkey";
+            columns: ["document_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "lesson_documents";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
+      lesson_documents: {
+        Row: {
+          content: Json;
+          created_at: string;
+          id: string;
+          lesson_id: string;
+          schema_version: number;
+          updated_at: string;
+          user_id: string;
+          version: number;
+        };
+        Insert: {
+          content: Json;
+          created_at?: string;
+          id?: string;
+          lesson_id: string;
+          schema_version?: number;
+          updated_at?: string;
+          user_id: string;
+          version?: number;
+        };
+        Update: {
+          content?: Json;
+          created_at?: string;
+          id?: string;
+          lesson_id?: string;
+          schema_version?: number;
+          updated_at?: string;
+          user_id?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lesson_documents_lesson_user_fkey";
+            columns: ["lesson_id", "user_id"];
+            isOneToOne: true;
+            referencedRelation: "lessons";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
       lessons: {
         Row: {
           completed_at: string | null;
@@ -297,6 +379,27 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      checkpoint_lesson_document: {
+        Args: { p_lesson_id: string };
+        Returns: Json;
+      };
+      prune_lesson_document_versions: {
+        Args: { p_document_id: string };
+        Returns: undefined;
+      };
+      restore_lesson_document_version: {
+        Args: { p_lesson_id: string; p_version: number };
+        Returns: Json;
+      };
+      save_lesson_document: {
+        Args: {
+          p_content: Json;
+          p_expected_version: number;
+          p_lesson_id: string;
+          p_schema_version: number;
+        };
+        Returns: Json;
+      };
       reorder_course_modules: {
         Args: { p_course_id: string; p_ids: string[] };
         Returns: undefined;
