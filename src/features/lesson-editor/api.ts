@@ -68,7 +68,9 @@ export async function saveLessonDocument(
   return data as unknown as SaveLessonDocumentResult;
 }
 
-export async function checkpointLessonDocument(lessonId: string): Promise<SaveLessonDocumentResult> {
+export async function checkpointLessonDocument(
+  lessonId: string,
+): Promise<SaveLessonDocumentResult> {
   const { data, error } = await supabase.rpc("checkpoint_lesson_document", {
     p_lesson_id: lessonId,
   });

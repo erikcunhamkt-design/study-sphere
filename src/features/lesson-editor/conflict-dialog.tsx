@@ -45,8 +45,8 @@ export function ConflictDialog({
             {remoteUpdatedAt
               ? `A versão salva mais recentemente é de ${remoteUpdatedAt} (outra aba ou dispositivo). `
               : ""}
-            Suas alterações aqui ainda não foram salvas. Escolha o que fazer — nada será
-            sobrescrito automaticamente.
+            Suas alterações aqui ainda não foram salvas. Escolha o que fazer — nada será sobrescrito
+            automaticamente.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

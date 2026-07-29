@@ -162,35 +162,33 @@ function walkTree(blocks: LessonBlock[], depth: number, stats: TreeStats) {
  * HTML, nunca Markdown — é o JSON nativo do BlockNote). Valida contagem
  * total, profundidade e unicidade de ID em uma só passada pela árvore.
  */
-export const lessonDocumentSchema = z
-  .array(lessonBlockSchema)
-  .superRefine((blocks, ctx) => {
-    const stats: TreeStats = { count: 0, maxDepth: blocks.length > 0 ? 1 : 0, ids: [] };
-    walkTree(blocks, 1, stats);
+export const lessonDocumentSchema = z.array(lessonBlockSchema).superRefine((blocks, ctx) => {
+  const stats: TreeStats = { count: 0, maxDepth: blocks.length > 0 ? 1 : 0, ids: [] };
+  walkTree(blocks, 1, stats);
 
-    if (stats.count > MAX_DOCUMENT_BLOCKS) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Documento com ${stats.count} blocos excede o limite de ${MAX_DOCUMENT_BLOCKS}`,
-      });
-    }
+  if (stats.count > MAX_DOCUMENT_BLOCKS) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Documento com ${stats.count} blocos excede o limite de ${MAX_DOCUMENT_BLOCKS}`,
+    });
+  }
 
-    if (stats.maxDepth > MAX_DOCUMENT_DEPTH) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Profundidade ${stats.maxDepth} excede o limite de ${MAX_DOCUMENT_DEPTH} níveis`,
-      });
-    }
+  if (stats.maxDepth > MAX_DOCUMENT_DEPTH) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Profundidade ${stats.maxDepth} excede o limite de ${MAX_DOCUMENT_DEPTH} níveis`,
+    });
+  }
 
-    const seen = new Set<string>();
-    for (const id of stats.ids) {
-      if (seen.has(id)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `ID de bloco duplicado: ${id}` });
-        break;
-      }
-      seen.add(id);
+  const seen = new Set<string>();
+  for (const id of stats.ids) {
+    if (seen.has(id)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `ID de bloco duplicado: ${id}` });
+      break;
     }
-  });
+    seen.add(id);
+  }
+});
 
 export type LessonDocument = z.infer<typeof lessonDocumentSchema>;
 

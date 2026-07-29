@@ -9,7 +9,9 @@ import { Skeleton } from "@/components/ui/skeleton";
  * cliente (useEffect nunca roda em SSR) — duas camadas independentes.
  * BlockNote carregado via lazy(), fora do bundle principal da rota da aula.
  */
-const LessonEditor = lazy(() => import("./lesson-editor").then((m) => ({ default: m.LessonEditor })));
+const LessonEditor = lazy(() =>
+  import("./lesson-editor").then((m) => ({ default: m.LessonEditor })),
+);
 
 function EditorLoadingState() {
   return (

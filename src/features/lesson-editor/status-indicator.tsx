@@ -11,7 +11,11 @@ const STATUS_CONFIG: Record<
   editing: { label: "Editando…", icon: PenLine, className: "text-muted-foreground" },
   saving: { label: "Salvando…", icon: Loader2, className: "text-muted-foreground" },
   saved: { label: "Salvo", icon: Check, className: "text-muted-foreground" },
-  offline: { label: "Sem conexão — tentando de novo…", icon: CloudOff, className: "text-amber-600 dark:text-amber-400" },
+  offline: {
+    label: "Sem conexão — tentando de novo…",
+    icon: CloudOff,
+    className: "text-amber-600 dark:text-amber-400",
+  },
   erro: { label: "Não foi possível salvar", icon: AlertTriangle, className: "text-destructive" },
   conflito: { label: "Conflito de versão", icon: Cloud, className: "text-destructive" },
 };

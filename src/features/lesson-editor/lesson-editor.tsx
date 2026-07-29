@@ -92,9 +92,7 @@ function LessonEditorLoaded({
   const hasInitialContent = !!doc?.content && doc.content.length > 0;
   const editor = useCreateBlockNote({
     schema: labEditorSchema,
-    ...(hasInitialContent
-      ? { initialContent: doc!.content as unknown as never }
-      : {}),
+    ...(hasInitialContent ? { initialContent: doc!.content as unknown as never } : {}),
   });
 
   useEditorChange((ed) => {

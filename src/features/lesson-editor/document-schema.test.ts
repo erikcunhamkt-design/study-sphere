@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  MAX_DOCUMENT_BLOCKS,
-  MAX_DOCUMENT_DEPTH,
-  validateLessonDocument,
-} from "./document-schema";
+import { MAX_DOCUMENT_BLOCKS, MAX_DOCUMENT_DEPTH, validateLessonDocument } from "./document-schema";
 
 interface TestBlock {
   id: string;
@@ -41,9 +37,7 @@ describe("lessonDocumentSchema", () => {
   });
 
   it(`rejeita mais de ${MAX_DOCUMENT_BLOCKS} blocos`, () => {
-    const blocks = Array.from({ length: MAX_DOCUMENT_BLOCKS + 1 }, (_, i) =>
-      paragraph(`id-${i}`),
-    );
+    const blocks = Array.from({ length: MAX_DOCUMENT_BLOCKS + 1 }, (_, i) => paragraph(`id-${i}`));
     const result = validateLessonDocument(blocks);
     expect(result.success).toBe(false);
   });

@@ -125,7 +125,9 @@ export function HistoryPanel({ lessonId, documentId }: HistoryPanelProps) {
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-foreground">Versão {v.version}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        Versão {v.version}
+                      </span>
                       <Badge variant="secondary" className="text-[10px]">
                         {REASON_LABELS[v.reason]}
                       </Badge>
@@ -153,13 +155,16 @@ export function HistoryPanel({ lessonId, documentId }: HistoryPanelProps) {
         </SheetContent>
       </Sheet>
 
-      <AlertDialog open={!!pendingRestore} onOpenChange={(next) => !next && setPendingRestore(null)}>
+      <AlertDialog
+        open={!!pendingRestore}
+        onOpenChange={(next) => !next && setPendingRestore(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Restaurar a versão {pendingRestore?.version}?</AlertDialogTitle>
             <AlertDialogDescription>
-              O conteúdo atual será salvo como um snapshot antes de restaurar, então nada se perde
-              — mas o caderno vai voltar a ficar como estava nessa versão.
+              O conteúdo atual será salvo como um snapshot antes de restaurar, então nada se perde —
+              mas o caderno vai voltar a ficar como estava nessa versão.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

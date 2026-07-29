@@ -7,13 +7,7 @@ import { useSaveLessonDocument } from "./hooks";
 import { LessonDocumentConflictError } from "./types";
 
 export type AutosaveStatus =
-  | "idle"
-  | "editing"
-  | "saving"
-  | "saved"
-  | "offline"
-  | "erro"
-  | "conflito";
+  "idle" | "editing" | "saving" | "saved" | "offline" | "erro" | "conflito";
 
 const DEBOUNCE_MS = 1000;
 const MAX_RETRIES = 3;
