@@ -16,10 +16,10 @@ import type { ReactNode } from "react";
 /**
  * Igual ao menu lateral do laboratório (Fase 03.0), com um adicional:
  * transformar tipo de bloco — só entre tipos textuais compatíveis
- * (content: "inline"), e só porque testei ao vivo que
- * editor.updateBlock(id, {type}) preserva ID/conteúdo/estilos/filhos (ver
- * docs/AUDITORIA_FASE_03_1.md §8). Código (content: "plain") e divisor
- * (content: "none") ficam de fora — não são compatíveis.
+ * (content: "inline"), porque editor.updateBlock(id, {type}) preserva
+ * ID/conteúdo/estilos/filhos (comprovado em teste automatizado, ver
+ * side-menu.test.ts). Código (content: "plain") e divisor (content:
+ * "none") ficam de fora — não são compatíveis.
  */
 
 const TEXTUAL_COMPATIBLE_TYPES = [
