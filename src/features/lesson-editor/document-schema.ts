@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { STUDY_KIND_VALUES } from "./study-block";
+
 /**
  * Validação estrutural do documento do caderno.
  * Fase 03.1 (Etapa 2): espelha o schema restrito da prova 03.0 em Zod,
@@ -33,6 +35,8 @@ const ALLOWED_BLOCK_TYPES = [
   "table",
   "bookmark",
   "tableOfContents",
+  // Fase 03.3
+  "studyBlock",
 ] as const;
 
 export const CALLOUT_TYPES = ["info", "attention", "success"] as const;
@@ -171,6 +175,12 @@ const mediaCommonProps = z
   })
   .partial();
 
+const studyBlockPropsSchema = z
+  .object({
+    kind: z.enum(STUDY_KIND_VALUES as [string, ...string[]]),
+  })
+  .partial();
+
 const bookmarkPropsSchema = z
   .object({
     url: z
@@ -206,6 +216,8 @@ function propsSchemaForType(type: (typeof ALLOWED_BLOCK_TYPES)[number]) {
       return bookmarkPropsSchema;
     case "tableOfContents":
       return emptyPropsSchema;
+    case "studyBlock":
+      return studyBlockPropsSchema;
     default:
       return commonBlockProps;
   }

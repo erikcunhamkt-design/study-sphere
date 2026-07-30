@@ -23,6 +23,7 @@ import {
   Video,
 } from "lucide-react";
 
+import { STUDY_KINDS, type StudyKind } from "./study-block";
 import type { LessonEditorSchema } from "./schema";
 
 type Editor = BlockNoteEditor<
@@ -36,8 +37,42 @@ type Editor = BlockNoteEditor<
  * padrão. Fase 03.2 adiciona os grupos de mídia e estrutura de documento;
  * nada de IA, colunas (licença GPL do xl-*) ou blocos fora do escopo.
  */
+const STUDY_KIND_ALIASES: Record<StudyKind, string[]> = {
+  conceito: ["conceito", "importante"],
+  definicao: ["definição", "definicao", "termo"],
+  exemplo: ["exemplo", "caso"],
+  duvida: ["dúvida", "duvida", "pergunta"],
+  atencao: ["atenção", "atencao", "cuidado"],
+  resumo: ["resumo", "síntese", "sintese"],
+  formula: ["fórmula", "formula", "equação", "equacao"],
+  linhaDoTempo: ["linha do tempo", "timeline", "cronologia"],
+  perguntaRevisao: ["pergunta de revisão", "revisão", "revisao", "quiz"],
+  referencia: ["referência", "referencia", "fonte", "bibliografia"],
+  aplicacaoPratica: ["aplicação prática", "aplicacao", "prática", "pratica"],
+  causaConsequencia: ["causa e consequência", "causa", "consequência", "consequencia"],
+  erroComum: ["erro comum", "erro", "pegadinha"],
+};
+
+function studyItems(editor: Editor): DefaultReactSuggestionItem[] {
+  return (Object.entries(STUDY_KINDS) as [StudyKind, (typeof STUDY_KINDS)[StudyKind]][]).map(
+    ([kind, config]) => {
+      const Icon = config.icon;
+      return {
+        title: config.label,
+        subtext: `Bloco de estudo: ${config.label.toLowerCase()}`,
+        aliases: STUDY_KIND_ALIASES[kind],
+        group: "Estudo",
+        icon: <Icon className="h-4 w-4" aria-hidden />,
+        onItemClick: () =>
+          insertOrUpdateBlockForSlashMenu(editor, { type: "studyBlock", props: { kind } }),
+      };
+    },
+  );
+}
+
 export function getLessonEditorSlashMenuItems(editor: Editor): DefaultReactSuggestionItem[] {
   return [
+    ...studyItems(editor),
     // Básicos
     {
       title: "Texto",

@@ -181,6 +181,20 @@ describe("lessonDocumentSchema", () => {
     expect(validateLessonDocument([tabelaComInline]).success).toBe(false);
   });
 
+  it("bloco de estudo aceita as variantes do plano e rejeita kind desconhecido", () => {
+    const valido = {
+      id: "s-1",
+      type: "studyBlock",
+      props: { kind: "perguntaRevisao" },
+      content: [{ type: "text", text: "O que é RLS?", styles: {} }],
+      children: [],
+    };
+    expect(validateLessonDocument([valido]).success).toBe(true);
+
+    const invalido = { ...valido, id: "s-2", props: { kind: "kanban" } };
+    expect(validateLessonDocument([invalido]).success).toBe(false);
+  });
+
   it("índice não aceita props desconhecidas", () => {
     const valid = { id: "toc-1", type: "tableOfContents", props: {}, children: [] };
     expect(validateLessonDocument([valid]).success).toBe(true);

@@ -1,4 +1,5 @@
 import { filterSuggestionItems } from "@blocknote/core/extensions";
+import { pt } from "@blocknote/core/locales";
 import { SuggestionMenuController, useCreateBlockNote, useEditorChange } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 import "@blocknote/shadcn/style.css";
@@ -174,6 +175,9 @@ function LessonEditorLoaded({
   const hasInitialContent = !isRemoteInvalid && !!doc?.content && doc.content.length > 0;
   const editor = useCreateBlockNote({
     schema: lessonEditorSchema,
+    // Textos internos do BlockNote (placeholders, painéis de mídia) em
+    // português — pendência de i18n registrada na auditoria da Fase 03.2.
+    dictionary: pt,
     // Upload validado por categoria (MIME + tamanho) antes da rede; o
     // documento guarda o caminho do storage, e resolveFileUrl troca por
     // URL assinada na exibição (o bucket é privado).

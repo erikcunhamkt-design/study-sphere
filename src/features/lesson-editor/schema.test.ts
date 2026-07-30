@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { lessonEditorSchema } from "./schema";
+import { STUDY_KIND_VALUES, STUDY_KINDS } from "./study-block";
 
 /**
  * O schema do caderno é a lista fechada de blocos autorizados pelo plano
@@ -29,6 +30,8 @@ describe("lessonEditorSchema", () => {
     "table",
     "bookmark",
     "tableOfContents",
+    // Fase 03.3
+    "studyBlock",
   ].sort();
 
   it("contém exatamente os blocos autorizados, nem um a mais", () => {
@@ -38,6 +41,34 @@ describe("lessonEditorSchema", () => {
   it("não contém nenhum bloco de coluna (licença GPL vetada)", () => {
     const types = Object.keys(lessonEditorSchema.blockSchema);
     expect(types.some((t) => /column/i.test(t))).toBe(false);
+  });
+
+  it("bloco de estudo tem exatamente as 13 variantes acadêmicas do plano", () => {
+    const esperadas = [
+      "conceito",
+      "definicao",
+      "exemplo",
+      "duvida",
+      "atencao",
+      "resumo",
+      "formula",
+      "linhaDoTempo",
+      "perguntaRevisao",
+      "referencia",
+      "aplicacaoPratica",
+      "causaConsequencia",
+      "erroComum",
+    ].sort();
+    expect([...STUDY_KIND_VALUES].sort()).toEqual(esperadas);
+    // O propSchema registrado no editor usa a MESMA lista (sem drift).
+    expect([...lessonEditorSchema.blockSchema.studyBlock.propSchema.kind.values!].sort()).toEqual(
+      esperadas,
+    );
+    // Toda variante tem rótulo e ícone.
+    for (const kind of STUDY_KIND_VALUES) {
+      expect(STUDY_KINDS[kind].label.length).toBeGreaterThan(0);
+      expect(STUDY_KINDS[kind].icon).toBeTruthy();
+    }
   });
 
   it("bookmark e índice estão registrados com as props esperadas", () => {
