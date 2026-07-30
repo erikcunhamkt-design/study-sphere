@@ -87,9 +87,14 @@ export function useRestoreLessonDocumentVersion(lessonId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (version: number) => api.restoreLessonDocumentVersion(lessonId, version),
-    onSuccess: (result) => {
-      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) });
-      qc.invalidateQueries({ queryKey: lessonDocumentVersionsKey(user?.id, result.document_id) });
-    },
+    // Retorna as invalidações para que mutateAsync só resolva depois que o
+    // documento restaurado foi re-buscado — quem remonta o editor no
+    // sucesso (HistoryPanel.onRestored) precisa encontrar o conteúdo novo
+    // no cache, não o antigo.
+    onSuccess: (result) =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) }),
+        qc.invalidateQueries({ queryKey: lessonDocumentVersionsKey(user?.id, result.document_id) }),
+      ]),
   });
 }

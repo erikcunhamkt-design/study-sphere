@@ -246,7 +246,7 @@ function LessonEditorLoaded({
             </span>
           ) : null}
         </div>
-        <HistoryPanel lessonId={lessonId} documentId={doc?.id} />
+        <HistoryPanel lessonId={lessonId} documentId={doc?.id} onRestored={onRequestReload} />
       </div>
 
       {localDraft ? (

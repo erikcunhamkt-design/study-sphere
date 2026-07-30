@@ -39,6 +39,16 @@ const REASON_LABELS: Record<VersionReason, string> = {
 interface HistoryPanelProps {
   lessonId: string;
   documentId: string | undefined;
+  /**
+   * Chamado após uma restauração bem-sucedida. O editor é montado com o
+   * conteúdo da versão que existia no carregamento (initialContent) e o
+   * autosave guarda a versão esperada daquele momento — sem remontar, o
+   * caderno continua mostrando o conteúdo antigo e a próxima edição gera
+   * um conflito falso ("editada em outro lugar"). Quem fornece este
+   * callback remonta o editor com o documento recém-restaurado (mesmo
+   * mecanismo do "Carregar versão mais recente" do diálogo de conflito).
+   */
+  onRestored: () => void;
 }
 
 /**
@@ -46,7 +56,7 @@ interface HistoryPanelProps {
  * Painel lateral, não uma barra fixa: só aparece quando aberto, não cobre
  * o texto do caderno.
  */
-export function HistoryPanel({ lessonId, documentId }: HistoryPanelProps) {
+export function HistoryPanel({ lessonId, documentId, onRestored }: HistoryPanelProps) {
   const [open, setOpen] = useState(false);
   const [pendingRestore, setPendingRestore] = useState<LessonDocumentVersionRow | null>(null);
   const { data: versions, isLoading } = useLessonDocumentVersions(documentId);
@@ -74,6 +84,7 @@ export function HistoryPanel({ lessonId, documentId }: HistoryPanelProps) {
       toast.success(`Restaurado para a versão ${pendingRestore.version}`);
       setPendingRestore(null);
       setOpen(false);
+      onRestored();
     } catch (err) {
       console.error("[restoreLessonDocumentVersion]", err);
       toast.error("Não foi possível restaurar essa versão");
