@@ -18,7 +18,7 @@ interface ConflictDialogProps {
 }
 
 /**
- * Aparece quando save_lesson_document retorna ERRCODE 40001 — a versão no
+ * Aparece quando save_lesson_document retorna ERRCODE VC409 — a versão no
  * servidor avançou (outra aba, outro dispositivo) desde o último carregamento
  * aqui. Nunca decide sozinho: o usuário escolhe explicitamente entre manter
  * o que estava escrevendo ou carregar a versão mais recente. AlertDialog não

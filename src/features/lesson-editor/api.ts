@@ -44,7 +44,7 @@ export async function fetchLessonDocumentVersions(
 /**
  * Cria ou atualiza o documento com controle de versão otimista. Lança
  * LessonDocumentConflictError especificamente quando o banco detecta que
- * expectedVersion não bate com a versão atual (ERRCODE 40001) — o chamador
+ * expectedVersion não bate com a versão atual (ERRCODE VC409) — o chamador
  * decide o que fazer (nunca deve sobrescrever silenciosamente).
  */
 export async function saveLessonDocument(
