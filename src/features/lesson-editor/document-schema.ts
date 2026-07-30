@@ -1,12 +1,14 @@
 import { z } from "zod";
 
 /**
- * Validação estrutural do documento do caderno (Fase 03.1, Etapa 2).
- * Espelha o schema restrito da Fase 03.0 (src/features/lab-editor/schema.ts)
- * — mesmos 10 blocos + callout — mas em Zod, para validar o JSON antes de
- * enviar ao banco (que também valida array/tamanho/contagem, mas não tipo
- * de bloco nem profundidade nem URLs perigosas: essa camada é só do
- * cliente).
+ * Validação estrutural do documento do caderno.
+ * Fase 03.1 (Etapa 2): espelha o schema restrito da prova 03.0 em Zod,
+ * para validar o JSON antes de enviar ao banco e antes de carregar no
+ * editor (o banco valida array/tamanho/contagem, mas não tipo de bloco,
+ * profundidade nem URLs perigosas: essa camada é só do cliente).
+ * Fase 03.2: mídia nativa (image/video/audio/file), tabela simples,
+ * bookmark e índice. URLs de mídia só podem ser caminho do storage
+ * (relativo, sem esquema) ou http(s) — nunca javascript:/data:/etc.
  */
 
 export const MAX_DOCUMENT_BLOCKS = 5000;
@@ -23,18 +25,41 @@ const ALLOWED_BLOCK_TYPES = [
   "codeBlock",
   "divider",
   "callout",
+  // Fase 03.2
+  "image",
+  "video",
+  "audio",
+  "file",
+  "table",
+  "bookmark",
+  "tableOfContents",
 ] as const;
 
 export const CALLOUT_TYPES = ["info", "attention", "success"] as const;
 
-// javascript:/data:/vbscript:/file: em href de link é o vetor clássico de
-// XSS/leitura local via clique — bloqueado na validação, não só confiado
-// ao sanitizador do BlockNote.
+// javascript:/data:/vbscript:/file: em href/src é o vetor clássico de
+// XSS/leitura local — bloqueado na validação, não só confiado ao
+// sanitizador do BlockNote.
 const DANGEROUS_URL_SCHEME = /^\s*(javascript|data|vbscript|file):/i;
 
+export function isSafeUrl(value: string): boolean {
+  if (value.trim() === "") return true; // vazio (em edição/upload) é inofensivo
+  return !DANGEROUS_URL_SCHEME.test(value);
+}
+
 function isSafeHref(href: string): boolean {
-  if (href.trim() === "") return true; // link vazio (em edição) é inofensivo
-  return !DANGEROUS_URL_SCHEME.test(href);
+  return isSafeUrl(href);
+}
+
+/**
+ * URL de mídia persistida: ou caminho do storage (relativo — sem esquema
+ * nenhum) ou http(s) absoluto. Qualquer outro esquema é recusado.
+ */
+function isSafeMediaUrl(value: string): boolean {
+  if (value.trim() === "") return true;
+  if (/^https?:\/\//i.test(value)) return true;
+  // Relativo = não começa com esquema algum.
+  return !/^\s*[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value);
 }
 
 const colorProp = z.string().max(40);
@@ -66,8 +91,46 @@ const inlineLinkSchema = z.object({
 
 const inlineContentItemSchema = z.union([inlineTextSchema, inlineLinkSchema]);
 
-const blockContentSchema = z.array(inlineContentItemSchema).optional();
+const inlineContentSchema = z.array(inlineContentItemSchema);
 
+// ── Tabela (Fase 03.2) ───────────────────────────────────────────────
+const tableCellPropsSchema = z
+  .object({
+    colspan: z.number().int().min(1).max(50),
+    rowspan: z.number().int().min(1).max(50),
+    backgroundColor: colorProp,
+    textColor: colorProp,
+    textAlignment: z.enum(["left", "center", "right", "justify"]),
+  })
+  .partial();
+
+const tableCellSchema = z.object({
+  type: z.literal("tableCell"),
+  content: inlineContentSchema,
+  props: tableCellPropsSchema.default({}),
+});
+
+// Células podem vir como objeto tableCell (formato atual) ou array de
+// conteúdo inline (formato tolerado pelo BlockNote ao parsear).
+const tableCellUnionSchema = z.union([tableCellSchema, inlineContentSchema]);
+
+const tableContentSchema = z.object({
+  type: z.literal("tableContent"),
+  columnWidths: z.array(z.number().positive().nullable()).max(50).optional(),
+  headerRows: z.number().int().min(0).max(1).optional(),
+  headerCols: z.number().int().min(0).max(1).optional(),
+  rows: z
+    .array(
+      z.object({
+        cells: z.array(tableCellUnionSchema).max(50),
+      }),
+    )
+    .max(500),
+});
+
+const blockContentSchema = z.union([inlineContentSchema, tableContentSchema]).optional();
+
+// ── Props por tipo ───────────────────────────────────────────────────
 const commonBlockProps = z
   .object({
     backgroundColor: colorProp,
@@ -91,6 +154,35 @@ const calloutPropsSchema = z.object({ type: z.enum(CALLOUT_TYPES) }).partial();
 
 const emptyPropsSchema = z.object({}).strict();
 
+const mediaUrlProp = z
+  .string()
+  .max(2000)
+  .refine(isSafeMediaUrl, { message: "URL de mídia não permitida" });
+
+const mediaCommonProps = z
+  .object({
+    backgroundColor: colorProp,
+    textAlignment: z.enum(["left", "center", "right", "justify"]),
+    name: z.string().max(300),
+    url: mediaUrlProp,
+    caption: z.string().max(1000),
+    showPreview: z.boolean(),
+    previewWidth: z.number().min(0).max(10000),
+  })
+  .partial();
+
+const bookmarkPropsSchema = z
+  .object({
+    url: z
+      .string()
+      .max(2000)
+      .refine((v) => v === "" || (/^https?:\/\//i.test(v) && isSafeUrl(v)), {
+        message: "Bookmark só aceita URLs http(s)",
+      }),
+    title: z.string().max(300),
+  })
+  .partial();
+
 function propsSchemaForType(type: (typeof ALLOWED_BLOCK_TYPES)[number]) {
   switch (type) {
     case "heading":
@@ -102,6 +194,17 @@ function propsSchemaForType(type: (typeof ALLOWED_BLOCK_TYPES)[number]) {
     case "callout":
       return calloutPropsSchema;
     case "divider":
+      return emptyPropsSchema;
+    case "image":
+    case "video":
+    case "audio":
+    case "file":
+      return mediaCommonProps;
+    case "table":
+      return commonBlockProps;
+    case "bookmark":
+      return bookmarkPropsSchema;
+    case "tableOfContents":
       return emptyPropsSchema;
     default:
       return commonBlockProps;
@@ -118,8 +221,8 @@ export interface LessonBlock {
 
 // Recursivo: children pode conter qualquer bloco permitido, sem limite de
 // profundidade codificado no tipo — profundidade real é medida à parte
-// (ver countAndValidateTree), porque Zod não modela bem recursão com
-// parâmetro de profundidade decrescente.
+// (ver walkTree), porque Zod não modela bem recursão com parâmetro de
+// profundidade decrescente.
 export const lessonBlockSchema: z.ZodType<LessonBlock, z.ZodTypeDef, unknown> = z.lazy(() =>
   z
     .object({
@@ -136,6 +239,23 @@ export const lessonBlockSchema: z.ZodType<LessonBlock, z.ZodTypeDef, unknown> = 
         for (const issue of result.error.issues) {
           ctx.addIssue({ ...issue, path: ["props", ...issue.path] });
         }
+      }
+      // Tabela exige conteúdo tabular; os demais tipos nunca o carregam.
+      const isTableContent =
+        !!block.content && !Array.isArray(block.content) && block.content.type === "tableContent";
+      if (block.type === "table" && block.content !== undefined && !isTableContent) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["content"],
+          message: "Bloco de tabela exige conteúdo tableContent",
+        });
+      }
+      if (block.type !== "table" && isTableContent) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["content"],
+          message: `Bloco ${block.type} não pode carregar conteúdo de tabela`,
+        });
       }
     }),
 );

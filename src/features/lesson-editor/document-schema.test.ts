@@ -75,8 +75,122 @@ describe("lessonDocumentSchema", () => {
     expect(validateLessonDocument([parent]).success).toBe(true);
   });
 
-  it("rejeita tipo de bloco fora do schema (ex.: image)", () => {
-    const invalid = { ...paragraph("a"), type: "image" };
+  it("rejeita tipo de bloco fora do schema (ex.: kanban, columnList)", () => {
+    const kanban = { ...paragraph("a"), type: "kanban" };
+    expect(validateLessonDocument([kanban]).success).toBe(false);
+
+    const columns = { ...paragraph("b"), type: "columnList" };
+    expect(validateLessonDocument([columns]).success).toBe(false);
+  });
+
+  // ── Fase 03.2 — mídia, tabela, bookmark e índice ──────────────────
+
+  it("aceita blocos de mídia com caminho do storage ou https", () => {
+    const image = {
+      id: "img-1",
+      type: "image",
+      props: { url: "0de70ee8-1111/aula-1/foto.png", name: "foto.png", previewWidth: 512 },
+      children: [],
+    };
+    const video = {
+      id: "vid-1",
+      type: "video",
+      props: { url: "https://exemplo.com/aula.mp4", caption: "aula" },
+      children: [],
+    };
+    expect(validateLessonDocument([image, video]).success).toBe(true);
+  });
+
+  it("rejeita mídia com esquema perigoso ou não-http", () => {
+    for (const url of [
+      "javascript:alert(1)",
+      "data:text/html,x",
+      "vbscript:x",
+      "file:///etc/passwd",
+      "ftp://servidor/arquivo",
+    ]) {
+      const block = { id: "m", type: "image", props: { url }, children: [] };
+      expect(validateLessonDocument([block]).success, url).toBe(false);
+    }
+  });
+
+  it("bookmark aceita só http(s) e rejeita esquemas perigosos", () => {
+    const valid = {
+      id: "b-1",
+      type: "bookmark",
+      props: { url: "https://exemplo.com/artigo", title: "Artigo" },
+      children: [],
+    };
+    expect(validateLessonDocument([valid]).success).toBe(true);
+
+    const semEsquema = { id: "b-2", type: "bookmark", props: { url: "exemplo.com" }, children: [] };
+    expect(validateLessonDocument([semEsquema]).success).toBe(false);
+
+    const perigoso = {
+      id: "b-3",
+      type: "bookmark",
+      props: { url: "javascript:alert(1)" },
+      children: [],
+    };
+    expect(validateLessonDocument([perigoso]).success).toBe(false);
+  });
+
+  it("tabela aceita conteúdo tableContent válido", () => {
+    const table = {
+      id: "t-1",
+      type: "table",
+      props: {},
+      content: {
+        type: "tableContent",
+        columnWidths: [null, 120],
+        rows: [
+          {
+            cells: [
+              {
+                type: "tableCell",
+                content: [{ type: "text", text: "célula", styles: {} }],
+                props: {},
+              },
+              [{ type: "text", text: "formato-array", styles: {} }],
+            ],
+          },
+        ],
+      },
+      children: [],
+    };
+    expect(validateLessonDocument([table]).success).toBe(true);
+  });
+
+  it("rejeita tableContent fora de um bloco de tabela e vice-versa", () => {
+    const paragrafoComTabela = {
+      id: "p-t",
+      type: "paragraph",
+      props: {},
+      content: { type: "tableContent", rows: [] },
+      children: [],
+    };
+    expect(validateLessonDocument([paragrafoComTabela]).success).toBe(false);
+
+    const tabelaComInline = {
+      id: "t-i",
+      type: "table",
+      props: {},
+      content: [{ type: "text", text: "solto", styles: {} }],
+      children: [],
+    };
+    expect(validateLessonDocument([tabelaComInline]).success).toBe(false);
+  });
+
+  it("índice não aceita props desconhecidas", () => {
+    const valid = { id: "toc-1", type: "tableOfContents", props: {}, children: [] };
+    expect(validateLessonDocument([valid]).success).toBe(true);
+
+    const invalid = {
+      id: "toc-2",
+      type: "tableOfContents",
+      props: { fonte: "externa" },
+      children: [],
+    };
     expect(validateLessonDocument([invalid]).success).toBe(false);
   });
 

@@ -11,14 +11,16 @@ import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LabEditorFormattingToolbar } from "@/features/lab-editor/formatting-toolbar";
-import { labEditorSchema } from "@/features/lab-editor/schema";
-import { getLabEditorSlashMenuItems } from "@/features/lab-editor/slash-menu-items";
 import "@/features/lab-editor/theme.css";
+import * as api from "./api";
 import { ConflictDialog } from "./conflict-dialog";
 import { validateLessonDocument, type LessonDocument } from "./document-schema";
 import { deleteDraft, getDraft } from "./drafts-db";
 import { HistoryPanel } from "./history-panel";
 import { useLessonDocument, useSaveLessonDocument } from "./hooks";
+import { createMediaUploader, MediaValidationError, resolveMediaUrl } from "./media-upload";
+import { lessonEditorSchema } from "./schema";
+import { getLessonEditorSlashMenuItems } from "./slash-menu-items";
 import { LessonEditorSideMenuController } from "./side-menu";
 import { AutosaveStatusIndicator } from "./status-indicator";
 import { watchLessonTabPresence } from "./tab-presence";
@@ -87,6 +89,11 @@ function InvalidRemoteDocument({
   async function handleDiscard() {
     setDiscarding(true);
     try {
+      // Snapshot manual ANTES do save vazio: o snapshot automático pode
+      // ser pulado dentro da janela de 5 minutos, e a promessa de que o
+      // conteúdo anterior fica no histórico precisa valer sempre
+      // (observação registrada na auditoria da Fase 03.1).
+      await api.checkpointLessonDocument(lessonId);
       await saveMutation.mutateAsync({
         content: [],
         schemaVersion: CURRENT_SCHEMA_VERSION,
@@ -166,7 +173,24 @@ function LessonEditorLoaded({
 
   const hasInitialContent = !isRemoteInvalid && !!doc?.content && doc.content.length > 0;
   const editor = useCreateBlockNote({
-    schema: labEditorSchema,
+    schema: lessonEditorSchema,
+    // Upload validado por categoria (MIME + tamanho) antes da rede; o
+    // documento guarda o caminho do storage, e resolveFileUrl troca por
+    // URL assinada na exibição (o bucket é privado).
+    uploadFile: async (file: File) => {
+      if (!userId) throw new Error("Usuário não autenticado");
+      try {
+        return await createMediaUploader(userId, lessonId)(file);
+      } catch (err) {
+        if (err instanceof MediaValidationError) {
+          toast.error(err.message);
+        } else {
+          toast.error("Não foi possível enviar o arquivo. Tente novamente.");
+        }
+        throw err;
+      }
+    },
+    resolveFileUrl: resolveMediaUrl,
     ...(hasInitialContent ? { initialContent: doc!.content as unknown as never } : {}),
   });
 
@@ -284,7 +308,7 @@ function LessonEditorLoaded({
           <SuggestionMenuController
             triggerCharacter="/"
             getItems={async (query) =>
-              filterSuggestionItems(getLabEditorSlashMenuItems(editor), query)
+              filterSuggestionItems(getLessonEditorSlashMenuItems(editor), query)
             }
           />
         </BlockNoteView>
