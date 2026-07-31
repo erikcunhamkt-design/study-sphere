@@ -104,14 +104,20 @@ export function FlashcardMetrics() {
         ) : null}
       </div>
 
-      <div className="rounded-xl border border-border bg-surface p-4 md:col-span-2">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface p-4 md:col-span-2">
         <p className="mb-3 text-sm text-muted-foreground">
           Revisões nos últimos {CHART_WINDOW_DAYS} dias
         </p>
-        <ChartContainer config={chartConfig} className="h-40 w-full">
+        <ChartContainer config={chartConfig} className="h-40 w-full overflow-hidden">
           <BarChart data={chartData}>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} />
+            <XAxis
+              dataKey="label"
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+              minTickGap={24}
+            />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="revisoes" fill="var(--color-revisoes)" radius={4} />
           </BarChart>
