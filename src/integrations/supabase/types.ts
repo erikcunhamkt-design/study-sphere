@@ -109,6 +109,112 @@ export type Database = {
           },
         ];
       };
+      flashcard_reviews: {
+        Row: {
+          flashcard_id: string;
+          id: string;
+          rating: string;
+          resulting_ease: number;
+          resulting_interval_days: number;
+          resulting_state: string;
+          reviewed_at: string;
+          user_id: string;
+        };
+        Insert: {
+          flashcard_id: string;
+          id?: string;
+          rating: string;
+          resulting_ease: number;
+          resulting_interval_days: number;
+          resulting_state: string;
+          reviewed_at?: string;
+          user_id: string;
+        };
+        Update: {
+          flashcard_id?: string;
+          id?: string;
+          rating?: string;
+          resulting_ease?: number;
+          resulting_interval_days?: number;
+          resulting_state?: string;
+          reviewed_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "flashcard_reviews_flashcard_user_fkey";
+            columns: ["flashcard_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "flashcards";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
+      flashcards: {
+        Row: {
+          back: Json;
+          created_at: string;
+          due_at: string | null;
+          ease: number;
+          front: Json;
+          id: string;
+          interval_days: number;
+          is_archived: boolean;
+          lapses: number;
+          learning_step: number;
+          lesson_id: string | null;
+          reps: number;
+          source_block_id: string | null;
+          state: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          back: Json;
+          created_at?: string;
+          due_at?: string | null;
+          ease?: number;
+          front: Json;
+          id?: string;
+          interval_days?: number;
+          is_archived?: boolean;
+          lapses?: number;
+          learning_step?: number;
+          lesson_id?: string | null;
+          reps?: number;
+          source_block_id?: string | null;
+          state?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          back?: Json;
+          created_at?: string;
+          due_at?: string | null;
+          ease?: number;
+          front?: Json;
+          id?: string;
+          interval_days?: number;
+          is_archived?: boolean;
+          lapses?: number;
+          learning_step?: number;
+          lesson_id?: string | null;
+          reps?: number;
+          source_block_id?: string | null;
+          state?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_lesson_user_fkey";
+            columns: ["lesson_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
       lesson_document_versions: {
         Row: {
           content: Json;
@@ -415,6 +521,10 @@ export type Database = {
       reorder_study_areas: {
         Args: { p_ids: string[] };
         Returns: undefined;
+      };
+      submit_flashcard_review: {
+        Args: { p_flashcard_id: string; p_rating: string };
+        Returns: Json;
       };
     };
     Enums: {

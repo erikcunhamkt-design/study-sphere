@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LabEditorFormattingToolbar } from "@/features/lab-editor/formatting-toolbar";
 import "@/features/lab-editor/theme.css";
+import { FlashcardFormDialog } from "@/features/flashcards/flashcard-form-dialog";
 import * as api from "./api";
 import { ConflictDialog } from "./conflict-dialog";
 import { validateLessonDocument, type LessonDocument } from "./document-schema";
 import { deleteDraft, getDraft } from "./drafts-db";
+import { FlashcardBridgeContext } from "./flashcard-bridge";
 import { HistoryPanel } from "./history-panel";
 import { useLessonDocument, useSaveLessonDocument } from "./hooks";
 import { createMediaUploader, MediaValidationError, resolveMediaUrl } from "./media-upload";
@@ -154,6 +156,11 @@ function LessonEditorLoaded({
 }) {
   const [localDraft, setLocalDraft] = useState<LocalDraftState>(null);
   const [otherTabOpen, setOtherTabOpen] = useState(false);
+  const [flashcardPrefill, setFlashcardPrefill] = useState<{
+    lessonId: string | null;
+    sourceBlockId: string | null;
+    front: string;
+  } | null>(null);
   const checkedDraftOnce = useRef(false);
   const initialVersion = doc?.version ?? 0;
 
@@ -300,22 +307,30 @@ function LessonEditorLoaded({
       ) : null}
 
       <div className="lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4">
-        <BlockNoteView
-          editor={editor}
-          theme={theme}
-          formattingToolbar={false}
-          slashMenu={false}
-          sideMenu={false}
+        <FlashcardBridgeContext.Provider
+          value={{
+            lessonId,
+            onCreateFlashcard: ({ sourceBlockId, frontText }) =>
+              setFlashcardPrefill({ lessonId, sourceBlockId, front: frontText }),
+          }}
         >
-          <LabEditorFormattingToolbar />
-          <LessonEditorSideMenuController />
-          <SuggestionMenuController
-            triggerCharacter="/"
-            getItems={async (query) =>
-              filterSuggestionItems(getLessonEditorSlashMenuItems(editor), query)
-            }
-          />
-        </BlockNoteView>
+          <BlockNoteView
+            editor={editor}
+            theme={theme}
+            formattingToolbar={false}
+            slashMenu={false}
+            sideMenu={false}
+          >
+            <LabEditorFormattingToolbar />
+            <LessonEditorSideMenuController />
+            <SuggestionMenuController
+              triggerCharacter="/"
+              getItems={async (query) =>
+                filterSuggestionItems(getLessonEditorSlashMenuItems(editor), query)
+              }
+            />
+          </BlockNoteView>
+        </FlashcardBridgeContext.Provider>
       </div>
 
       <ConflictDialog
@@ -323,6 +338,12 @@ function LessonEditorLoaded({
         remoteDocument={doc}
         onKeepMine={(remoteVersion) => void autosave.resolveConflictKeepMine(remoteVersion)}
         onLoadRemote={() => void handleLoadRemote()}
+      />
+
+      <FlashcardFormDialog
+        open={!!flashcardPrefill}
+        onOpenChange={(open) => !open && setFlashcardPrefill(null)}
+        prefill={flashcardPrefill ?? undefined}
       />
     </div>
   );
