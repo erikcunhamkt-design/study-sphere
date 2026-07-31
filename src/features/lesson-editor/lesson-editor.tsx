@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LabEditorFormattingToolbar } from "@/features/lab-editor/formatting-toolbar";
 import "@/features/lab-editor/theme.css";
 import { FlashcardFormDialog } from "@/features/flashcards/flashcard-form-dialog";
+import type { FlashcardContent } from "@/features/flashcards/schema";
 import * as api from "./api";
 import { ConflictDialog } from "./conflict-dialog";
 import { validateLessonDocument, type LessonDocument } from "./document-schema";
@@ -160,6 +161,7 @@ function LessonEditorLoaded({
     lessonId: string | null;
     sourceBlockId: string | null;
     front: string;
+    frontContent: FlashcardContent | null;
   } | null>(null);
   const checkedDraftOnce = useRef(false);
   const initialVersion = doc?.version ?? 0;
@@ -310,8 +312,8 @@ function LessonEditorLoaded({
         <FlashcardBridgeContext.Provider
           value={{
             lessonId,
-            onCreateFlashcard: ({ sourceBlockId, frontText }) =>
-              setFlashcardPrefill({ lessonId, sourceBlockId, front: frontText }),
+            onCreateFlashcard: ({ sourceBlockId, frontText, frontContent }) =>
+              setFlashcardPrefill({ lessonId, sourceBlockId, front: frontText, frontContent }),
           }}
         >
           <BlockNoteView

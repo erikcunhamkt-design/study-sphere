@@ -5,7 +5,9 @@ import {
   flashcardFormSchema,
   flashcardRatingSchema,
   plainTextToInlineContent,
+  resolveFrontContentForSubmit,
   textFromInlineContent,
+  type OriginalFrontContent,
 } from "./schema";
 
 describe("flashcardContentSchema", () => {
@@ -152,5 +154,48 @@ describe("conversão texto simples <-> conteúdo inline", () => {
     const original = "Pergunta com acentuação: RLS é o quê?";
     const content = plainTextToInlineContent(original);
     expect(textFromInlineContent(content)).toBe(original);
+  });
+});
+
+describe("resolveFrontContentForSubmit — achado do Gate 3 (conversão/edição não podem perder formatação)", () => {
+  const richContent: ReturnType<typeof plainTextToInlineContent> = [
+    { type: "text", text: "O que é ", styles: {} },
+    {
+      type: "link",
+      href: "https://example.com/rls",
+      content: [{ type: "text", text: "RLS", styles: { bold: true } }],
+    },
+    { type: "text", text: "?", styles: {} },
+  ];
+  const original: OriginalFrontContent = {
+    text: "O que é RLS?",
+    content: richContent,
+  };
+
+  it("sem edição do texto, persiste o conteúdo rico original intacto", () => {
+    const result = resolveFrontContentForSubmit("O que é RLS?", original);
+    expect(result).toBe(richContent);
+    expect(result).toEqual(richContent);
+  });
+
+  it("ignora espaços nas pontas ao comparar (não conta como edição)", () => {
+    const result = resolveFrontContentForSubmit("  O que é RLS?  ", original);
+    expect(result).toBe(richContent);
+  });
+
+  it("com o texto editado, persiste texto simples (formatação anterior é descartada)", () => {
+    const result = resolveFrontContentForSubmit("O que é RLS, afinal?", original);
+    expect(result).toEqual(plainTextToInlineContent("O que é RLS, afinal?"));
+    expect(result).not.toBe(richContent);
+  });
+
+  it("sem conteúdo original (criação manual do zero), sempre usa texto simples", () => {
+    const result = resolveFrontContentForSubmit("Pergunta nova", null);
+    expect(result).toEqual(plainTextToInlineContent("Pergunta nova"));
+  });
+
+  it("edição vazia (apagou tudo) não bate com o original — usa texto simples (vazio)", () => {
+    const result = resolveFrontContentForSubmit("", original);
+    expect(result).toEqual(plainTextToInlineContent(""));
   });
 });

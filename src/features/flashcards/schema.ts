@@ -87,3 +87,31 @@ export function textFromInlineContent(content: FlashcardContent): string {
 export function plainTextToInlineContent(text: string): FlashcardContent {
   return [{ type: "text", text, styles: {} }];
 }
+
+export interface OriginalFrontContent {
+  /** Texto achatado do conteúdo original — o que apareceu no textarea ao abrir o diálogo. */
+  text: string;
+  /** Conteúdo inline rico original (do bloco convertido ou do cartão sendo editado). */
+  content: FlashcardContent;
+}
+
+/**
+ * Decide o que persistir como frente do cartão (achado do Gate 3: a
+ * conversão bloco→cartão e a edição de um cartão já rico achatavam para
+ * texto simples e nunca devolviam a formatação — negrito/links da
+ * pergunta original morriam mesmo sem o usuário tocar no campo).
+ *
+ * Se o texto no textarea é igual (ignorando espaços nas pontas) ao texto
+ * achatado do conteúdo original, o usuário não editou a frente — persiste
+ * o conteúdo rico original, formatação intacta. Se editou, persiste o
+ * texto simples digitado (comportamento v1, sem editor rico no diálogo).
+ */
+export function resolveFrontContentForSubmit(
+  editedText: string,
+  original: OriginalFrontContent | null,
+): FlashcardContent {
+  if (original && editedText.trim() === original.text.trim()) {
+    return original.content;
+  }
+  return plainTextToInlineContent(editedText.trim());
+}

@@ -13,6 +13,7 @@ import {
 import { ArrowDown, ArrowUp, Copy, Layers } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { flashcardContentSchema } from "@/features/flashcards/schema";
 import { useFlashcardBridge } from "./flashcard-bridge";
 
 /**
@@ -146,9 +147,18 @@ function CreateFlashcardItem() {
   return (
     <Components.Generic.Menu.Item
       onClick={() => {
+        // Achado do Gate 3: achatar para texto e nunca devolver o
+        // conteúdo original perdia negrito/links da pergunta. Aqui
+        // validamos o conteúdo do bloco (mesmo formato inline-content
+        // usado por lesson_documents) contra o schema de flashcards; se
+        // for compatível, a ponte carrega o rico junto do texto achatado
+        // — o diálogo decide qual persistir conforme o usuário editar ou
+        // não o campo (resolveFrontContentForSubmit).
+        const parsed = flashcardContentSchema.safeParse(block.content);
         bridge.onCreateFlashcard({
           sourceBlockId: block.id,
           frontText: blockContentToPlainText(block.content),
+          frontContent: parsed.success ? parsed.data : null,
         });
       }}
     >

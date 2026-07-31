@@ -21,7 +21,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAllLessons } from "@/features/studies/hooks/use-lessons";
-import { flashcardFormSchema, plainTextToInlineContent, textFromInlineContent } from "./schema";
+import {
+  flashcardFormSchema,
+  resolveFrontContentForSubmit,
+  textFromInlineContent,
+  plainTextToInlineContent,
+  type FlashcardContent,
+  type OriginalFrontContent,
+} from "./schema";
 import { useCreateFlashcard, useUpdateFlashcardContent } from "./hooks";
 import type { FlashcardRow } from "./types";
 
@@ -31,7 +38,13 @@ interface FlashcardFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Preenche a criação a partir de uma conversão bloco→cartão (Pergunta de revisão). */
-  prefill?: { lessonId: string | null; sourceBlockId: string | null; front: string };
+  prefill?: {
+    lessonId: string | null;
+    sourceBlockId: string | null;
+    front: string;
+    /** Conteúdo inline rico do bloco original, quando validável — usado se o usuário não editar a frente. */
+    frontContent: FlashcardContent | null;
+  };
   flashcard?: FlashcardRow;
 }
 
@@ -49,6 +62,11 @@ export function FlashcardFormDialog({
   const [back, setBack] = useState("");
   const [lessonId, setLessonId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Conteúdo rico original (do cartão em edição ou do bloco convertido) e
+  // o texto achatado correspondente — se o usuário não tocar no campo
+  // Frente, o submit persiste este conteúdo intacto em vez de reduzir
+  // tudo a texto simples (achado do Gate 3).
+  const [originalFront, setOriginalFront] = useState<OriginalFrontContent | null>(null);
   const submittingRef = useRef(false);
 
   const { data: lessons } = useAllLessons();
@@ -61,13 +79,19 @@ export function FlashcardFormDialog({
   useEffect(() => {
     if (!open) return;
     if (flashcard) {
-      setFront(textFromInlineContent(flashcard.front));
+      const flatFront = textFromInlineContent(flashcard.front);
+      setFront(flatFront);
       setBack(textFromInlineContent(flashcard.back));
       setLessonId(flashcard.lesson_id);
+      setOriginalFront({ text: flatFront, content: flashcard.front });
     } else {
-      setFront(prefill?.front ?? "");
+      const flatFront = prefill?.front ?? "";
+      setFront(flatFront);
       setBack("");
       setLessonId(prefill?.lessonId ?? null);
+      setOriginalFront(
+        prefill?.frontContent ? { text: flatFront, content: prefill.frontContent } : null,
+      );
     }
     setError(null);
     const id = window.setTimeout(() => frontRef.current?.focus(), 0);
@@ -81,7 +105,7 @@ export function FlashcardFormDialog({
     const parsed = flashcardFormSchema.safeParse({
       lessonId,
       sourceBlockId: prefill?.sourceBlockId ?? null,
-      front: plainTextToInlineContent(front.trim()),
+      front: resolveFrontContentForSubmit(front, originalFront),
       back: plainTextToInlineContent(back.trim()),
     });
     if (!parsed.success) {
