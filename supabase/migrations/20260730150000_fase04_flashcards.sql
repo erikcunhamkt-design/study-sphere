@@ -104,16 +104,19 @@ CREATE TRIGGER flashcards_set_updated_at
   BEFORE UPDATE ON public.flashcards
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
--- O grant de UPDATE acima existe para permitir edição legítima de
--- front/back/lesson_id/is_archived pelo cliente — mas isso também abriria
--- uma via para o cliente escrever DIRETO nas colunas de agendamento
--- (state/learning_step/interval_days/ease/reps/lapses/due_at), inflando
--- estatísticas ou pulando o algoritmo sem passar por uma revisão real.
--- Mesmo princípio de enforce_lesson_document_versioning (Fase 03.1): o
--- estado que a UI promete refletir tem que ser garantido pelo banco, não
--- pela disciplina do cliente. A própria submit_flashcard_review sinaliza
--- sua escrita legítima via set_config local (nunca visível/setável pelo
--- cliente através da API pública) antes do UPDATE.
+-- O grant de INSERT/UPDATE acima existe para permitir criação e edição
+-- legítima de front/back/lesson_id/is_archived pelo cliente — mas isso
+-- também abriria uma via para o cliente escrever DIRETO nas colunas de
+-- agendamento (state/learning_step/interval_days/ease/reps/lapses/
+-- due_at), seja forjando um agendamento já avançado na CRIAÇÃO (achado
+-- da auditoria do Gate 2: o trigger original só cobria UPDATE), seja
+-- inflando estatísticas por UPDATE direto depois. Mesmo princípio de
+-- enforce_lesson_document_versioning (Fase 03.1): o estado que a UI
+-- promete refletir tem que ser garantido pelo banco, não pela disciplina
+-- do cliente. A própria submit_flashcard_review sinaliza sua escrita
+-- legítima via set_config local (nunca visível/setável pelo cliente
+-- através da API pública) antes do UPDATE — INSERT nunca precisa desse
+-- sinal, porque todo cartão novo só pode nascer no estado inicial padrão.
 CREATE OR REPLACE FUNCTION public.enforce_flashcard_schedule_immutability()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -124,6 +127,21 @@ BEGIN
     RETURN NEW;
   END IF;
 
+  IF TG_OP = 'INSERT' THEN
+    IF NEW.state <> 'novo'
+       OR NEW.learning_step <> 0
+       OR NEW.interval_days <> 0
+       OR NEW.ease <> 2.50
+       OR NEW.reps <> 0
+       OR NEW.lapses <> 0
+       OR NEW.due_at IS NOT NULL THEN
+      RAISE EXCEPTION 'Um cartão novo só pode ser criado com o agendamento inicial padrão (sem revisões ainda)'
+        USING ERRCODE = '22023';
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  -- TG_OP = 'UPDATE'
   IF NEW.state IS DISTINCT FROM OLD.state
      OR NEW.learning_step IS DISTINCT FROM OLD.learning_step
      OR NEW.interval_days IS DISTINCT FROM OLD.interval_days
@@ -143,7 +161,7 @@ REVOKE EXECUTE ON FUNCTION public.enforce_flashcard_schedule_immutability()
   FROM PUBLIC, anon, authenticated;
 
 CREATE TRIGGER flashcards_enforce_schedule_immutability
-  BEFORE UPDATE ON public.flashcards
+  BEFORE INSERT OR UPDATE ON public.flashcards
   FOR EACH ROW EXECUTE FUNCTION public.enforce_flashcard_schedule_immutability();
 
 -- =====================================================================
@@ -330,10 +348,16 @@ BEGIN
       v_new_interval := CEIL(v_card.interval_days * v_card.ease)::INTEGER;
     ELSE -- facil
       v_new_state := 'revisao';
-      v_new_ease := v_card.ease + 0.15;
+      -- Teto de 5.00: evita estourar o NUMERIC(4,2) em uso legítimo
+      -- extremo (muitas revisões "fácil" seguidas).
+      v_new_ease := LEAST(v_card.ease + 0.15, 5.00);
       v_new_interval := CEIL(v_card.interval_days * v_card.ease * 1.3)::INTEGER;
     END IF;
   END IF;
+
+  -- Teto de ~100 anos: evita due_at absurdamente distante em uso
+  -- legítimo extremo (ease alto composto por muitas revisões).
+  v_new_interval := LEAST(v_new_interval, 36500);
 
   v_new_reps := v_card.reps + 1;
   v_new_due_at := v_reviewed_at + make_interval(days => v_new_interval);
