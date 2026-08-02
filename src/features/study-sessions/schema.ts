@@ -12,11 +12,12 @@ export const startSessionSchema = z.object({
 export type StartSessionValues = z.infer<typeof startSessionSchema>;
 
 /**
- * Validação por método, chamada em runtime antes de qualquer UPDATE de
- * details — espelha o CHECK de forma solta do banco (jsonb_typeof =
- * 'object' + teto de ~100KB), mas dá feedback específico por campo.
- * Textos livres, sem editor rico (lição da Fase 04); os tetos por campo
- * aqui são de sanidade — quem realmente barra tamanho é o CHECK do banco.
+ * Especificação testada da forma de `details` por método (ver
+ * schema.test.ts) — nenhum componente chama estes schemas em runtime, os
+ * componentes constroem `details` já tipado via TS antes do finish. A
+ * barreira real contra payload absurdo é `maxLength={20000}` nas
+ * textareas + o CHECK de ~100KB no banco (jsonb_typeof = 'object' +
+ * octet_length). Textos livres, sem editor rico (lição da Fase 04).
  */
 const freeText = (max: number) => z.string().trim().max(max);
 
@@ -41,14 +42,6 @@ export const cornellDetailsSchema = z.object({
 export const livreDetailsSchema = z.object({
   nota: freeText(20000).optional(),
 });
-
-export const detailsSchemaByMethod = {
-  pomodoro: pomodoroDetailsSchema,
-  feynman: feynmanDetailsSchema,
-  blurting: blurtingDetailsSchema,
-  cornell: cornellDetailsSchema,
-  livre: livreDetailsSchema,
-} as const;
 
 /** Forma inicial gravada no INSERT — recordacao_ativa nunca chega aqui (não cria sessão, ver hub). */
 export function initialDetailsForMethod(method: StudyMethod): StudySessionDetails {

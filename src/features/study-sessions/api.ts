@@ -70,20 +70,6 @@ export async function createStudySession(
   return data as unknown as StudySessionRow;
 }
 
-export async function updateStudySessionDetails(
-  sessionId: string,
-  details: StudySessionDetails,
-): Promise<StudySessionRow> {
-  const { data, error } = await supabase
-    .from("study_sessions")
-    .update({ details: details as unknown as Json })
-    .eq("id", sessionId)
-    .select(STUDY_SESSION_COLUMNS)
-    .single();
-  if (error) throw error;
-  return data as unknown as StudySessionRow;
-}
-
 /**
  * Fecha a sessão (ended_at write-once, garantido pelo trigger do banco).
  * ended_at vem do relógio do cliente, não de um now() no servidor — não há

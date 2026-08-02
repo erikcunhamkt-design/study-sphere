@@ -63,12 +63,6 @@ export function useCreateStudySession() {
   });
 }
 
-export function useUpdateStudySessionDetails(sessionId: string) {
-  return useMutation({
-    mutationFn: (details: StudySessionDetails) => api.updateStudySessionDetails(sessionId, details),
-  });
-}
-
 export function useFinishStudySession(sessionId: string, startedAtIso: string) {
   const invalidate = useInvalidateStudySessionLists();
   return useMutation({
