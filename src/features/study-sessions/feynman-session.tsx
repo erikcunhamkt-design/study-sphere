@@ -20,7 +20,7 @@ export function FeynmanSession({ resumingSession, onDone }: FeynmanSessionProps)
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [explicacao, setExplicacao] = useState("");
   const createSession = useCreateStudySession();
-  const finishSession = useFinishStudySession(session?.id ?? "");
+  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "");
 
   useUnsavedTextWarning(!!session && explicacao.trim().length > 0);
 

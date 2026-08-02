@@ -22,7 +22,7 @@ export function CornellSession({ resumingSession, onDone }: CornellSessionProps)
   const [pistas, setPistas] = useState("");
   const [resumo, setResumo] = useState("");
   const createSession = useCreateStudySession();
-  const finishSession = useFinishStudySession(session?.id ?? "");
+  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "");
 
   const isDirty = notas.trim().length > 0 || pistas.trim().length > 0 || resumo.trim().length > 0;
   useUnsavedTextWarning(!!session && isDirty);

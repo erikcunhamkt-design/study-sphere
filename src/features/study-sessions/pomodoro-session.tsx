@@ -80,7 +80,7 @@ function PomodoroRunner({
   onDone: () => void;
 }) {
   const elapsed = useElapsedSeconds(session.started_at);
-  const finishSession = useFinishStudySession(session.id);
+  const finishSession = useFinishStudySession(session.id, session.started_at);
   const finishedRef = useRef(false);
 
   const state = computePomodoroState(elapsed, {
