@@ -109,6 +109,119 @@ export type Database = {
           },
         ];
       };
+      exam_attempts: {
+        Row: {
+          duration_seconds: number | null;
+          ended_at: string | null;
+          exam_id: string | null;
+          id: string;
+          score_correct: number | null;
+          score_total: number | null;
+          started_at: string;
+          user_id: string;
+        };
+        Insert: {
+          duration_seconds?: never;
+          ended_at?: string | null;
+          exam_id?: string | null;
+          id?: string;
+          score_correct?: number | null;
+          score_total?: number | null;
+          started_at?: string;
+          user_id: string;
+        };
+        Update: {
+          duration_seconds?: never;
+          ended_at?: string | null;
+          exam_id?: string | null;
+          id?: string;
+          score_correct?: number | null;
+          score_total?: number | null;
+          started_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exam_attempts_exam_user_fkey";
+            columns: ["exam_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "exams";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
+      exam_questions: {
+        Row: {
+          created_at: string;
+          exam_id: string;
+          position: number;
+          question_id: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          exam_id: string;
+          position: number;
+          question_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          exam_id?: string;
+          position?: number;
+          question_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exam_questions_exam_user_fkey";
+            columns: ["exam_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "exams";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
+            foreignKeyName: "exam_questions_question_user_fkey";
+            columns: ["question_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "questions";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
+      exams: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: string;
+          is_archived: boolean;
+          time_limit_minutes: number | null;
+          title: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          time_limit_minutes?: number | null;
+          title: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          time_limit_minutes?: number | null;
+          title?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       flashcard_reviews: {
         Row: {
           flashcard_id: string;
@@ -380,6 +493,104 @@ export type Database = {
         };
         Relationships: [];
       };
+      question_attempts: {
+        Row: {
+          attempted_at: string;
+          exam_attempt_id: string | null;
+          id: string;
+          is_correct: boolean;
+          question_id: string;
+          selected_option_index: number | null;
+          self_assessed_correct: boolean | null;
+          user_id: string;
+        };
+        Insert: {
+          attempted_at?: string;
+          exam_attempt_id?: string | null;
+          id?: string;
+          is_correct: boolean;
+          question_id: string;
+          selected_option_index?: number | null;
+          self_assessed_correct?: boolean | null;
+          user_id: string;
+        };
+        Update: {
+          attempted_at?: string;
+          exam_attempt_id?: string | null;
+          id?: string;
+          is_correct?: boolean;
+          question_id?: string;
+          selected_option_index?: number | null;
+          self_assessed_correct?: boolean | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "question_attempts_exam_attempt_user_fkey";
+            columns: ["exam_attempt_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "exam_attempts";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
+            foreignKeyName: "question_attempts_question_user_fkey";
+            columns: ["question_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "questions";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
+      questions: {
+        Row: {
+          correct_option_index: number | null;
+          created_at: string;
+          expected_answer: string | null;
+          id: string;
+          is_archived: boolean;
+          lesson_id: string | null;
+          options: Json;
+          statement: string;
+          type: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          correct_option_index?: number | null;
+          created_at?: string;
+          expected_answer?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          lesson_id?: string | null;
+          options?: Json;
+          statement: string;
+          type: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          correct_option_index?: number | null;
+          created_at?: string;
+          expected_answer?: string | null;
+          id?: string;
+          is_archived?: boolean;
+          lesson_id?: string | null;
+          options?: Json;
+          statement?: string;
+          type?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "questions_lesson_user_fkey";
+            columns: ["lesson_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
       study_areas: {
         Row: {
           color: string;
@@ -524,6 +735,19 @@ export type Database = {
       };
       submit_flashcard_review: {
         Args: { p_flashcard_id: string; p_rating: string };
+        Returns: Json;
+      };
+      submit_question_attempt: {
+        Args: {
+          p_exam_attempt_id?: string | null;
+          p_question_id: string;
+          p_self_assessed_correct?: boolean | null;
+          p_selected_option_index?: number | null;
+        };
+        Returns: Json;
+      };
+      finish_exam_attempt: {
+        Args: { p_exam_attempt_id: string };
         Returns: Json;
       };
     };
