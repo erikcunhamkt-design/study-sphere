@@ -33,6 +33,33 @@
 -- autoenganar ao responder sua própria questão. Mesma classe da
 -- autoavaliação em discursiva e das notas de flashcard: o dado é do
 -- dono, a honestidade da resposta é dele.
+--
+-- Residuais aceitos adicionais (achado do Gate 2, mesma classe —
+-- autoinfligidos pelo próprio dono dos dados, sem impacto entre
+-- usuários):
+--   - started_at de exam_attempts é aceito como enviado no INSERT (sem
+--     trigger de "não pode ser passado" além do CHECK de forma); o
+--     próprio usuário pode inserir uma tentativa com início retroativo,
+--     inflando artificialmente duration_seconds a favor dele mesmo.
+--   - exam_id de uma exam_attempts pode ser reapontado pelo dono via
+--     UPDATE comum (não é coberto pelo trigger de imutabilidade, que só
+--     protege ended_at/score_*/started_at) — necessário para o próprio
+--     ON DELETE SET NULL (exam_id) permanecer o único jeito de "limpar"
+--     o vínculo sem apagar o histórico; reapontar para outro exame seu é
+--     uma ação legítima de dono, não uma falsificação de resultado (o
+--     placar já congelado por finish_exam_attempt não recalcula sozinho
+--     por causa disso).
+--   - Uma question_attempts inserida por submit_question_attempt na
+--     janela entre a checagem EXISTS (tentativa ainda em andamento) e o
+--     SELECT ... FOR UPDATE de finish_exam_attempt em outra aba fica de
+--     fora do retrato que finish_exam_attempt já tinha começado a
+--     congelar — como finish_exam_attempt sempre recalcula score_correct/
+--     score_total no momento do lock (não usa um snapshot anterior), na
+--     prática essa resposta ou entra no placar final (se o INSERT
+--     comitar antes do lock) ou não entra (se comitar depois) — nunca
+--     fica “perdida” de forma inconsistente, só é uma corrida de
+--     resultado incerto entre abas do mesmo usuário, aceita pela mesma
+--     razão do residual de FOR UPDATE já documentado acima na RPC.
 
 -- =====================================================================
 -- 0) Função auxiliar — valida array JSONB de strings com tamanho máximo
@@ -537,6 +564,16 @@ GRANT EXECUTE ON FUNCTION public.submit_question_attempt(UUID, INTEGER, BOOLEAN,
 -- serializar corretamente uma corrida de finalização duplicada; chamada
 -- repetida (retry de rede) é idempotente e devolve o resultado já
 -- gravado em vez de erro.
+--
+-- score_correct e score_total vêm da MESMA consulta, ancorada em
+-- exam_questions (LEFT JOIN question_attempts) — se uma questão for
+-- removida do exame com a tentativa em andamento, o acerto dela some
+-- junto do total, não só do total. Isso garante score_correct <=
+-- score_total por construção da query, não por clamp: contar acertos
+-- direto em question_attempts (sem passar por exam_questions) permitiria
+-- a tentativa contar o acerto de uma questão já removida do simulado,
+-- estourando o CHECK exam_attempts_score_shape_check e deixando a
+-- tentativa permanentemente infinalizável (todo retry falharia igual).
 
 CREATE FUNCTION public.finish_exam_attempt(
   p_exam_attempt_id UUID
@@ -581,13 +618,14 @@ BEGIN
       USING ERRCODE = '22023';
   END IF;
 
-  SELECT count(*) INTO v_total
+  SELECT
+    count(*),
+    count(*) FILTER (WHERE qa.id IS NOT NULL AND qa.is_correct = true)
+  INTO v_total, v_correct
   FROM public.exam_questions eq
+  LEFT JOIN public.question_attempts qa
+    ON qa.exam_attempt_id = p_exam_attempt_id AND qa.question_id = eq.question_id
   WHERE eq.exam_id = v_attempt.exam_id;
-
-  SELECT count(*) INTO v_correct
-  FROM public.question_attempts qa
-  WHERE qa.exam_attempt_id = p_exam_attempt_id AND qa.is_correct = true;
 
   PERFORM set_config('app.exam_attempt_finish', 'on', true);
 
