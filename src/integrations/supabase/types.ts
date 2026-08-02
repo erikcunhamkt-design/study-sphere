@@ -638,6 +638,53 @@ export type Database = {
           },
         ];
       };
+      study_sessions: {
+        Row: {
+          created_at: string;
+          details: Json;
+          duration_seconds: number | null;
+          ended_at: string | null;
+          id: string;
+          lesson_id: string | null;
+          method: string;
+          started_at: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          details?: Json;
+          duration_seconds?: never;
+          ended_at?: string | null;
+          id?: string;
+          lesson_id?: string | null;
+          method: string;
+          started_at?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          details?: Json;
+          duration_seconds?: never;
+          ended_at?: string | null;
+          id?: string;
+          lesson_id?: string | null;
+          method?: string;
+          started_at?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_lesson_user_fkey";
+            columns: ["lesson_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "lessons";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
       user_preferences: {
         Row: {
           created_at: string;

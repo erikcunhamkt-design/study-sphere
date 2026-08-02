@@ -1,6 +1,16 @@
-import { useEffect, useState } from "react";
-import { useParams } from "@tanstack/react-router";
-import { Search, Sparkles, Sun, Moon, MonitorSmartphone, Target } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "@tanstack/react-router";
+import {
+  Layers,
+  ListChecks,
+  Play,
+  Search,
+  Sparkles,
+  Sun,
+  Moon,
+  MonitorSmartphone,
+  Target,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,9 +29,10 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { useTheme } from "@/hooks/use-theme";
-import { usePreferences } from "@/hooks/use-preferences";
+import { usePreferences, useProfile } from "@/hooks/use-preferences";
+import { startOfDayIso } from "@/lib/timezone";
+import { useStudySessionSecondsSince } from "@/features/study-sessions/hooks";
 import { UserMenu, useBreadcrumbLabel } from "./navigation";
 import {
   Breadcrumb,
@@ -40,6 +51,9 @@ export function TopBar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const label = useBreadcrumbLabel();
   const { data: prefs } = usePreferences();
+  const { data: profile } = useProfile();
+  const sinceIso = useMemo(() => startOfDayIso(profile?.timezone), [profile?.timezone]);
+  const { data: todaySeconds } = useStudySessionSecondsSince(sinceIso);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -94,7 +108,10 @@ export function TopBar() {
 
         <QuickCreate />
 
-        <DailyGoalIndicator minutes={prefs?.daily_study_goal_minutes ?? 60} />
+        <DailyGoalIndicator
+          todaySeconds={todaySeconds ?? 0}
+          goalMinutes={prefs?.daily_study_goal_minutes ?? 60}
+        />
 
         <ThemeToggle />
 
@@ -119,8 +136,6 @@ export function TopBar() {
     </header>
   );
 }
-
-const QUICK_CREATE_UNAVAILABLE = ["Anotação", "Flashcard", "Questão", "Sessão de estudo"];
 
 function QuickCreate() {
   const [areaFormOpen, setAreaFormOpen] = useState(false);
@@ -153,14 +168,21 @@ function QuickCreate() {
           <DropdownMenuItem onClick={() => setModuleFormOpen(true)}>Novo módulo</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setLessonFormOpen(true)}>Nova aula</DropdownMenuItem>
           <DropdownMenuSeparator />
-          {QUICK_CREATE_UNAVAILABLE.map((item) => (
-            <DropdownMenuItem key={item} disabled>
-              <span className="flex-1">{item}</span>
-              <Badge variant="secondary" className="ml-2 text-[10px]">
-                Em breve
-              </Badge>
-            </DropdownMenuItem>
-          ))}
+          <DropdownMenuItem asChild>
+            <Link to="/app/flashcards">
+              <Layers className="mr-2 h-4 w-4" aria-hidden /> Novo flashcard
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/app/questoes">
+              <ListChecks className="mr-2 h-4 w-4" aria-hidden /> Nova questão
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/app/estudar">
+              <Play className="mr-2 h-4 w-4" aria-hidden /> Nova sessão de estudo
+            </Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -185,17 +207,26 @@ function QuickCreate() {
   );
 }
 
-function DailyGoalIndicator({ minutes }: { minutes: number }) {
+function DailyGoalIndicator({
+  todaySeconds,
+  goalMinutes,
+}: {
+  todaySeconds: number;
+  goalMinutes: number;
+}) {
+  const todayMinutes = Math.round(todaySeconds / 60);
   return (
     <TooltipProvider delayDuration={200}>
       <Tooltip>
         <TooltipTrigger asChild>
           <div
             className="hidden md:flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground"
-            aria-label={`Meta diária: ${minutes} minutos`}
+            aria-label={`Meta diária: ${todayMinutes} de ${goalMinutes} minutos`}
           >
             <Target className="h-3.5 w-3.5" aria-hidden />
-            <span>{minutes} min</span>
+            <span>
+              {todayMinutes}/{goalMinutes} min
+            </span>
           </div>
         </TooltipTrigger>
         <TooltipContent>Meta diária de estudo</TooltipContent>

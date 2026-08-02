@@ -1,17 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Clock, Layers, ListChecks, PlayCircle, Sparkles, Target } from "lucide-react";
+import { useMemo } from "react";
 
 import { EmptyState, PageHeader, Section } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useProfile } from "@/hooks/use-preferences";
+import { useProfile, usePreferences } from "@/hooks/use-preferences";
 import { useAuth } from "@/hooks/use-auth";
+import { resolveTimezone, startOfDayIso } from "@/lib/timezone";
 import { useAllCourses } from "@/features/studies/hooks/use-courses";
 import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
 import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
 import { calculateCourseProgress, COURSE_STATUS_LABELS } from "@/features/studies/utils";
+import { useDueFlashcards } from "@/features/flashcards/hooks";
+import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
+import {
+  useRecentStudySessions,
+  useStudySessionSecondsSince,
+} from "@/features/study-sessions/hooks";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
@@ -24,6 +33,12 @@ function DashboardPage() {
   const { data: courses, isLoading: coursesLoading } = useAllCourses();
   const { data: allModules } = useAllCourseModules();
   const { data: allLessons } = useAllLessons();
+  const { data: prefs } = usePreferences();
+  const { data: dueFlashcards, isLoading: dueFlashcardsLoading } = useDueFlashcards();
+  const sinceIso = useMemo(() => startOfDayIso(profile?.timezone), [profile?.timezone]);
+  const { data: todaySeconds, isLoading: todaySecondsLoading } =
+    useStudySessionSecondsSince(sinceIso);
+  const { data: recentSessions, isLoading: recentSessionsLoading } = useRecentStudySessions(5);
   const displayName =
     profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
   const greeting = greetingForNow(profile?.timezone);
@@ -86,19 +101,38 @@ function DashboardPage() {
         </Section>
 
         <Section title="Revisões de hoje">
-          <EmptyState
-            icon={<Layers className="h-5 w-5" aria-hidden />}
-            title="Nenhuma revisão programada"
-            description="Flashcards e revisão espaçada serão exibidos aqui assim que existirem cartões."
-          />
+          {dueFlashcardsLoading ? (
+            <Skeleton className="h-14 w-full" />
+          ) : !dueFlashcards || dueFlashcards.length === 0 ? (
+            <EmptyState
+              icon={<Layers className="h-5 w-5" aria-hidden />}
+              title="Nenhuma revisão programada"
+              description="Flashcards e revisão espaçada serão exibidos aqui assim que existirem cartões devidos."
+            />
+          ) : (
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3">
+              <div>
+                <p className="text-2xl font-semibold text-foreground">{dueFlashcards.length}</p>
+                <p className="text-xs text-muted-foreground">
+                  {dueFlashcards.length === 1 ? "cartão devido" : "cartões devidos"} agora
+                </p>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/app/flashcards">Revisar</Link>
+              </Button>
+            </div>
+          )}
         </Section>
 
         <Section title="Meta diária">
-          <EmptyState
-            icon={<Target className="h-5 w-5" aria-hidden />}
-            title="Sem sessões registradas hoje"
-            description="Ao iniciar uma sessão de estudo, o progresso da meta aparecerá aqui."
-          />
+          {todaySecondsLoading ? (
+            <Skeleton className="h-14 w-full" />
+          ) : (
+            <DailyGoalProgress
+              todaySeconds={todaySeconds ?? 0}
+              goalMinutes={prefs?.daily_study_goal_minutes ?? 60}
+            />
+          )}
         </Section>
 
         <Section title="Cursos em andamento">
@@ -158,12 +192,45 @@ function DashboardPage() {
         </Section>
       </div>
 
-      <Section title="Atividades recentes">
-        <EmptyState
-          icon={<Clock className="h-5 w-5" aria-hidden />}
-          title="Nenhuma atividade registrada"
-          description="Sessões, questões respondidas e revisões aparecerão aqui em ordem cronológica."
-        />
+      <Section
+        title="Atividades recentes"
+        description="Só sessões de estudo por enquanto — flashcards e questões entram numa fase futura."
+      >
+        {recentSessionsLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-14 w-full" />
+            <Skeleton className="h-14 w-full" />
+          </div>
+        ) : !recentSessions || recentSessions.length === 0 ? (
+          <EmptyState
+            icon={<Clock className="h-5 w-5" aria-hidden />}
+            title="Nenhuma atividade registrada"
+            description="Conclua uma sessão em Estudar para vê-la aqui."
+          />
+        ) : (
+          <div className="space-y-2">
+            {recentSessions.map((session) => {
+              const lesson = (allLessons ?? []).find((l) => l.id === session.lesson_id);
+              const minutes = Math.round((session.duration_seconds ?? 0) / 60);
+              return (
+                <div
+                  key={session.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-foreground">
+                      {STUDY_METHOD_LABELS[session.method]}
+                      {lesson ? ` · ${lesson.title}` : ""}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(session.started_at).toLocaleString("pt-BR")} · {minutes} min
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Section>
 
       <Section title="Atalhos">
@@ -189,6 +256,36 @@ function DashboardPage() {
   );
 }
 
+/**
+ * Sempre visível com números reais, mesmo em 0 min — diferente da taxa de
+ * retenção de flashcards (indefinida sem revisões), 0 minutos hoje contra
+ * uma meta real é um "0%" honesto, não um dado fabricado.
+ */
+function DailyGoalProgress({
+  todaySeconds,
+  goalMinutes,
+}: {
+  todaySeconds: number;
+  goalMinutes: number;
+}) {
+  const todayMinutes = Math.round(todaySeconds / 60);
+  const goalSeconds = goalMinutes * 60;
+  const percent =
+    goalSeconds > 0 ? Math.min(100, Math.round((todaySeconds / goalSeconds) * 100)) : 0;
+
+  return (
+    <div className="space-y-2 rounded-xl border border-border bg-surface/60 px-4 py-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-foreground">
+          {todayMinutes}/{goalMinutes} min
+        </span>
+        <span className="text-xs text-muted-foreground">{percent}%</span>
+      </div>
+      <Progress value={percent} />
+    </div>
+  );
+}
+
 function ShortcutCard({ to, title, icon }: { to: string; title: string; icon: React.ReactNode }) {
   return (
     <Link
@@ -206,7 +303,7 @@ function ShortcutCard({ to, title, icon }: { to: string; title: string; icon: Re
 }
 
 function greetingForNow(timezone?: string): string {
-  const tz = timezone || "America/Sao_Paulo";
+  const tz = resolveTimezone(timezone);
   try {
     const hour = Number(
       new Intl.DateTimeFormat("pt-BR", { hour: "numeric", hour12: false, timeZone: tz }).format(
