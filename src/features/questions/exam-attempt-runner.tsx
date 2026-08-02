@@ -55,7 +55,12 @@ export function ExamAttemptRunner({ exam, attempt, onFinish, onExit }: ExamAttem
 
   useEffect(() => {
     const startedAt = new Date(attempt.started_at).getTime();
-    const tick = () => setElapsed(Math.floor((Date.now() - startedAt) / 1000));
+    // started_at vem do relógio do servidor (now() no INSERT) — se ele
+    // estiver um pouco à frente do relógio do cliente (achado do Gate 4:
+    // ~3,8s de desvio observado), Date.now() - startedAt fica negativo
+    // nos primeiros segundos. Consultivo, não precisa de sincronização de
+    // relógio: só piso em zero até o desvio ser superado pelo tempo real.
+    const tick = () => setElapsed(Math.max(0, Math.floor((Date.now() - startedAt) / 1000)));
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
