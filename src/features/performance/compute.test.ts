@@ -63,6 +63,18 @@ describe("bucketStudyMinutesByDay", () => {
     );
     expect(buckets[6]!.minutes).toBe(Math.round((1800 + 900) / 60));
   });
+
+  it("regressão do achado do Gate 3: janela de 30 dias atravessando a virada de horário de verão (America/New_York) não duplica nem pula bucket", () => {
+    const buckets = bucketStudyMinutesByDay(
+      [],
+      30,
+      "America/New_York",
+      new Date("2026-03-11T15:00:00.000Z"),
+    );
+    expect(buckets).toHaveLength(30);
+    const uniqueDays = new Set(buckets.map((b) => b.bucketStartIso));
+    expect(uniqueDays.size).toBe(30);
+  });
 });
 
 describe("computeAccuracyForWindow", () => {
@@ -127,6 +139,18 @@ describe("bucketAccuracyEvolution", () => {
   it("janela de 90 dias: bucketiza por semana (13 buckets)", () => {
     const buckets = bucketAccuracyEvolution([], 90, "UTC", NOW);
     expect(buckets).toHaveLength(13);
+  });
+
+  it("regressão do achado do Gate 3: 13 buckets semanais atravessando a virada de horário de verão (America/New_York) sem duplicar nem pular semana", () => {
+    const buckets = bucketAccuracyEvolution(
+      [],
+      90,
+      "America/New_York",
+      new Date("2026-03-11T15:00:00.000Z"),
+    );
+    expect(buckets).toHaveLength(13);
+    const uniqueWeeks = new Set(buckets.map((b) => b.bucketStartIso));
+    expect(uniqueWeeks.size).toBe(13);
   });
 
   it("virada de semana: respostas em domingo e na segunda seguinte caem em buckets diferentes (90 dias)", () => {

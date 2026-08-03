@@ -47,15 +47,38 @@ export function startOfDayIso(
   }
 }
 
+/**
+ * Início do dia civil `days` dias antes/depois de `ref`, no fuso dado, como
+ * instante UTC real — passo a passo, um dia civil por vez, ANCORADO NO
+ * MEIO-DIA em vez de subtrair `days * 86_400_000` de uma vez. Meio-dia
+ * nunca fica a menos de ~9h de uma transição de DST (que acontece perto da
+ * meia-noite na maioria dos fusos), então um salto de exatamente 24h a
+ * partir dali nunca erra o dia civil de destino, mesmo num dia com 23h ou
+ * 25h por causa do horário de verão. Subtração direta de `N * 86_400_000`
+ * erraria nesse caso: duplicaria ou pularia um bucket inteiro perto da
+ * meia-noite da transição (achado do Gate 3 — a versão anterior prometia
+ * "não por subtração de milissegundos" no comentário, mas fazia exatamente
+ * isso).
+ */
+export function addCivilDays(timezone: string | null | undefined, ref: Date, days: number): string {
+  const tz = resolveTimezone(timezone);
+  let dayStartIso = startOfDayIso(tz, ref);
+  const step = days < 0 ? -1 : 1;
+  for (let i = 0; i !== days; i += step) {
+    const noon = new Date(new Date(dayStartIso).getTime() + 12 * 3_600_000);
+    dayStartIso = startOfDayIso(tz, new Date(noon.getTime() + step * 86_400_000));
+  }
+  return dayStartIso;
+}
+
 // Segunda=0 .. domingo=6 — ordem usada para achar quantos dias voltar até a segunda.
 const WEEKDAY_MONDAY_FIRST = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /**
  * Início da semana (segunda-feira, 00:00) no fuso informado, como instante
- * UTC real — mesma técnica de startOfDayIso, recalculada dia a dia (não por
- * subtração de milissegundos) para não acumular erro em fusos com DST.
- * Decisão do Gate 1 da Fase 06: semana sempre começa na segunda, no dia
- * civil de profile.timezone.
+ * UTC real — anda dia civil por dia civil via addCivilDays (imune a DST),
+ * nunca subtrai milissegundos direto. Decisão do Gate 1 da Fase 06: semana
+ * sempre começa na segunda, no dia civil de profile.timezone.
  */
 export function startOfWeekIso(
   timezone: string | null | undefined,
@@ -71,6 +94,5 @@ export function startOfWeekIso(
     return startOfWeekIso(DEFAULT_TIMEZONE, referenceDate);
   }
   const daysSinceMonday = Math.max(0, WEEKDAY_MONDAY_FIRST.indexOf(weekdayShort));
-  const mondayReference = new Date(referenceDate.getTime() - daysSinceMonday * 86_400_000);
-  return startOfDayIso(tz, mondayReference);
+  return addCivilDays(tz, referenceDate, -daysSinceMonday);
 }

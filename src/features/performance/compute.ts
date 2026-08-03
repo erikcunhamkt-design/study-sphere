@@ -1,4 +1,4 @@
-import { resolveTimezone, startOfDayIso, startOfWeekIso } from "@/lib/timezone";
+import { addCivilDays, resolveTimezone, startOfDayIso, startOfWeekIso } from "@/lib/timezone";
 import type { StudyMethod, StudySessionForMetrics } from "@/features/study-sessions/types";
 import type { QuestionAttemptForMetrics } from "@/features/questions/types";
 import type {
@@ -36,8 +36,7 @@ export function bucketStudyMinutesByDay(
 
   const buckets: DayMinutes[] = [];
   for (let i = windowDays - 1; i >= 0; i--) {
-    const ref = new Date(now.getTime() - i * 86_400_000);
-    const bucketStartIso = startOfDayIso(timezone, ref);
+    const bucketStartIso = addCivilDays(timezone, now, -i);
     buckets.push({
       bucketStartIso,
       label: formatDayLabel(bucketStartIso, timezone),
@@ -93,8 +92,8 @@ export function bucketAccuracyEvolution(
 
   const buckets: AccuracyBucket[] = [];
   for (let i = bucketCount - 1; i >= 0; i--) {
-    const ref = new Date(now.getTime() - i * stepDays * 86_400_000);
-    const bucketStartIso = bucketKeyFor(ref);
+    const anchorIso = addCivilDays(timezone, now, -i * stepDays);
+    const bucketStartIso = useWeekly ? startOfWeekIso(timezone, new Date(anchorIso)) : anchorIso;
     const t = tallyByBucket.get(bucketStartIso);
     buckets.push({
       bucketStartIso,

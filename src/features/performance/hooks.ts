@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { useProfile } from "@/hooks/use-preferences";
-import { startOfDayIso } from "@/lib/timezone";
+import { addCivilDays } from "@/lib/timezone";
 import { useFlashcardReviews, useFlashcards } from "@/features/flashcards/hooks";
 import { useQuestionAttemptsSince, useQuestions } from "@/features/questions/hooks";
 import { useStudySessionsSince } from "@/features/study-sessions/hooks";
@@ -31,11 +31,10 @@ export function usePerformanceMetrics(windowDays: WindowDays) {
   const { data: profile } = useProfile();
   const timezone = profile?.timezone;
 
-  const windowSinceIso = useMemo(() => {
-    const now = new Date();
-    const start = new Date(now.getTime() - (windowDays - 1) * 86_400_000);
-    return startOfDayIso(timezone, start);
-  }, [timezone, windowDays]);
+  const windowSinceIso = useMemo(
+    () => addCivilDays(timezone, new Date(), -(windowDays - 1)),
+    [timezone, windowDays],
+  );
 
   const studySessions = useStudySessionsSince(windowSinceIso);
   const questionAttempts = useQuestionAttemptsSince(windowSinceIso);

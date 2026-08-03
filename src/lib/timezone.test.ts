@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveTimezone, startOfDayIso, startOfWeekIso } from "./timezone";
+import { addCivilDays, resolveTimezone, startOfDayIso, startOfWeekIso } from "./timezone";
 
 describe("resolveTimezone", () => {
   it("usa o fuso informado quando presente", () => {
@@ -84,5 +84,58 @@ describe("startOfWeekIso", () => {
     const ref = new Date("2026-01-28T14:00:00.000Z");
     expect(() => startOfWeekIso("Not/AZone", ref)).not.toThrow();
     expect(startOfWeekIso("Not/AZone", ref)).toBe(startOfWeekIso(undefined, ref));
+  });
+});
+
+describe("addCivilDays", () => {
+  it("0 dias retorna o próprio dia civil", () => {
+    const ref = new Date("2026-08-02T14:00:00.000Z");
+    expect(addCivilDays("UTC", ref, 0)).toBe(startOfDayIso("UTC", ref));
+  });
+
+  it("anda pra frente e pra trás o número certo de dias (UTC)", () => {
+    const ref = new Date("2026-08-02T14:00:00.000Z"); // 2026-08-02
+    expect(new Date(addCivilDays("UTC", ref, 3)).toISOString()).toBe("2026-08-05T00:00:00.000Z");
+    expect(new Date(addCivilDays("UTC", ref, -3)).toISOString()).toBe("2026-07-30T00:00:00.000Z");
+  });
+
+  it("startOfWeekIso e addCivilDays concordam (mesmo resultado pra segunda-feira)", () => {
+    const wednesday = new Date("2026-01-28T14:00:00.000Z");
+    expect(startOfWeekIso("UTC", wednesday)).toBe(addCivilDays("UTC", wednesday, -2));
+  });
+
+  /**
+   * Regressão do achado do Gate 3: a versão anterior de startOfWeekIso (e os
+   * loops de bucket de compute.ts/hooks.ts) subtraíam `N * 86_400_000` de
+   * uma vez. Num fuso com DST, um dia de 23h (virada de horário de verão)
+   * faz essa subtração pular o dia civil errado depois de acumular alguns
+   * passos — o teste abaixo anda 8 dias civis atravessando a virada de
+   * 08/03/2026 em America/New_York (23h de duração) e verifica que os 8
+   * dias resultantes são todos distintos e em ordem — nenhum duplicado
+   * (que contaria minutos 2x num gráfico) nem pulado (que sumiria com um
+   * dia inteiro de dado).
+   */
+  it("atravessa a virada de horário de verão (America/New_York, 08/03/2026) sem duplicar nem pular dia civil", () => {
+    const now = new Date("2026-03-11T15:00:00.000Z");
+    const isos = Array.from({ length: 8 }, (_, i) =>
+      addCivilDays("America/New_York", now, -(7 - i)),
+    );
+    const days = isos.map((iso) => iso.slice(0, 10));
+    expect(new Set(days).size).toBe(8);
+    expect(days).toEqual([
+      "2026-03-04",
+      "2026-03-05",
+      "2026-03-06",
+      "2026-03-07",
+      "2026-03-08",
+      "2026-03-09",
+      "2026-03-10",
+      "2026-03-11",
+    ]);
+  });
+
+  it("cai para o fuso padrão em timezone inválido, sem lançar", () => {
+    const ref = new Date("2026-01-28T14:00:00.000Z");
+    expect(() => addCivilDays("Not/AZone", ref, 2)).not.toThrow();
   });
 });
