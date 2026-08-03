@@ -51,3 +51,13 @@ export interface StudySessionRow {
   created_at: string;
   updated_at: string;
 }
+
+/** Forma mínima para métricas (Fase 06) — sem `details`, que as métricas não usam. */
+export interface StudySessionForMetrics {
+  id: string;
+  method: StudyMethod;
+  started_at: string;
+  ended_at: string | null;
+  duration_seconds: number | null;
+  lesson_id: string | null;
+}

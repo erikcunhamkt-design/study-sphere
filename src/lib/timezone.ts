@@ -46,3 +46,31 @@ export function startOfDayIso(
     return startOfDayIso(DEFAULT_TIMEZONE, referenceDate);
   }
 }
+
+// Segunda=0 .. domingo=6 — ordem usada para achar quantos dias voltar até a segunda.
+const WEEKDAY_MONDAY_FIRST = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/**
+ * Início da semana (segunda-feira, 00:00) no fuso informado, como instante
+ * UTC real — mesma técnica de startOfDayIso, recalculada dia a dia (não por
+ * subtração de milissegundos) para não acumular erro em fusos com DST.
+ * Decisão do Gate 1 da Fase 06: semana sempre começa na segunda, no dia
+ * civil de profile.timezone.
+ */
+export function startOfWeekIso(
+  timezone: string | null | undefined,
+  referenceDate = new Date(),
+): string {
+  const tz = resolveTimezone(timezone);
+  let weekdayShort: string;
+  try {
+    weekdayShort = new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short" }).format(
+      referenceDate,
+    );
+  } catch {
+    return startOfWeekIso(DEFAULT_TIMEZONE, referenceDate);
+  }
+  const daysSinceMonday = Math.max(0, WEEKDAY_MONDAY_FIRST.indexOf(weekdayShort));
+  const mondayReference = new Date(referenceDate.getTime() - daysSinceMonday * 86_400_000);
+  return startOfDayIso(tz, mondayReference);
+}

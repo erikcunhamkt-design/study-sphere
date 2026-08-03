@@ -60,6 +60,14 @@ export interface QuestionAttemptRow {
   is_correct: boolean;
 }
 
+/** Forma mínima para métricas (Fase 06) — sem os campos de forma da resposta. */
+export interface QuestionAttemptForMetrics {
+  question_id: string;
+  attempted_at: string;
+  is_correct: boolean;
+  exam_attempt_id: string | null;
+}
+
 /** Devolvido por submit_question_attempt — o cliente nunca calcula is_correct sozinho. */
 export interface SubmitQuestionAttemptResult {
   attempt_id: string;

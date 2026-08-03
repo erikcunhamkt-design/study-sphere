@@ -16,6 +16,10 @@ export function studySessionSecondsKey(userId: string | undefined, sinceIso: str
   return ["study-sessions-seconds", userId, sinceIso] as const;
 }
 
+export function studySessionsSinceKey(userId: string | undefined, sinceIso: string | undefined) {
+  return ["study-sessions-since", userId, sinceIso] as const;
+}
+
 export function useInProgressStudySessions() {
   const { user } = useAuth();
   return useQuery({
@@ -44,6 +48,16 @@ export function useStudySessionSecondsSince(sinceIso: string | undefined) {
   });
 }
 
+/** Para métricas (Fase 06) — sessões finalizadas numa janela, colunas mínimas. */
+export function useStudySessionsSince(sinceIso: string | undefined) {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: !!user && !!sinceIso,
+    queryKey: studySessionsSinceKey(user?.id, sinceIso),
+    queryFn: () => api.fetchStudySessionsSince(user!.id, sinceIso!),
+  });
+}
+
 function useInvalidateStudySessionLists() {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -51,6 +65,7 @@ function useInvalidateStudySessionLists() {
     void qc.invalidateQueries({ queryKey: inProgressStudySessionsKey(user?.id) });
     void qc.invalidateQueries({ queryKey: ["study-sessions-recent", user?.id] });
     void qc.invalidateQueries({ queryKey: ["study-sessions-seconds", user?.id] });
+    void qc.invalidateQueries({ queryKey: ["study-sessions-since", user?.id] });
   };
 }
 
