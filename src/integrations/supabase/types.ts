@@ -533,6 +533,77 @@ export type Database = {
           },
         ]
       }
+      planned_studies: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          estimated_minutes: number | null
+          id: string
+          scheduled_date: string
+          status: string
+          study_area_id: string | null
+          study_session_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          estimated_minutes?: number | null
+          id?: string
+          scheduled_date: string
+          status?: string
+          study_area_id?: string | null
+          study_session_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          estimated_minutes?: number | null
+          id?: string
+          scheduled_date?: string
+          status?: string
+          study_area_id?: string | null
+          study_session_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "planned_studies_course_user_fkey"
+            columns: ["course_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "planned_studies_session_user_fkey"
+            columns: ["study_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "planned_studies_study_area_user_fkey"
+            columns: ["study_area_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "study_areas"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "planned_studies_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
