@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -60,7 +61,14 @@ export function FeynmanSession({ resumingSession, onDone, plannedId }: FeynmanSe
           disabled={createSession.isPending}
           className="w-full"
         >
-          Começar explicação
+          {createSession.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              Iniciando...
+            </>
+          ) : (
+            "Começar explicação"
+          )}
         </Button>
       </div>
     );

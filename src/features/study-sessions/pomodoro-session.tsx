@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -53,7 +54,14 @@ export function PomodoroSession({ resumingSession, onDone, plannedId }: Pomodoro
           disabled={createSession.isPending}
           className="w-full"
         >
-          Iniciar Pomodoro
+          {createSession.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              Iniciando...
+            </>
+          ) : (
+            "Iniciar Pomodoro"
+          )}
         </Button>
       </div>
     );

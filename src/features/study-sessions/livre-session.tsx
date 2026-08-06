@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -66,7 +67,14 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
           disabled={createSession.isPending}
           className="w-full"
         >
-          Iniciar sessão livre
+          {createSession.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              Iniciando...
+            </>
+          ) : (
+            "Iniciar sessão livre"
+          )}
         </Button>
       </div>
     );
