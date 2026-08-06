@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -70,7 +71,14 @@ export function BlurtingSession({ resumingSession, onDone, plannedId }: Blurting
           disabled={createSession.isPending}
           className="w-full"
         >
-          Começar blurting
+          {createSession.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              Iniciando...
+            </>
+          ) : (
+            "Começar blurting"
+          )}
         </Button>
       </div>
     );
