@@ -63,3 +63,21 @@ export function useDeletePlannedStudy() {
     onSuccess: invalidate,
   });
 }
+
+export function useCompletePlannedStudyManually() {
+  const invalidate = useInvalidatePlannedStudies();
+  return useMutation({
+    mutationFn: (plannedId: string) => api.completePlannedStudyManually(plannedId),
+    onSuccess: invalidate,
+  });
+}
+
+export function useLinkedSessionDurations(sessionIds: string[]) {
+  // Chave estável ordenada: evita refetch por reordenação do array.
+  const key = [...sessionIds].sort();
+  return useQuery({
+    enabled: sessionIds.length > 0,
+    queryKey: ["planned-linked-durations", key],
+    queryFn: () => api.fetchLinkedSessionDurations(sessionIds),
+  });
+}

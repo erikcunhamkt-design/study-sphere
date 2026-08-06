@@ -14,6 +14,13 @@ import { ResumeBanner } from "@/features/study-sessions/resume-banner";
 import type { StudyMethod, StudySessionRow } from "@/features/study-sessions/types";
 
 export const Route = createFileRoute("/app/estudar")({
+  validateSearch: (search: Record<string, unknown>): { plannedId?: string } => {
+    const raw = search.plannedId;
+    if (typeof raw === "string" && /^[0-9a-fA-F-]{36}$/.test(raw)) {
+      return { plannedId: raw };
+    }
+    return {};
+  },
   component: EstudarPage,
 });
 
@@ -51,6 +58,7 @@ const METHODS: { method: StudyMethod; description: string; icon: typeof Timer }[
 ];
 
 function EstudarPage() {
+  const { plannedId } = Route.useSearch();
   const [activeMethod, setActiveMethod] = useState<StudyMethod | null>(null);
   const [resumingSession, setResumingSession] = useState<StudySessionRow | null>(null);
 
@@ -70,15 +78,15 @@ function EstudarPage() {
       <div className="space-y-6">
         <PageHeader title={label} />
         {activeMethod === "pomodoro" ? (
-          <PomodoroSession resumingSession={resumingSession} onDone={backToHub} />
+          <PomodoroSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "feynman" ? (
-          <FeynmanSession resumingSession={resumingSession} onDone={backToHub} />
+          <FeynmanSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "blurting" ? (
-          <BlurtingSession resumingSession={resumingSession} onDone={backToHub} />
+          <BlurtingSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "cornell" ? (
-          <CornellSession resumingSession={resumingSession} onDone={backToHub} />
+          <CornellSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "livre" ? (
-          <LivreSession resumingSession={resumingSession} onDone={backToHub} />
+          <LivreSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : (
           <RecordacaoAtivaHub onBack={backToHub} />
         )}
