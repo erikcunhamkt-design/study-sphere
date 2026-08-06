@@ -25,7 +25,7 @@ export function LivreSession({ resumingSession, onDone }: LivreSessionProps) {
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [nota, setNota] = useState("");
   const createSession = useCreateStudySession();
-  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "");
+  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
   const elapsed = useElapsedSeconds(session?.started_at ?? NO_SESSION_ISO);
 
   useUnsavedTextWarning(!!session && nota.trim().length > 0);

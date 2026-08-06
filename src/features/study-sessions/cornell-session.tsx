@@ -13,16 +13,17 @@ import type { CornellDetails, StudySessionRow } from "./types";
 interface CornellSessionProps {
   resumingSession: StudySessionRow | null;
   onDone: () => void;
+  plannedId?: string;
 }
 
-export function CornellSession({ resumingSession, onDone }: CornellSessionProps) {
+export function CornellSession({ resumingSession, onDone, plannedId }: CornellSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [notas, setNotas] = useState("");
   const [pistas, setPistas] = useState("");
   const [resumo, setResumo] = useState("");
   const createSession = useCreateStudySession();
-  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "");
+  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
 
   const isDirty = notas.trim().length > 0 || pistas.trim().length > 0 || resumo.trim().length > 0;
   useUnsavedTextWarning(!!session && isDirty);
