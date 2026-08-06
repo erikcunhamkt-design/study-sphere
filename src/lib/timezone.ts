@@ -46,3 +46,28 @@ export function startOfDayIso(
     return startOfDayIso(DEFAULT_TIMEZONE, referenceDate);
   }
 }
+
+/**
+ * Data civil de hoje (YYYY-MM-DD) no fuso informado — para comparar com colunas
+ * DATE (ex.: planned_studies.scheduled_date), que são dia civil sem fuso.
+ * "Hoje" é sempre relativo a profile.timezone, nunca ao relógio do dispositivo
+ * (mesma decisão da Fase 05.2).
+ */
+export function civilDateInTimezone(
+  timezone: string | null | undefined,
+  referenceDate = new Date(),
+): string {
+  const tz = resolveTimezone(timezone);
+  try {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: tz,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(referenceDate);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+    return `${get("year")}-${get("month")}-${get("day")}`;
+  } catch {
+    return civilDateInTimezone(DEFAULT_TIMEZONE, referenceDate);
+  }
+}
