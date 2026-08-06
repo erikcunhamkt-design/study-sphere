@@ -98,9 +98,9 @@ export async function submitQuestionAttempt(input: {
 }): Promise<SubmitQuestionAttemptResult> {
   const { data, error } = await supabase.rpc("submit_question_attempt", {
     p_question_id: input.questionId,
-    p_selected_option_index: input.selectedOptionIndex ?? undefined,
-    p_self_assessed_correct: input.selfAssessedCorrect ?? undefined,
-    p_exam_attempt_id: input.examAttemptId ?? undefined,
+    p_selected_option_index: input.selectedOptionIndex ?? null,
+    p_self_assessed_correct: input.selfAssessedCorrect ?? null,
+    p_exam_attempt_id: input.examAttemptId ?? null,
   });
   if (error) throw error;
   return data as unknown as SubmitQuestionAttemptResult;
