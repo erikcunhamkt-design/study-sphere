@@ -89,34 +89,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient; auth
       { property: "og:description", content: APP_CONFIG.description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { title: "Lovable App" },
-      { property: "og:title", content: "Lovable App" },
-      { name: "twitter:title", content: "Lovable App" },
-      {
-        name: "description",
-        content:
-          "Study Sphere is a foundational study application for organizing knowledge, courses, and study materials.",
-      },
-      {
-        property: "og:description",
-        content:
-          "Study Sphere is a foundational study application for organizing knowledge, courses, and study materials.",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Study Sphere is a foundational study application for organizing knowledge, courses, and study materials.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/db79cc65-bc17-4d08-8914-f861270bf80a/id-preview-585b04e0--fa7f1e51-5b7b-47ce-8b2b-6c97f6e4f825.lovable.app-1784417251243.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/db79cc65-bc17-4d08-8914-f861270bf80a/id-preview-585b04e0--fa7f1e51-5b7b-47ce-8b2b-6c97f6e4f825.lovable.app-1784417251243.png",
-      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

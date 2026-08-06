@@ -9,21 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
-import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as CadastroRouteImport } from './routes/cadastro'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppQuestoesRouteImport } from './routes/app.questoes'
-import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
-import { Route as AppFlashcardsRouteImport } from './routes/app.flashcards'
-import { Route as AppFaculdadeRouteImport } from './routes/app.faculdade'
-import { Route as AppEstudarRouteImport } from './routes/app.estudar'
-import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
-import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
+import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
+import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
+import { Route as AppEstudarRouteImport } from './routes/app.estudar'
+import { Route as AppFaculdadeRouteImport } from './routes/app.faculdade'
+import { Route as AppFlashcardsRouteImport } from './routes/app.flashcards'
+import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
+import { Route as AppQuestoesRouteImport } from './routes/app.questoes'
 import { Route as AppEstudosIndexRouteImport } from './routes/app.estudos.index'
 import { Route as AppLabEditorRouteImport } from './routes/app.lab.editor'
 import { Route as AppEstudosAreaIdIndexRouteImport } from './routes/app.estudos.$areaId.index'
@@ -31,24 +31,9 @@ import { Route as AppEstudosAreaIdCursosCourseIdIndexRouteImport } from './route
 import { Route as AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.modulos.$moduleId.index'
 import { Route as AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.modulos.$moduleId.aulas.$lessonId'
 
-const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
-  id: '/redefinir-senha',
-  path: '/redefinir-senha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
-  id: '/recuperar-senha',
-  path: '/recuperar-senha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CadastroRoute = CadastroRouteImport.update({
-  id: '/cadastro',
-  path: '/cadastro',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -56,9 +41,24 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -66,34 +66,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppQuestoesRoute = AppQuestoesRouteImport.update({
-  id: '/questoes',
-  path: '/questoes',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
-  id: '/planejamento',
-  path: '/planejamento',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppFlashcardsRoute = AppFlashcardsRouteImport.update({
-  id: '/flashcards',
-  path: '/flashcards',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppFaculdadeRoute = AppFaculdadeRouteImport.update({
-  id: '/faculdade',
-  path: '/faculdade',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppEstudarRoute = AppEstudarRouteImport.update({
-  id: '/estudar',
-  path: '/estudar',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDesempenhoRoute = AppDesempenhoRouteImport.update({
-  id: '/desempenho',
-  path: '/desempenho',
+const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
   getParentRoute: () => AppRoute,
 } as any)
 const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
@@ -101,9 +76,34 @@ const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
   path: '/configuracoes',
   getParentRoute: () => AppRoute,
 } as any)
-const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
-  id: '/biblioteca',
-  path: '/biblioteca',
+const AppDesempenhoRoute = AppDesempenhoRouteImport.update({
+  id: '/desempenho',
+  path: '/desempenho',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEstudarRoute = AppEstudarRouteImport.update({
+  id: '/estudar',
+  path: '/estudar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFaculdadeRoute = AppFaculdadeRouteImport.update({
+  id: '/faculdade',
+  path: '/faculdade',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFlashcardsRoute = AppFlashcardsRouteImport.update({
+  id: '/flashcards',
+  path: '/flashcards',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
+  id: '/planejamento',
+  path: '/planejamento',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQuestoesRoute = AppQuestoesRouteImport.update({
+  id: '/questoes',
+  path: '/questoes',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEstudosIndexRoute = AppEstudosIndexRouteImport.update({
@@ -291,32 +291,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/redefinir-senha': {
-      id: '/redefinir-senha'
-      path: '/redefinir-senha'
-      fullPath: '/redefinir-senha'
-      preLoaderRoute: typeof RedefinirSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recuperar-senha': {
-      id: '/recuperar-senha'
-      path: '/recuperar-senha'
-      fullPath: '/recuperar-senha'
-      preLoaderRoute: typeof RecuperarSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cadastro': {
-      id: '/cadastro'
-      path: '/cadastro'
-      fullPath: '/cadastro'
-      preLoaderRoute: typeof CadastroRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -326,11 +305,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recuperar-senha': {
+      id: '/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/recuperar-senha'
+      preLoaderRoute: typeof RecuperarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -340,46 +340,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/questoes': {
-      id: '/app/questoes'
-      path: '/questoes'
-      fullPath: '/app/questoes'
-      preLoaderRoute: typeof AppQuestoesRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/planejamento': {
-      id: '/app/planejamento'
-      path: '/planejamento'
-      fullPath: '/app/planejamento'
-      preLoaderRoute: typeof AppPlanejamentoRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/flashcards': {
-      id: '/app/flashcards'
-      path: '/flashcards'
-      fullPath: '/app/flashcards'
-      preLoaderRoute: typeof AppFlashcardsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/faculdade': {
-      id: '/app/faculdade'
-      path: '/faculdade'
-      fullPath: '/app/faculdade'
-      preLoaderRoute: typeof AppFaculdadeRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/estudar': {
-      id: '/app/estudar'
-      path: '/estudar'
-      fullPath: '/app/estudar'
-      preLoaderRoute: typeof AppEstudarRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/desempenho': {
-      id: '/app/desempenho'
-      path: '/desempenho'
-      fullPath: '/app/desempenho'
-      preLoaderRoute: typeof AppDesempenhoRouteImport
+    '/app/biblioteca': {
+      id: '/app/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/app/biblioteca'
+      preLoaderRoute: typeof AppBibliotecaRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/configuracoes': {
@@ -389,11 +354,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConfiguracoesRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/biblioteca': {
-      id: '/app/biblioteca'
-      path: '/biblioteca'
-      fullPath: '/app/biblioteca'
-      preLoaderRoute: typeof AppBibliotecaRouteImport
+    '/app/desempenho': {
+      id: '/app/desempenho'
+      path: '/desempenho'
+      fullPath: '/app/desempenho'
+      preLoaderRoute: typeof AppDesempenhoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/estudar': {
+      id: '/app/estudar'
+      path: '/estudar'
+      fullPath: '/app/estudar'
+      preLoaderRoute: typeof AppEstudarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/faculdade': {
+      id: '/app/faculdade'
+      path: '/faculdade'
+      fullPath: '/app/faculdade'
+      preLoaderRoute: typeof AppFaculdadeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/flashcards': {
+      id: '/app/flashcards'
+      path: '/flashcards'
+      fullPath: '/app/flashcards'
+      preLoaderRoute: typeof AppFlashcardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/planejamento': {
+      id: '/app/planejamento'
+      path: '/planejamento'
+      fullPath: '/app/planejamento'
+      preLoaderRoute: typeof AppPlanejamentoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/questoes': {
+      id: '/app/questoes'
+      path: '/questoes'
+      fullPath: '/app/questoes'
+      preLoaderRoute: typeof AppQuestoesRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/estudos/': {
