@@ -1,6 +1,6 @@
 import { addCivilDays, resolveTimezone, startOfDayIso, startOfWeekIso } from "@/lib/timezone";
 import type { StudyMethod, StudySessionForMetrics } from "@/features/study-sessions/types";
-import type { QuestionAttemptForMetrics } from "@/features/questions/types";
+import type { QuestionAttemptRow } from "@/features/questions/types";
 import type {
   AccuracyBucket,
   AreaDomainResult,
@@ -53,7 +53,7 @@ export function bucketStudyMinutesByDay(
  * resposta real do usuário e conta no acerto (ajuste #4 do Gate 1 da Fase
  * 06). Não "corrija" isso achando que é bug.
  */
-export function computeAccuracyForWindow(attempts: QuestionAttemptForMetrics[]): {
+export function computeAccuracyForWindow(attempts: QuestionAttemptRow[]): {
   accuracyPct: number | null;
   total: number;
   correct: number;
@@ -70,7 +70,7 @@ export function computeAccuracyForWindow(attempts: QuestionAttemptForMetrics[]):
  * gráfico via connectNulls={false}), nunca 0%.
  */
 export function bucketAccuracyEvolution(
-  attempts: QuestionAttemptForMetrics[],
+  attempts: QuestionAttemptRow[],
   windowDays: WindowDays,
   timezone: string | null | undefined,
   now = new Date(),

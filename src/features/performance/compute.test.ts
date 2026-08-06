@@ -10,7 +10,7 @@ import {
   computeTimeByMethod,
 } from "./compute";
 import type { StudySessionForMetrics } from "@/features/study-sessions/types";
-import type { QuestionAttemptForMetrics } from "@/features/questions/types";
+import type { QuestionAttemptRow } from "@/features/questions/types";
 
 const NOW = new Date("2026-08-02T12:00:00.000Z"); // domingo, UTC
 
@@ -26,12 +26,16 @@ function session(overrides: Partial<StudySessionForMetrics>): StudySessionForMet
   };
 }
 
-function attempt(overrides: Partial<QuestionAttemptForMetrics>): QuestionAttemptForMetrics {
+function attempt(overrides: Partial<QuestionAttemptRow>): QuestionAttemptRow {
   return {
+    id: "qa1",
+    user_id: "u1",
     question_id: "q1",
     attempted_at: "2026-08-02T10:00:00.000Z",
     is_correct: true,
     exam_attempt_id: null,
+    selected_option_index: null,
+    self_assessed_correct: null,
     ...overrides,
   };
 }

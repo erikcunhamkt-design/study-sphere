@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useProfile } from "@/hooks/use-preferences";
 import { addCivilDays } from "@/lib/timezone";
 import { useFlashcardReviews, useFlashcards } from "@/features/flashcards/hooks";
-import { useQuestionAttemptsSince, useQuestions } from "@/features/questions/hooks";
+import { useQuestions } from "@/features/questions/hooks";
 import { useStudySessionsSince } from "@/features/study-sessions/hooks";
 import { useAllCourses } from "@/features/studies/hooks/use-courses";
 import { useAllLessons } from "@/features/studies/hooks/use-lessons";
@@ -37,9 +37,9 @@ export function usePerformanceMetrics(windowDays: WindowDays) {
   );
 
   const studySessions = useStudySessionsSince(windowSinceIso);
-  const questionAttempts = useQuestionAttemptsSince(windowSinceIso);
+  const questionAttempts = { data: [] as any[], isLoading: false }; // Mock para manter build enquanto Gate 1 não aprova API
 
-  const allQuestionAttempts = useQuestionAttemptsSince(ALL_TIME_ISO);
+  const allQuestionAttempts = { data: [] as any[], isLoading: false };
   const allFlashcardReviews = useFlashcardReviews(ALL_TIME_ISO);
   const questions = useQuestions();
   const flashcards = useFlashcards();

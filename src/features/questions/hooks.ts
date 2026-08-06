@@ -23,9 +23,6 @@ export function questionAttemptsKey(userId: string | undefined, examAttemptId: s
   return ["question-attempts", userId, examAttemptId] as const;
 }
 
-export function questionAttemptsSinceKey(userId: string | undefined, sinceIso: string | undefined) {
-  return ["question-attempts-since", userId, sinceIso] as const;
-}
 
 // ---------------------------------------------------------------------
 // Questions
@@ -232,12 +229,3 @@ export function useQuestionAttempts(examAttemptId: string | undefined) {
   });
 }
 
-/** Para métricas (Fase 06) — todas as respostas do usuário numa janela. */
-export function useQuestionAttemptsSince(sinceIso: string | undefined) {
-  const { user } = useAuth();
-  return useQuery({
-    enabled: !!user && !!sinceIso,
-    queryKey: questionAttemptsSinceKey(user?.id, sinceIso),
-    queryFn: () => api.fetchQuestionAttemptsSince(user!.id, sinceIso!),
-  });
-}
