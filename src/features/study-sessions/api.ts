@@ -56,6 +56,12 @@ export async function createStudySession(
   userId: string,
   input: CreateStudySessionInput,
 ): Promise<StudySessionRow> {
+  const t0 = performance.now();
+  console.log("[perf] createStudySession: antes do getSession");
+  const { data: sess } = await supabase.auth.getSession();
+  const t1 = performance.now();
+  console.log(`[perf] getSession levou ${(t1 - t0).toFixed(0)}ms; token? ${!!sess.session?.access_token}`);
+
   const { data, error } = await supabase
     .from("study_sessions")
     .insert({
@@ -66,6 +72,10 @@ export async function createStudySession(
     })
     .select(STUDY_SESSION_COLUMNS)
     .single();
+
+  const t2 = performance.now();
+  console.log(`[perf] insert levou ${(t2 - t1).toFixed(0)}ms; erro? ${error?.message ?? "nenhum"}`);
+
   if (error) throw error;
   return data as unknown as StudySessionRow;
 }
