@@ -15,12 +15,13 @@ import type { LivreDetails, StudySessionRow } from "./types";
 interface LivreSessionProps {
   resumingSession: StudySessionRow | null;
   onDone: () => void;
+  plannedId?: string;
 }
 
 /** Fallback estável para useElapsedSeconds antes de a sessão existir — nunca exibido (o timer só aparece depois do INSERT). */
 const NO_SESSION_ISO = new Date(0).toISOString();
 
-export function LivreSession({ resumingSession, onDone }: LivreSessionProps) {
+export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [nota, setNota] = useState("");
