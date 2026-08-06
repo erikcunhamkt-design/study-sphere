@@ -63,7 +63,7 @@ Não utilizaremos RPC. Embora duas escritas no cliente não sejam atômicas, o r
 
 ### Reversão e Integridade (Decisão 4)
 A migration 06.1 já garante integridade referencial: `ON DELETE SET NULL`. 
-- **Decisão**: Se a sessão sumir, o status `completed` deve ser tratado como inconsistente. Recomendamos que o hook de busca (`usePlannedStudiesInRange`) ou a UI do `DaySheet` trate isso: se `status === 'completed'` mas `study_session_id === null`, exibe um aviso ou reseta para `planned`.
+- **Decisão**: Se a sessão vinculada for excluída, o app detectará a inconsistência (`status === 'completed'` mas `study_session_id === null`). Em vez de reset automático, a UI do `DaySheet` exibirá um aviso visual informando que a sessão foi removida, oferecendo botões explícitos para o usuário "Limpar vínculo" (voltar para `planned`) ou manter como concluído manualmente. Isso evita escritas silenciosas disparadas por leituras.
 
 ### Restrições Inegociáveis
 - **Sem RPC**: Respeitado. Usaremos `UPDATE` via RLS.
