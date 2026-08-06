@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { PlannedStudyRow } from "./types";
-import { useDeletePlannedStudy, useSetPlannedStudyStatus } from "./hooks";
+import { useDeletePlannedStudy, useSetPlannedStudyStatus, useCompletePlannedStudyManually, useLinkedSessionDurations } from "./hooks";
 import { PlannedStudyFormDialog } from "./planned-study-form-dialog";
 
 interface DaySheetProps {
@@ -36,6 +36,11 @@ export function DaySheet({ open, onOpenChange, date, dateLabel, items }: DayShee
   const navigate = useNavigate();
   const deleteMut = useDeletePlannedStudy();
   const statusMut = useSetPlannedStudyStatus();
+  const completeManualMut = useCompletePlannedStudyManually();
+  const linkedIds = items
+    .map((i) => i.study_session_id)
+    .filter((v): v is string => v !== null);
+  const { data: durations } = useLinkedSessionDurations(linkedIds);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<PlannedStudyRow | undefined>(undefined);
@@ -57,10 +62,10 @@ export function DaySheet({ open, onOpenChange, date, dateLabel, items }: DayShee
     });
   }
 
-  function handleStart() {
+  function handleStart(plannedId: string) {
     // Decisão do Gate 1/2: a agenda NÃO cria sessão. Apenas navega para a
     // tela de métodos de estudo (Fase 05.2), que cria e fecha a sessão real.
-    void navigate({ to: "/app/estudar" });
+    void navigate({ to: "/app/estudar", search: { plannedId } });
   }
 
   return (
@@ -84,7 +89,24 @@ export function DaySheet({ open, onOpenChange, date, dateLabel, items }: DayShee
             {items.map((item) => (
               <div key={item.id} className="rounded-lg border p-3 space-y-2">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium leading-snug">{item.title}</p>
+                  <div className="space-y-1">
+                    <p className="font-medium leading-snug">{item.title}</p>
+                    {item.status === "completed" && item.study_session_id ? (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Badge variant="outline" className="h-4 px-1 text-[10px] font-normal">
+                          Sessão concluída
+                        </Badge>
+                        {durations && durations[item.study_session_id] != null
+                          ? ` · ${Math.round((durations[item.study_session_id] as number) / 60)} min`
+                          : ""}
+                      </p>
+                    ) : null}
+                    {item.status === "completed" && !item.study_session_id ? (
+                      <p className="text-[10px] text-destructive flex items-center gap-1">
+                        A sessão vinculada foi removida.
+                      </p>
+                    ) : null}
+                  </div>
                   <Badge variant={item.status === "completed" ? "default" : "secondary"}>
                     {STATUS_LABEL[item.status] ?? item.status}
                   </Badge>
@@ -99,10 +121,24 @@ export function DaySheet({ open, onOpenChange, date, dateLabel, items }: DayShee
 
                 <div className="flex flex-wrap gap-2 pt-1">
                   {item.status === "planned" ? (
-                    <Button size="sm" variant="secondary" onClick={handleStart}>
-                      <Play className="h-3.5 w-3.5" aria-hidden />
-                      Estudar
-                    </Button>
+                    <>
+                      <Button size="sm" variant="secondary" onClick={() => handleStart(item.id)}>
+                        <Play className="h-3.5 w-3.5" aria-hidden />
+                        Estudar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          completeManualMut.mutate(item.id, {
+                            onSuccess: () => toast.success("Marcado como concluído"),
+                            onError: () => toast.error("Não foi possível concluir"),
+                          })
+                        }
+                      >
+                        Concluir
+                      </Button>
+                    </>
                   ) : null}
                   <Button size="sm" variant="ghost" onClick={() => openEdit(item)}>
                     <Pencil className="h-3.5 w-3.5" aria-hidden />

@@ -25,17 +25,25 @@ Conectar os estudos planejados (Fase 06.1) às sessões de estudo reais (Fase 05
 | Item | Recomendação | Justificativa |
 |---|---|---|
 | **1. Transporte do ID** | **Query param na navegação** (`/app/estudar?plannedId=<uuid>`). | É a opção mais simples, resiliente a reloads e que não altera o contrato das rotas existentes. |
-| **2. Momento do Vínculo** | **No Fim (Finalização da Sessão)**. | **OPÇÃO A escolhida.** `createStudySession` não grava nada em `planned_studies`. Apenas `finishStudySession` grava, simultaneamente: `study_session_id = <id>` E `status = 'completed'`. |
+| **2. Momento do Vínculo** | **App-side no onSuccess do useFinishStudySession** (via parâmetro plannedId). | Decisão central (Opção A) escolhida: o vínculo ocorre apenas quando a sessão é finalizada com sucesso. |
 | **3. Lógica de Status** | **App-side no `onFinished`**. | As telas de método dispararão `onFinished(session)` após o sucesso real. O hook de consumo disparará o UPDATE em `planned_studies`. |
 | **4. Reversão (Delete)** | **Estado "Sessão Removida"**. | Se a sessão vinculada for excluída, o app detectará `status='completed' AND study_session_id IS NULL` e exibirá um aviso no `DaySheet`, permitindo ao usuário reabrir ou limpar manualmente. |
 | **5. Feedback Visual** | **Duração real (Fetch extra)**. | No `DaySheet`, itens `completed` mostrarão a duração real obtida via fetch secundário das `study_sessions` vinculadas (PostgREST simples). |
 
 ## 3. Análise Técnica
 
-### Descoberta Técnica: Ambiguidade do onDone
-A análise do código da Fase 05.2 revelou que as 5 telas de método (`pomodoro`, `feynman`, `blurting`, `cornell`, `livre`) usam um único `onDone` para conclusão com sucesso e cancelamento ("Voltar").
-- **Implicação**: Não é possível marcar o plano como `completed` confiavelmente apenas com `onDone`.
-- **Solução**: Separar os callbacks: `onFinished(session: StudySessionRow)` (sucesso) e `onCancel()` (voltar sem concluir).
+### Abordagem de Implementação (vínculo no hook, não em callbacks)
+  A ambiguidade do `onDone` (usado tanto para concluir quanto para cancelar) NÃO é
+  resolvida reescrevendo callbacks. Em vez disso, o vínculo do planejamento ocorre
+  dentro do hook `useFinishStudySession`, no seu `onSuccess` — que por definição só
+  dispara quando a sessão é finalizada com sucesso. O hook recebe um parâmetro
+  opcional `plannedId`; havendo-o, após finalizar a sessão ele faz o UPDATE em
+  `planned_studies` (study_session_id + status='completed'). Cancelar ("Sair sem
+  finalizar") chama `onDone()` sem passar pelo finish, logo nunca vincula. As 5 telas
+  de método são tocadas apenas para RECEBER e REPASSAR um `plannedId` opcional — sem
+  mudança de assinatura de callback, sem reescrita. A ambiguidade pré-existente do
+  `onDone` fica registrada como dívida técnica menor (não causa bug com esta
+  abordagem) e pode ser tratada em fase futura.
 
 ### Atomicidade e Segurança
 Não utilizaremos RPC.
@@ -43,14 +51,14 @@ Não utilizaremos RPC.
 
 ### Arquivos Modificados
 1. **MODIFICADOS**:
-   - `src/features/study-sessions/blurting-session.tsx` (Callbacks)
-   - `src/features/study-sessions/cornell-session.tsx` (Callbacks)
-   - `src/features/study-sessions/feynman-session.tsx` (Callbacks)
-   - `src/features/study-sessions/livre-session.tsx` (Callbacks)
-   - `src/features/study-sessions/pomodoro-session.tsx` (Callbacks)
-   - `src/features/study-sessions/api.ts` / `hooks.ts` (Ajustes de retorno/mutação se necessário)
-   - `src/routes/app.estudar.tsx` (Passagem do plannedId e novos callbacks)
-   - `src/features/planned-studies/day-sheet.tsx` (Feedback visual e botão de conclusão manual)
+   - `src/features/study-sessions/blurting-session.tsx` (recebe e repassa plannedId, sem mudar callbacks)
+   - `src/features/study-sessions/cornell-session.tsx` (recebe e repassa plannedId, sem mudar callbacks)
+   - `src/features/study-sessions/feynman-session.tsx` (recebe e repassa plannedId, sem mudar callbacks)
+   - `src/features/study-sessions/livre-session.tsx` (recebe e repassa plannedId, sem mudar callbacks)
+   - `src/features/study-sessions/pomodoro-session.tsx` (recebe e repassa plannedId, sem mudar callbacks)
+   - `src/features/study-sessions/api.ts` / `hooks.ts`
+   - `src/routes/app.estudar.tsx` 
+   - `src/features/planned-studies/day-sheet.tsx`
 
 2. **NOVOS**:
    - Nenhum de schema.

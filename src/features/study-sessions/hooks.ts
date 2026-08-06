@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@/hooks/use-auth";
 import * as api from "./api";
+import { linkSessionAndComplete } from "@/features/planned-studies/api";
 import type { StudySessionDetails } from "./types";
 
 export function inProgressStudySessionsKey(userId: string | undefined) {
@@ -63,12 +64,31 @@ export function useCreateStudySession() {
   });
 }
 
-export function useFinishStudySession(sessionId: string, startedAtIso: string) {
+export function useFinishStudySession(
+  sessionId: string,
+  startedAtIso: string,
+  plannedId?: string,
+) {
   const invalidate = useInvalidateStudySessionLists();
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (details: StudySessionDetails) =>
       api.finishStudySession(sessionId, startedAtIso, details),
-    onSuccess: invalidate,
+    onSuccess: async (session) => {
+      invalidate();
+      // Vínculo com o planejamento (Fase 06.2, Opção A): só quando veio de um
+      // planejamento (plannedId) e a sessão realmente finalizou (estamos no
+      // onSuccess do finish). Falha aqui NÃO desfaz o finish — o usuário pode
+      // concluir o planejamento manualmente pelo DaySheet (rede de segurança).
+      if (plannedId) {
+        try {
+          await linkSessionAndComplete(plannedId, session.id);
+          void qc.invalidateQueries({ queryKey: ["planned-studies-range"] });
+        } catch (err) {
+          console.error("[planned-studies] falha ao vincular sessão ao planejamento", err);
+        }
+      }
+    },
   });
 }
 

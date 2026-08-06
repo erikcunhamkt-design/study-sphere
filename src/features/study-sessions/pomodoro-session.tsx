@@ -21,9 +21,10 @@ const PHASE_LABELS: Record<PomodoroPhase, string> = {
 interface PomodoroSessionProps {
   resumingSession: StudySessionRow | null;
   onDone: () => void;
+  plannedId?: string;
 }
 
-export function PomodoroSession({ resumingSession, onDone }: PomodoroSessionProps) {
+export function PomodoroSession({ resumingSession, onDone, plannedId }: PomodoroSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const { data: prefs, isLoading: prefsLoading } = usePreferences();
@@ -62,13 +63,14 @@ export function PomodoroSession({ resumingSession, onDone }: PomodoroSessionProp
     return <Skeleton className="h-48 w-full" />;
   }
 
-  return <PomodoroRunner session={session} prefs={prefs} onDone={onDone} />;
+  return <PomodoroRunner session={session} prefs={prefs} onDone={onDone} plannedId={plannedId} />;
 }
 
 function PomodoroRunner({
   session,
   prefs,
   onDone,
+  plannedId,
 }: {
   session: StudySessionRow;
   prefs: {
@@ -78,9 +80,10 @@ function PomodoroRunner({
     pomodoro_cycles: number;
   };
   onDone: () => void;
+  plannedId?: string;
 }) {
   const elapsed = useElapsedSeconds(session.started_at);
-  const finishSession = useFinishStudySession(session.id, session.started_at);
+  const finishSession = useFinishStudySession(session.id, session.started_at, plannedId);
   const finishedRef = useRef(false);
 
   const state = computePomodoroState(elapsed, {

@@ -13,14 +13,15 @@ import type { FeynmanDetails, StudySessionRow } from "./types";
 interface FeynmanSessionProps {
   resumingSession: StudySessionRow | null;
   onDone: () => void;
+  plannedId?: string;
 }
 
-export function FeynmanSession({ resumingSession, onDone }: FeynmanSessionProps) {
+export function FeynmanSession({ resumingSession, onDone, plannedId }: FeynmanSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [explicacao, setExplicacao] = useState("");
   const createSession = useCreateStudySession();
-  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "");
+  const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
 
   useUnsavedTextWarning(!!session && explicacao.trim().length > 0);
 

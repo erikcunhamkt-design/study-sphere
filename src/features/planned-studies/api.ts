@@ -97,3 +97,41 @@ export async function deletePlannedStudy(id: string): Promise<void> {
   const { error } = await supabase.from("planned_studies").delete().eq("id", id);
   if (error) throw error;
 }
+
+/** Vincula uma sessão concluída ao planejamento e marca como 'completed' (Opção A). */
+export async function linkSessionAndComplete(
+  plannedId: string,
+  sessionId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("planned_studies")
+    .update({ study_session_id: sessionId, status: "completed" })
+    .eq("id", plannedId);
+  if (error) throw error;
+}
+
+/** Marca um planejamento como concluído manualmente, sem sessão vinculada (rede de segurança). */
+export async function completePlannedStudyManually(plannedId: string): Promise<void> {
+  const { error } = await supabase
+    .from("planned_studies")
+    .update({ status: "completed" })
+    .eq("id", plannedId);
+  if (error) throw error;
+}
+
+/** Duração real das sessões vinculadas a um conjunto de planejamentos (feedback visual). */
+export async function fetchLinkedSessionDurations(
+  sessionIds: string[],
+): Promise<Record<string, number | null>> {
+  if (sessionIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from("study_sessions")
+    .select("id, duration_seconds")
+    .in("id", sessionIds);
+  if (error) throw error;
+  const map: Record<string, number | null> = {};
+  for (const row of data ?? []) {
+    map[(row as { id: string }).id] = (row as { duration_seconds: number | null }).duration_seconds;
+  }
+  return map;
+}
