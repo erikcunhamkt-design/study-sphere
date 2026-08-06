@@ -70,6 +70,7 @@ function PomodoroRunner({
   session,
   prefs,
   onDone,
+  plannedId,
 }: {
   session: StudySessionRow;
   prefs: {
