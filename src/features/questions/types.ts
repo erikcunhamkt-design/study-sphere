@@ -60,7 +60,6 @@ export interface QuestionAttemptRow {
   is_correct: boolean;
 }
 
-
 /** Devolvido por submit_question_attempt — o cliente nunca calcula is_correct sozinho. */
 export interface SubmitQuestionAttemptResult {
   attempt_id: string;

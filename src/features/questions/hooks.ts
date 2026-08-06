@@ -23,7 +23,6 @@ export function questionAttemptsKey(userId: string | undefined, examAttemptId: s
   return ["question-attempts", userId, examAttemptId] as const;
 }
 
-
 // ---------------------------------------------------------------------
 // Questions
 // ---------------------------------------------------------------------
@@ -228,4 +227,3 @@ export function useQuestionAttempts(examAttemptId: string | undefined) {
     queryFn: () => api.fetchQuestionAttempts(user!.id, examAttemptId!),
   });
 }
-

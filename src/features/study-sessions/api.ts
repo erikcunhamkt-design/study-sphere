@@ -1,11 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
-import type {
-  StudyMethod,
-  StudySessionDetails,
-  StudySessionForMetrics,
-  StudySessionRow,
-} from "./types";
+import type { StudyMethod, StudySessionDetails, StudySessionRow } from "./types";
 
 const STUDY_SESSION_COLUMNS =
   "id, user_id, lesson_id, method, started_at, ended_at, duration_seconds, details, created_at, updated_at";
@@ -49,25 +44,6 @@ export async function fetchStudySessionSecondsSince(
     .gte("started_at", sinceIso);
   if (error) throw error;
   return (data ?? []).reduce((sum, row) => sum + (row.duration_seconds ?? 0), 0);
-}
-
-/**
- * Para métricas (Fase 06): sessões finalizadas numa janela, colunas
- * mínimas — sem `details` (JSON potencialmente grande e inútil para
- * agregação de tempo/método).
- */
-export async function fetchStudySessionsSince(
-  userId: string,
-  sinceIso: string,
-): Promise<StudySessionForMetrics[]> {
-  const { data, error } = await supabase
-    .from("study_sessions")
-    .select("id, method, started_at, ended_at, duration_seconds, lesson_id")
-    .eq("user_id", userId)
-    .not("ended_at", "is", null)
-    .gte("started_at", sinceIso);
-  if (error) throw error;
-  return (data ?? []) as unknown as StudySessionForMetrics[];
 }
 
 export interface CreateStudySessionInput {
