@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useProfile, usePreferences } from "@/hooks/use-preferences";
 import { civilDateInTimezone } from "@/lib/timezone";
 import { buildMonthGrid, weekdayHeaders, ymd } from "@/features/planned-studies/calendar";
-import { usePlannedStudiesInRange } from "@/features/planned-studies/hooks";
+import { usePlannedStudiesInRange, useLinkedSessionDurations } from "@/features/planned-studies/hooks";
 import { DaySheet } from "@/features/planned-studies/day-sheet";
 import type { PlannedStudyRow } from "@/features/planned-studies/types";
 
@@ -54,6 +54,37 @@ function PlanejamentoPage() {
     }
     return map;
   }, [planned]);
+
+  // Todas as sessões vinculadas visíveis no range — para somar o tempo real por dia.
+  const linkedSessionIds = useMemo(
+    () =>
+      (planned ?? [])
+        .map((r) => r.study_session_id)
+        .filter((v): v is string => v !== null),
+    [planned],
+  );
+  const { data: durationsById } = useLinkedSessionDurations(linkedSessionIds);
+
+  // Resumo por dia civil: concluídos, total e minutos reais somados.
+  const summaryByDate = useMemo(() => {
+    const map = new Map<string, { completed: number; total: number; minutes: number }>();
+    for (const [date, items] of byDate.entries()) {
+      let completed = 0;
+      let seconds = 0;
+      for (const item of items) {
+        if (item.status === "completed") completed += 1;
+        if (item.study_session_id && durationsById) {
+          seconds += durationsById[item.study_session_id] ?? 0;
+        }
+      }
+      map.set(date, {
+        completed,
+        total: items.length,
+        minutes: Math.round(seconds / 60),
+      });
+    }
+    return map;
+  }, [byDate, durationsById]);
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(today);
@@ -150,11 +181,16 @@ function PlanejamentoPage() {
                   >
                     {cell.day}
                   </span>
-                  {items.length > 0 ? (
-                    <span className="mt-1 block truncate text-xs text-muted-foreground">
-                      {items.length} estudo{items.length > 1 ? "s" : ""}
-                    </span>
-                  ) : null}
+                  {(() => {
+                    const s = summaryByDate.get(cell.date);
+                    if (!s || s.total === 0) return null;
+                    return (
+                      <span className="mt-1 block truncate text-xs text-muted-foreground">
+                        {s.completed}/{s.total}
+                        {s.minutes > 0 ? ` · ${s.minutes} min` : ""}
+                      </span>
+                    );
+                  })()}
                 </button>
               );
             })}
