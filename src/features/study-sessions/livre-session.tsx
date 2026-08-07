@@ -29,7 +29,21 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
   const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
-  const elapsed = useElapsedSeconds(session?.started_at ?? optimisticStart ?? NO_SESSION_ISO);
+  // Ancora no início MAIS CEDO: o started_at do servidor pode vir à frente do relógio
+  // do cliente e, sozinho, congelaria o contador em 00:00 (clamp Math.max(0) do
+  // useElapsedSeconds) até o relógio local alcançá-lo. Usar o menor dos dois mantém a
+  // contagem contínua desde o clique.
+  const clockAnchor = (() => {
+    const candidates = [optimisticStart, session?.started_at].filter(
+      (v): v is string => !!v,
+    );
+    if (candidates.length === 0) return NO_SESSION_ISO;
+    return candidates.reduce((earliest, cur) =>
+      new Date(cur).getTime() < new Date(earliest).getTime() ? cur : earliest,
+    );
+  })();
+
+  const elapsed = useElapsedSeconds(clockAnchor);
 
   useUnsavedTextWarning(!!session && nota.trim().length > 0);
 
