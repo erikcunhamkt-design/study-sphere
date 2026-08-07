@@ -92,13 +92,21 @@ export async function finishStudySession(
   const startedAt = new Date(startedAtIso).getTime();
   const endedAt = new Date(Math.max(now, startedAt)).toISOString();
 
+  console.log("[finishdbg] sessionId:", sessionId);
+  console.log("[finishdbg] startedAtIso recebido:", startedAtIso, "| parseado válido?", !Number.isNaN(startedAt));
+  console.log("[finishdbg] now:", new Date(now).toISOString(), "| endedAt calculado:", endedAt);
+
   const { data, error } = await supabase
     .from("study_sessions")
     .update({ ended_at: endedAt, details: details as unknown as Json })
     .eq("id", sessionId)
     .select(STUDY_SESSION_COLUMNS)
     .single();
-  if (error) throw error;
+
+  if (error) {
+    console.error("[finishdbg] ERRO do banco:", { code: error.code, message: error.message, details: error.details, hint: error.hint });
+    throw error;
+  }
   return data as unknown as StudySessionRow;
 }
 
