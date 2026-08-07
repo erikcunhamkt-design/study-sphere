@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useProfile, usePreferences } from "@/hooks/use-preferences";
 import { civilDateInTimezone } from "@/lib/timezone";
 import { buildMonthGrid, weekdayHeaders, ymd } from "@/features/planned-studies/calendar";
-import { usePlannedStudiesInRange } from "@/features/planned-studies/hooks";
+import { usePlannedStudiesInRange, useLinkedSessionDurations } from "@/features/planned-studies/hooks";
 import { DaySheet } from "@/features/planned-studies/day-sheet";
 import type { PlannedStudyRow } from "@/features/planned-studies/types";
 
