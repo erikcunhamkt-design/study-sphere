@@ -90,11 +90,12 @@ export async function finishStudySession(
 ): Promise<StudySessionRow> {
   const now = Date.now();
   const startedAt = new Date(startedAtIso).getTime();
-  const endedAt = new Date(Math.max(now, startedAt)).toISOString();
-
-  console.log("[finishdbg] sessionId:", sessionId);
-  console.log("[finishdbg] startedAtIso recebido:", startedAtIso, "| parseado válido?", !Number.isNaN(startedAt));
-  console.log("[finishdbg] now:", new Date(now).toISOString(), "| endedAt calculado:", endedAt);
+  // started_at do servidor tem precisão de microssegundos; getTime() trunca para ms.
+  // Para nunca violar o CHECK (ended_at >= started_at) por essa diferença de precisão
+  // — nem quando o relógio do cliente está atrás do servidor — garantimos que ended_at
+  // seja pelo menos 1s após o started_at conhecido. Sessões de duração sub-segundo
+  // passam a registrar 1s (honesto: "menos de 1 segundo" arredondado para cima).
+  const endedAt = new Date(Math.max(now, startedAt + 1000)).toISOString();
 
   const { data, error } = await supabase
     .from("study_sessions")
@@ -102,11 +103,7 @@ export async function finishStudySession(
     .eq("id", sessionId)
     .select(STUDY_SESSION_COLUMNS)
     .single();
-
-  if (error) {
-    console.error("[finishdbg] ERRO do banco:", { code: error.code, message: error.message, details: error.details, hint: error.hint });
-    throw error;
-  }
+  if (error) throw error;
   return data as unknown as StudySessionRow;
 }
 
