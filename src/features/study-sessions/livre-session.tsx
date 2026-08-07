@@ -26,13 +26,15 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [nota, setNota] = useState("");
+  const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
-  const elapsed = useElapsedSeconds(session?.started_at ?? NO_SESSION_ISO);
+  const elapsed = useElapsedSeconds(session?.started_at ?? optimisticStart ?? NO_SESSION_ISO);
 
   useUnsavedTextWarning(!!session && nota.trim().length > 0);
 
   async function handleStart() {
+    setOptimisticStart(new Date().toISOString());
     try {
       const created = await createSession.mutateAsync({
         method: "livre",
@@ -41,6 +43,7 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
       });
       setSession(created);
     } catch (err) {
+      setOptimisticStart(null);
       console.error("[study-sessions] falha ao iniciar sessão livre", err);
       toast.error("Não foi possível iniciar a sessão");
     }
@@ -58,7 +61,7 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
     }
   }
 
-  if (!session) {
+  if (!session && !optimisticStart) {
     return (
       <div className="space-y-4 rounded-xl border border-border bg-surface p-6">
         <LessonPicker value={lessonId} onChange={setLessonId} />
@@ -102,7 +105,7 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
       </div>
       <Button
         onClick={() => void handleFinish()}
-        disabled={finishSession.isPending}
+        disabled={finishSession.isPending || !session}
         className="w-full"
       >
         Concluir

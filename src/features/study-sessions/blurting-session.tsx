@@ -26,13 +26,15 @@ export function BlurtingSession({ resumingSession, onDone, plannedId }: Blurting
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [texto, setTexto] = useState("");
+  const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
-  const elapsed = useElapsedSeconds(session?.started_at ?? NO_SESSION_ISO);
+  const elapsed = useElapsedSeconds(session?.started_at ?? optimisticStart ?? NO_SESSION_ISO);
 
   useUnsavedTextWarning(!!session && texto.trim().length > 0);
 
   async function handleStart() {
+    setOptimisticStart(new Date().toISOString());
     try {
       const created = await createSession.mutateAsync({
         method: "blurting",
@@ -41,7 +43,8 @@ export function BlurtingSession({ resumingSession, onDone, plannedId }: Blurting
       });
       setSession(created);
     } catch (err) {
-      console.error("[study-sessions] falha ao iniciar blurting", err);
+      setOptimisticStart(null);
+      console.error("[study-sessions] falha ao iniciar sessão de blurting", err);
       toast.error("Não foi possível iniciar a sessão");
     }
   }
@@ -58,7 +61,7 @@ export function BlurtingSession({ resumingSession, onDone, plannedId }: Blurting
     }
   }
 
-  if (!session) {
+  if (!session && !optimisticStart) {
     return (
       <div className="space-y-4 rounded-xl border border-border bg-surface p-6">
         <p className="text-sm text-muted-foreground">
@@ -105,7 +108,7 @@ export function BlurtingSession({ resumingSession, onDone, plannedId }: Blurting
       />
       <Button
         onClick={() => void handleFinish()}
-        disabled={finishSession.isPending}
+        disabled={finishSession.isPending || !session}
         className="w-full"
       >
         Concluir
