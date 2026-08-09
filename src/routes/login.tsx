@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Chrome, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RouteLoading } from "@/components/route-loading";
+import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { friendlyAuthError } from "@/lib/auth-errors";
 import { isSafeInternalPath } from "@/lib/safe-redirect";
@@ -68,11 +69,28 @@ function LoginPage() {
     }
   }
 
-  // Login com Google (Lovable OAuth) fica oculto por ora: o fluxo completo
-  // (callback, criação de profiles/user_preferences, ausência de duplicação
-  // de usuário) não pôde ser testado ponta a ponta nesta auditoria. Ver
-  // docs/AUDITORIA_FASE_01_1.md §7. A integração (src/integrations/lovable)
-  // permanece intacta para reativação futura após teste completo.
+  async function handleGoogle() {
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Não foi possível entrar com o Google");
+        return;
+      }
+      if (result.redirected) {
+        return;
+      }
+      toast.success("Bem-vindo!");
+      if (redirectTo) {
+        navigate({ href: redirectTo, replace: true });
+      } else {
+        navigate({ to: "/app", replace: true });
+      }
+    } catch {
+      toast.error("Não foi possível entrar com o Google");
+    }
+  }
 
   return (
     <AuthShell
@@ -145,6 +163,25 @@ function LoginPage() {
 
         <Button type="submit" className="w-full" disabled={submitting}>
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
+        </Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">ou</span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleGoogle}
+        >
+          <Chrome className="h-4 w-4" />
+          Entrar com Google
         </Button>
       </form>
     </AuthShell>
