@@ -69,11 +69,28 @@ function LoginPage() {
     }
   }
 
-  // Login com Google (Lovable OAuth) fica oculto por ora: o fluxo completo
-  // (callback, criação de profiles/user_preferences, ausência de duplicação
-  // de usuário) não pôde ser testado ponta a ponta nesta auditoria. Ver
-  // docs/AUDITORIA_FASE_01_1.md §7. A integração (src/integrations/lovable)
-  // permanece intacta para reativação futura após teste completo.
+  async function handleGoogle() {
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Não foi possível entrar com o Google");
+        return;
+      }
+      if (result.redirected) {
+        return;
+      }
+      toast.success("Bem-vindo!");
+      if (redirectTo) {
+        navigate({ href: redirectTo, replace: true });
+      } else {
+        navigate({ to: "/app", replace: true });
+      }
+    } catch {
+      toast.error("Não foi possível entrar com o Google");
+    }
+  }
 
   return (
     <AuthShell
