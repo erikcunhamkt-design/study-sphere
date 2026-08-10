@@ -113,7 +113,7 @@ Reflete a CONSISTÊNCIA e a RECÊNCIA.
 ### Tela de Saúde do Cérebro (`/app/desempenho/saude`)
 *   Cérebro centralizado em destaque.
 *   Cards com o breakdown (Tempo, Domínio, Consistência).
-*   **Mensagem de Transparência**: "Você está no Estágio 4. Não estuda há 2 dias, o vigor caiu 5%. Estude hoje para recuperar o brilho!"
+*   **Mensagem de Transparência**: "Você está no Estágio 4. Não estuda há 2 dias, o vigor caiu 5% devido à inatividade. Estude hoje para recuperar o brilho!"
 
 ---
 
