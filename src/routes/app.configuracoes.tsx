@@ -25,6 +25,7 @@ import {
   type ThemeChoice,
 } from "@/hooks/use-preferences";
 import { useTheme } from "@/hooks/use-theme";
+import { APP_CONFIG } from "@/lib/app-config";
 
 export const Route = createFileRoute("/app/configuracoes")({
   component: SettingsPage,
