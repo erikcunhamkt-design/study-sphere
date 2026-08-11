@@ -71,7 +71,7 @@ export function TopBar() {
       <Breadcrumb className="min-w-0">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/app">StudyOS</BreadcrumbLink>
+            <BreadcrumbLink href="/app">{APP_CONFIG.name}</BreadcrumbLink>
           </BreadcrumbItem>
           {label && label !== "Início" ? (
             <>
