@@ -25,7 +25,7 @@ function LabEditorRoute() {
     <div className="space-y-4">
       <div className="rounded-lg border border-dashed border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
         Laboratório interno — prova técnica do motor de editor (Fase 03.0). Conteúdo local, nunca
-        salvo. Não é uma função oficial do StudyOS.
+        salvo. Não é uma função oficial do DominusApp.
       </div>
       <ClientOnlyLabEditor />
     </div>

@@ -25,6 +25,7 @@ import {
   type ThemeChoice,
 } from "@/hooks/use-preferences";
 import { useTheme } from "@/hooks/use-theme";
+import { APP_CONFIG } from "@/lib/app-config";
 
 export const Route = createFileRoute("/app/configuracoes")({
   component: SettingsPage,
@@ -94,7 +95,7 @@ function ProfileSection() {
   }
 
   return (
-    <Section title="Perfil" description="Como você aparece no StudyOS.">
+    <Section title="Perfil" description={`Como você aparece no ${APP_CONFIG.name}.`}>
       {isLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-10 w-full max-w-sm" />

@@ -15,9 +15,11 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
     <div className="min-h-dvh grid lg:grid-cols-2 bg-background text-foreground">
       <aside className="hidden lg:flex flex-col justify-between p-10 bg-sidebar border-r border-sidebar-border">
         <Link to="/" className="inline-flex items-center gap-2 text-sidebar-foreground">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground font-bold">
-            D
-          </span>
+          <img
+            src="/logo-dominus.svg"
+            alt="DominusApp Logo"
+            className="h-9 w-9 object-contain"
+          />
           <span className="text-lg font-semibold tracking-tight">{APP_CONFIG.name}</span>
         </Link>
         <div className="space-y-4 max-w-md">
@@ -37,9 +39,11 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
       <main className="flex flex-col justify-center px-6 py-10 sm:px-10">
         <div className="mx-auto w-full max-w-sm">
           <Link to="/" className="lg:hidden mb-8 inline-flex items-center gap-2 text-foreground">
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground font-bold text-sm">
-              D
-            </span>
+            <img
+              src="/logo-dominus.svg"
+              alt="DominusApp Logo"
+              className="h-8 w-8 object-contain"
+            />
             <span className="font-semibold">{APP_CONFIG.name}</span>
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>

@@ -34,6 +34,7 @@ import { usePreferences, useProfile } from "@/hooks/use-preferences";
 import { startOfDayIso } from "@/lib/timezone";
 import { useStudySessionSecondsSince } from "@/features/study-sessions/hooks";
 import { UserMenu, useBreadcrumbLabel } from "./navigation";
+import { APP_CONFIG } from "@/lib/app-config";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -71,7 +72,7 @@ export function TopBar() {
       <Breadcrumb className="min-w-0">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/app">StudyOS</BreadcrumbLink>
+            <BreadcrumbLink href="/app">{APP_CONFIG.name}</BreadcrumbLink>
           </BreadcrumbItem>
           {label && label !== "Início" ? (
             <>
