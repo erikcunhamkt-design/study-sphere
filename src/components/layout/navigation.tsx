@@ -123,7 +123,7 @@ export function DesktopSidebar({
         )}
       >
         <img
-          src="/logo-dominus.svg"
+          src="/logo-dominus.png"
           alt="DominusApp Logo"
           className="h-9 w-9 object-contain"
         />
