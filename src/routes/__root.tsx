@@ -118,7 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient; auth
 const THEME_BOOTSTRAP_SCRIPT = `
 (function () {
   try {
-    var stored = window.localStorage.getItem("studyos.theme");
+    var stored = window.localStorage.getItem("dominus.theme");
     var theme = stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
     var isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     var root = document.documentElement;
