@@ -15,9 +15,10 @@ export function PageHeader({ title, description, actions, className }: PageHeade
       className={cn("flex flex-col gap-4 md:flex-row md:items-end md:justify-between", className)}
     >
       <div className="space-y-1.5 min-w-0">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
           {title}
         </h1>
+
         {description ? (
           <p className="text-sm text-muted-foreground max-w-2xl">{description}</p>
         ) : null}
@@ -39,9 +40,10 @@ export function EmptyState({ title, description, icon, action, className }: Empt
   return (
     <div
       className={cn(
-        "rounded-xl border border-dashed border-border bg-surface/40 px-6 py-10 text-center",
+        "rounded-2xl border border-dashed border-border/60 bg-surface/20 px-6 py-12 text-center backdrop-blur-[2px] transition-all hover:bg-surface/30 hover:border-border/80",
         className,
       )}
+
     >
       {icon ? (
         <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-lg bg-muted text-muted-foreground">
@@ -68,7 +70,7 @@ export function Section({ title, description, children, className }: SectionProp
   return (
     <section className={cn("space-y-3", className)}>
       <div className="space-y-1">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/80">
           {title}
         </h2>
         {description ? <p className="text-xs text-muted-foreground">{description}</p> : null}
