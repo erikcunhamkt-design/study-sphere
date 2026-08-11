@@ -24,11 +24,11 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
         </Link>
         <div className="space-y-4 max-w-md">
           <h2 className="text-3xl font-semibold leading-tight text-sidebar-foreground">
-            Um ambiente completo para estudar com foco.
+            Do estudo ao domínio.
           </h2>
           <p className="text-sm text-muted-foreground">
             Áreas de conhecimento, anotações, flashcards, questões e revisão espaçada — reunidos em
-            um único fluxo.
+            um único fluxo, do primeiro estudo ao domínio completo.
           </p>
         </div>
         <p className="text-xs text-muted-foreground">
