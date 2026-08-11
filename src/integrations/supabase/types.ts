@@ -961,6 +961,7 @@ export type Database = {
         }
         Returns: Json
       }
+      test_get_brain_state: { Args: { target_user_id: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
