@@ -170,7 +170,27 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+  }
+
+  /* Glassmorphism utility */
+  .glass {
+    background: color-mix(in oklch, var(--surface) 70%, transparent);
+    backdrop-filter: blur(12px);
+    border: 1px solid color-mix(in oklch, var(--border) 40%, transparent);
+  }
+
+  .glass-elevated {
+    background: color-mix(in oklch, var(--surface-elevated) 80%, transparent);
+    backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.1);
+  }
+
 
   *:focus-visible {
     outline: 2px solid var(--color-ring);

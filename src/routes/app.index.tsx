@@ -72,24 +72,30 @@ function DashboardPage() {
     <div className="space-y-8">
       <PageHeader title={`${greeting}, ${displayName}.`} description="O que vamos aprender hoje?" />
 
-      {/* Destaque principal */}
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/15 via-surface to-surface p-6 md:p-8">
-        <div className="max-w-xl space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+      {/* Destaque principal - Premium Hero with Bento-like feel */}
+      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-surface/40 to-surface/80 p-8 md:p-10 shadow-sm transition-all hover:shadow-md group">
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-primary/5 blur-3xl transition-all group-hover:bg-primary/10" />
+        <div className="relative max-w-xl space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-primary/20 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Comece por aqui
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">{hero.title}</h2>
-          <p className="text-sm text-muted-foreground">{hero.description}</p>
-          <div className="pt-2">
-            <Button asChild size="lg">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-3 duration-700 fill-mode-both">
+            {hero.title}
+          </h2>
+          <p className="text-base text-muted-foreground leading-relaxed max-w-md animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-both">
+            {hero.description}
+          </p>
+          <div className="pt-4 animate-in fade-in slide-in-from-bottom-5 duration-1000 delay-300 fill-mode-both">
+            <Button asChild size="lg" className="rounded-full px-8 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95">
               <Link to="/app/estudos">
-                <BookOpen className="mr-2 h-4 w-4" aria-hidden /> {hero.cta}
+                <BookOpen className="mr-2 h-5 w-5" aria-hidden /> {hero.cta}
               </Link>
             </Button>
           </div>
         </div>
       </div>
+
 
       <div className="grid gap-8 md:grid-cols-2">
         <Section title="Continuar estudando">
@@ -110,7 +116,7 @@ function DashboardPage() {
               description="Flashcards e revisão espaçada serão exibidos aqui assim que existirem cartões devidos."
             />
           ) : (
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-4 transition-all hover:border-primary/30 hover:shadow-sm">
               <div>
                 <p className="text-2xl font-semibold text-foreground">{dueFlashcards.length}</p>
                 <p className="text-xs text-muted-foreground">
@@ -167,7 +173,7 @@ function DashboardPage() {
                     key={course.id}
                     to="/app/estudos/$areaId/cursos/$courseId"
                     params={{ areaId: course.study_area_id, courseId: course.id }}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-primary/40 hover:bg-surface"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-4 transition-all hover:border-primary/40 hover:bg-surface/60 hover:shadow-sm group"
                   >
                     <div className="min-w-0">
                       <span className="block truncate text-sm font-medium text-foreground">
@@ -274,7 +280,7 @@ function DailyGoalProgress({
     goalSeconds > 0 ? Math.min(100, Math.round((todaySeconds / goalSeconds) * 100)) : 0;
 
   return (
-    <div className="space-y-2 rounded-xl border border-border bg-surface/60 px-4 py-3">
+    <div className="space-y-4 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-5 shadow-sm">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-foreground">
           {todayMinutes}/{goalMinutes} min
@@ -290,7 +296,7 @@ function ShortcutCard({ to, title, icon }: { to: string; title: string; icon: Re
   return (
     <Link
       to={to}
-      className="group flex items-center gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-primary/40 hover:bg-surface"
+      className="group flex items-center gap-4 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-4 transition-all hover:border-primary/40 hover:bg-surface/60 hover:shadow-md active:scale-95"
     >
       <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
         {icon}
