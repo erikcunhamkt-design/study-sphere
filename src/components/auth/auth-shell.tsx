@@ -16,7 +16,7 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
       <aside className="hidden lg:flex flex-col justify-between p-10 bg-sidebar border-r border-sidebar-border">
         <Link to="/" className="inline-flex items-center gap-2 text-sidebar-foreground">
           <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground font-bold">
-            S
+            D
           </span>
           <span className="text-lg font-semibold tracking-tight">{APP_CONFIG.name}</span>
         </Link>
@@ -38,7 +38,7 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
         <div className="mx-auto w-full max-w-sm">
           <Link to="/" className="lg:hidden mb-8 inline-flex items-center gap-2 text-foreground">
             <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground font-bold text-sm">
-              S
+              D
             </span>
             <span className="font-semibold">{APP_CONFIG.name}</span>
           </Link>
