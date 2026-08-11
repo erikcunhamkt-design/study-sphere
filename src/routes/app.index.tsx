@@ -52,7 +52,7 @@ function DashboardPage() {
     ? {
         title: "Comece organizando seus estudos",
         description:
-          "Crie áreas de conhecimento, cadastre seus cursos e traga suas anotações — o restante do StudyOS conecta tudo automaticamente.",
+          "Crie áreas de conhecimento, cadastre seus cursos e traga suas anotações — o restante do DominusAPP conecta tudo automaticamente.",
         cta: "Criar primeira área",
       }
     : !hasCourses
