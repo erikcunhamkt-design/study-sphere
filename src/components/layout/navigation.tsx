@@ -1,7 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   BookOpen,
-  GraduationCap,
   Home,
   Library,
   ListChecks,
@@ -42,7 +41,6 @@ type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   { to: "/app", label: "Início", icon: Home, mobile: true },
   { to: "/app/estudos", label: "Estudos", icon: BookOpen, mobile: true },
-  { to: "/app/faculdade", label: "Faculdade", icon: GraduationCap },
   { to: "/app/estudar", label: "Estudar", icon: Play, mobile: true },
   { to: "/app/flashcards", label: "Flashcards", icon: Layers },
   { to: "/app/questoes", label: "Questões", icon: ListChecks },
