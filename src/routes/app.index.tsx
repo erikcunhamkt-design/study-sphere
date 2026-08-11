@@ -221,8 +221,9 @@ function DashboardPage() {
               return (
                 <div
                   key={session.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3"
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-4 transition-all hover:border-primary/30"
                 >
+
                   <div className="min-w-0">
                     <span className="block truncate text-sm font-medium text-foreground">
                       {STUDY_METHOD_LABELS[session.method]}
