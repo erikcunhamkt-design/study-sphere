@@ -125,7 +125,7 @@ export function DesktopSidebar({
         )}
       >
         <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground font-bold">
-          S
+          D
         </span>
         {!collapsed && (
           <div className="flex-1 min-w-0">
