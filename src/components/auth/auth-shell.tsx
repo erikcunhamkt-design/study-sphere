@@ -16,7 +16,7 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
       <aside className="hidden lg:flex flex-col justify-between p-10 bg-sidebar border-r border-sidebar-border">
         <Link to="/" className="inline-flex items-center gap-2 text-sidebar-foreground">
           <img
-            src="/logo-dominus.svg"
+            src="/logo-dominus.png"
             alt="DominusApp Logo"
             className="h-9 w-9 object-contain"
           />
@@ -40,7 +40,7 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
         <div className="mx-auto w-full max-w-sm">
           <Link to="/" className="lg:hidden mb-8 inline-flex items-center gap-2 text-foreground">
             <img
-              src="/logo-dominus.svg"
+              src="/logo-dominus.png"
               alt="DominusApp Logo"
               className="h-8 w-8 object-contain"
             />
