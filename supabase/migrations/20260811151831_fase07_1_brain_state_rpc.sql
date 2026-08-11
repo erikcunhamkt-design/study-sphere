@@ -17,8 +17,8 @@ DECLARE
     v_today_civil date;
     
     -- Janelas
-    v_window_7d_start timestamptz;
-    v_window_28d_start timestamptz;
+    v_window_7d_start date;
+    v_window_28d_start date;
     
     -- Componentes 7d
     v_duration_seconds_7d int;
@@ -78,8 +78,8 @@ BEGIN
     v_now_tz := now();
     v_today_civil := (v_now_tz AT TIME ZONE v_timezone)::date;
     
-    v_window_7d_start := (v_today_civil - interval '6 days'); -- Hoje + 6 dias anteriores
-    v_window_28d_start := (v_today_civil - interval '27 days');
+    v_window_7d_start := v_today_civil - 6; -- Hoje + 6 dias anteriores (date - int = date)
+    v_window_28d_start := v_today_civil - 27;
 
     -- 2. Coleta de Dados 7 dias
     
@@ -168,12 +168,13 @@ BEGIN
     IF v_days_absent <= 1 THEN
         v_decay_message := 'Cérebro em plena atividade! Mantenha o ritmo.';
     ELSE
-        v_decay_message := format('Seu vigor caiu %s%% devido a %s dias de ausência. Estude hoje para brilhar!', 
+        v_decay_message := format('Sua saúde cognitiva caiu %s%% após %s dias sem estudar. Estude hoje para reativar!', 
                                   ROUND((1.0 - v_decay_factor) * 100), 
                                   v_days_absent);
     END IF;
 
     -- 5. Cálculo Estágio (28 dias)
+    -- TODO(07.x): estágio regride em degrau ao fim da janela de 28d; refinar para regressão gradual em fase futura.
     SELECT COALESCE(SUM(duration_seconds), 0)
     INTO v_duration_seconds_28d
     FROM public.study_sessions
