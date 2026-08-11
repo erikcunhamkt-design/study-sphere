@@ -11,7 +11,7 @@ import {
 import { usePreferences, useUpdatePreferences, type ThemeChoice } from "./use-preferences";
 import { useAuth } from "./use-auth";
 
-const STORAGE_KEY = "studyos.theme";
+const STORAGE_KEY = "dominus.theme";
 
 interface ThemeContextValue {
   theme: ThemeChoice;
