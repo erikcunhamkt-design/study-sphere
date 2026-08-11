@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.test_get_brain_state(uuid);

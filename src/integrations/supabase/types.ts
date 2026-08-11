@@ -913,6 +913,7 @@ export type Database = {
         Args: { p_exam_attempt_id: string }
         Returns: Json
       }
+      get_brain_state: { Args: never; Returns: Json }
       jsonb_text_array_within_length: {
         Args: { p_array: Json; p_max_length: number }
         Returns: boolean
