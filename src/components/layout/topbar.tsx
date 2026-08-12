@@ -166,6 +166,7 @@ function QuickCreate() {
           <DropdownMenuItem onClick={() => setCourseFormOpen(true)}>Novo curso</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setModuleFormOpen(true)}>Novo módulo</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setLessonFormOpen(true)}>Nova aula</DropdownMenuItem>
+          {/* Criação avulsa de flashcards/questões volta aqui quando a Biblioteca existir (Fase 08.x) */}
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link to="/app/estudar">
