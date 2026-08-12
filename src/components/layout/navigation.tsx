@@ -132,7 +132,7 @@ export function DesktopSidebar({
             <p className="text-sm font-semibold tracking-tight text-sidebar-foreground">
               {APP_CONFIG.name}
             </p>
-            <p className="text-xs text-muted-foreground truncate">{APP_CONFIG.tagline}</p>
+            <p className="text-xs text-muted-foreground truncate">Do estudo ao domínio.</p>
           </div>
         )}
       </div>
