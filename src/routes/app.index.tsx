@@ -124,7 +124,7 @@ function DashboardPage() {
                 </p>
               </div>
               <Button asChild variant="outline" size="sm">
-                <Link to="/app/flashcards">Revisar</Link>
+                <Link to="/app/estudar" search={{ method: "recordacao_ativa" }}>Revisar</Link>
               </Button>
             </div>
           )}
@@ -243,7 +243,8 @@ function DashboardPage() {
       <Section title="Atalhos">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <ShortcutCard
-            to="/app/questoes"
+            to="/app/estudar"
+            search={{ method: "recordacao_ativa" }}
             title="Resolver questões"
             icon={<ListChecks className="h-4 w-4" aria-hidden />}
           />
@@ -293,10 +294,21 @@ function DailyGoalProgress({
   );
 }
 
-function ShortcutCard({ to, title, icon }: { to: string; title: string; icon: React.ReactNode }) {
+function ShortcutCard({ 
+  to, 
+  title, 
+  icon, 
+  search 
+}: { 
+  to: string; 
+  title: string; 
+  icon: React.ReactNode;
+  search?: any;
+}) {
   return (
     <Link
       to={to}
+      search={search}
       className="group flex items-center gap-4 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-4 transition-all hover:border-primary/40 hover:bg-surface/60 hover:shadow-md active:scale-95"
     >
       <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
