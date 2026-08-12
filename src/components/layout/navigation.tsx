@@ -130,7 +130,7 @@ export function DesktopSidebar({
         {!collapsed && (
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-              {APP_CONFIG.name}
+              Dominus<span className="text-primary">App</span>
             </p>
             <p className="text-xs text-muted-foreground truncate">Do estudo ao domínio.</p>
           </div>
