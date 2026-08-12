@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import {
-  Layers,
-  ListChecks,
   Play,
   Search,
   Sparkles,
@@ -169,16 +167,6 @@ function QuickCreate() {
           <DropdownMenuItem onClick={() => setModuleFormOpen(true)}>Novo módulo</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setLessonFormOpen(true)}>Nova aula</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link to="/app/flashcards">
-              <Layers className="mr-2 h-4 w-4" aria-hidden /> Novo flashcard
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to="/app/questoes">
-              <ListChecks className="mr-2 h-4 w-4" aria-hidden /> Nova questão
-            </Link>
-          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to="/app/estudar">
               <Play className="mr-2 h-4 w-4" aria-hidden /> Nova sessão de estudo
