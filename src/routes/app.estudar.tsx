@@ -14,12 +14,16 @@ import { ResumeBanner } from "@/features/study-sessions/resume-banner";
 import type { StudyMethod, StudySessionRow } from "@/features/study-sessions/types";
 
 export const Route = createFileRoute("/app/estudar")({
-  validateSearch: (search: Record<string, unknown>): { plannedId?: string } => {
-    const raw = search.plannedId;
-    if (typeof raw === "string" && /^[0-9a-fA-F-]{36}$/.test(raw)) {
-      return { plannedId: raw };
-    }
-    return {};
+  validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod } => {
+    const plannedId = typeof search.plannedId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.plannedId) 
+      ? search.plannedId 
+      : undefined;
+    
+    const method = typeof search.method === "string" && METHODS.some(m => m.method === search.method)
+      ? (search.method as StudyMethod)
+      : undefined;
+
+    return { plannedId, method };
   },
   component: EstudarPage,
 });
@@ -58,8 +62,8 @@ const METHODS: { method: StudyMethod; description: string; icon: typeof Timer }[
 ];
 
 function EstudarPage() {
-  const { plannedId } = Route.useSearch();
-  const [activeMethod, setActiveMethod] = useState<StudyMethod | null>(null);
+  const { plannedId, method: initialMethod } = Route.useSearch();
+  const [activeMethod, setActiveMethod] = useState<StudyMethod | null>(initialMethod ?? null);
   const [resumingSession, setResumingSession] = useState<StudySessionRow | null>(null);
 
   function backToHub() {

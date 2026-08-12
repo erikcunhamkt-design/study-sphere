@@ -35,9 +35,10 @@ interface QuestionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   question?: QuestionRow;
+  prefill?: { lessonId: string | null };
 }
 
-export function QuestionFormDialog({ open, onOpenChange, question }: QuestionFormDialogProps) {
+export function QuestionFormDialog({ open, onOpenChange, question, prefill }: QuestionFormDialogProps) {
   const isEditing = !!question;
   const statementId = useId();
 
@@ -67,14 +68,14 @@ export function QuestionFormDialog({ open, onOpenChange, question }: QuestionFor
       setExpectedAnswer(question.expected_answer ?? "");
     } else {
       setType("multipla_escolha");
-      setLessonId(null);
+      setLessonId(prefill?.lessonId ?? null);
       setStatement("");
       setOptions(["", ""]);
       setCorrectOptionIndex(null);
       setExpectedAnswer("");
     }
     setError(null);
-  }, [open, question]);
+  }, [open, question, prefill]);
 
   function updateOption(index: number, value: string) {
     setOptions((prev) => prev.map((o, i) => (i === index ? value : o)));

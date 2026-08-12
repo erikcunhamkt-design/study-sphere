@@ -42,8 +42,6 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/app", label: "Início", icon: Home, mobile: true },
   { to: "/app/estudos", label: "Estudos", icon: BookOpen, mobile: true },
   { to: "/app/estudar", label: "Estudar", icon: Play, mobile: true },
-  { to: "/app/flashcards", label: "Flashcards", icon: Layers },
-  { to: "/app/questoes", label: "Questões", icon: ListChecks },
   { to: "/app/planejamento", label: "Planejamento", icon: Target },
   { to: "/app/biblioteca", label: "Biblioteca", icon: Library },
   { to: "/app/desempenho", label: "Desempenho", icon: LineChart, mobile: true },

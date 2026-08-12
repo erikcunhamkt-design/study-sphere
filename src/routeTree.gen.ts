@@ -16,9 +16,7 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppQuestoesRouteImport } from './routes/app.questoes'
 import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
-import { Route as AppFlashcardsRouteImport } from './routes/app.flashcards'
 import { Route as AppEstudarRouteImport } from './routes/app.estudar'
 import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
@@ -65,19 +63,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppQuestoesRoute = AppQuestoesRouteImport.update({
-  id: '/questoes',
-  path: '/questoes',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
   id: '/planejamento',
   path: '/planejamento',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppFlashcardsRoute = AppFlashcardsRouteImport.update({
-  id: '/flashcards',
-  path: '/flashcards',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEstudarRoute = AppEstudarRouteImport.update({
@@ -145,9 +133,7 @@ export interface FileRoutesByFullPath {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
-  '/app/flashcards': typeof AppFlashcardsRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
-  '/app/questoes': typeof AppQuestoesRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/estudos/': typeof AppEstudosIndexRoute
@@ -166,9 +152,7 @@ export interface FileRoutesByTo {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
-  '/app/flashcards': typeof AppFlashcardsRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
-  '/app/questoes': typeof AppQuestoesRoute
   '/app': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/estudos': typeof AppEstudosIndexRoute
@@ -189,9 +173,7 @@ export interface FileRoutesById {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
-  '/app/flashcards': typeof AppFlashcardsRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
-  '/app/questoes': typeof AppQuestoesRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/estudos/': typeof AppEstudosIndexRoute
@@ -213,9 +195,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/desempenho'
     | '/app/estudar'
-    | '/app/flashcards'
     | '/app/planejamento'
-    | '/app/questoes'
     | '/app/'
     | '/app/lab/editor'
     | '/app/estudos/'
@@ -234,9 +214,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/desempenho'
     | '/app/estudar'
-    | '/app/flashcards'
     | '/app/planejamento'
-    | '/app/questoes'
     | '/app'
     | '/app/lab/editor'
     | '/app/estudos'
@@ -256,9 +234,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/desempenho'
     | '/app/estudar'
-    | '/app/flashcards'
     | '/app/planejamento'
-    | '/app/questoes'
     | '/app/'
     | '/app/lab/editor'
     | '/app/estudos/'
@@ -328,25 +304,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/questoes': {
-      id: '/app/questoes'
-      path: '/questoes'
-      fullPath: '/app/questoes'
-      preLoaderRoute: typeof AppQuestoesRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/planejamento': {
       id: '/app/planejamento'
       path: '/planejamento'
       fullPath: '/app/planejamento'
       preLoaderRoute: typeof AppPlanejamentoRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/flashcards': {
-      id: '/app/flashcards'
-      path: '/flashcards'
-      fullPath: '/app/flashcards'
-      preLoaderRoute: typeof AppFlashcardsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/estudar': {
@@ -427,9 +389,7 @@ interface AppRouteChildren {
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
   AppDesempenhoRoute: typeof AppDesempenhoRoute
   AppEstudarRoute: typeof AppEstudarRoute
-  AppFlashcardsRoute: typeof AppFlashcardsRoute
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
-  AppQuestoesRoute: typeof AppQuestoesRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLabEditorRoute: typeof AppLabEditorRoute
   AppEstudosIndexRoute: typeof AppEstudosIndexRoute
@@ -444,9 +404,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConfiguracoesRoute: AppConfiguracoesRoute,
   AppDesempenhoRoute: AppDesempenhoRoute,
   AppEstudarRoute: AppEstudarRoute,
-  AppFlashcardsRoute: AppFlashcardsRoute,
   AppPlanejamentoRoute: AppPlanejamentoRoute,
-  AppQuestoesRoute: AppQuestoesRoute,
   AppIndexRoute: AppIndexRoute,
   AppLabEditorRoute: AppLabEditorRoute,
   AppEstudosIndexRoute: AppEstudosIndexRoute,
@@ -472,13 +430,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
