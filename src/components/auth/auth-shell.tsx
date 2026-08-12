@@ -24,7 +24,7 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
         </Link>
         <div className="space-y-4 max-w-md">
           <h2 className="text-3xl font-semibold leading-tight text-sidebar-foreground">
-            Do estudo ao domínio.
+            Do estudo ao <span className="text-primary">domínio</span>.
           </h2>
           <p className="text-sm text-muted-foreground">
             Áreas de conhecimento, anotações, flashcards, questões e revisão espaçada — reunidos em
