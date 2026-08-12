@@ -5,7 +5,7 @@
 export const APP_CONFIG = {
   name: "DominusApp",
   shortName: "Dominus",
-  tagline: "Seu ambiente de estudos, no seu ritmo.",
+  tagline: "Do estudo ao domínio.",
   description:
     "Organize áreas de conhecimento, cursos, flashcards, questões e revisões em um único lugar.",
 } as const;
