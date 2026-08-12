@@ -11,9 +11,15 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LabEditorFormattingToolbar } from "@/features/lab-editor/formatting-toolbar";
 import "@/features/lab-editor/theme.css";
 import { FlashcardFormDialog } from "@/features/flashcards/flashcard-form-dialog";
+import { FlashcardList } from "@/features/flashcards/flashcard-list";
+import { useFlashcards } from "@/features/flashcards/hooks";
+import { QuestionFormDialog } from "@/features/questions/question-form-dialog";
+import { QuestionList } from "@/features/questions/question-list";
+import { useQuestions } from "@/features/questions/hooks";
 import type { FlashcardContent } from "@/features/flashcards/schema";
 import * as api from "./api";
 import { ConflictDialog } from "./conflict-dialog";
@@ -163,6 +169,7 @@ function LessonEditorLoaded({
     front: string;
     frontContent: FlashcardContent | null;
   } | null>(null);
+  const [creatingQuestion, setCreatingQuestion] = useState(false);
   const checkedDraftOnce = useRef(false);
   const initialVersion = doc?.version ?? 0;
 
@@ -308,32 +315,66 @@ function LessonEditorLoaded({
         </div>
       ) : null}
 
-      <div className="lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4">
-        <FlashcardBridgeContext.Provider
-          value={{
-            lessonId,
-            onCreateFlashcard: ({ sourceBlockId, frontText, frontContent }) =>
-              setFlashcardPrefill({ lessonId, sourceBlockId, front: frontText, frontContent }),
-          }}
-        >
-          <BlockNoteView
-            editor={editor}
-            theme={theme}
-            formattingToolbar={false}
-            slashMenu={false}
-            sideMenu={false}
-          >
-            <LabEditorFormattingToolbar />
-            <LessonEditorSideMenuController />
-            <SuggestionMenuController
-              triggerCharacter="/"
-              getItems={async (query) =>
-                filterSuggestionItems(getLessonEditorSlashMenuItems(editor), query)
-              }
-            />
-          </BlockNoteView>
-        </FlashcardBridgeContext.Provider>
-      </div>
+      <Tabs defaultValue="conteudo" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
+          <TabsTrigger value="flashcards">Flashcards</TabsTrigger>
+          <TabsTrigger value="questoes">Questões</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="conteudo" className="mt-4 space-y-3">
+          <div className="lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4">
+            <FlashcardBridgeContext.Provider
+              value={{
+                lessonId,
+                onCreateFlashcard: ({ sourceBlockId, frontText, frontContent }) =>
+                  setFlashcardPrefill({ lessonId, sourceBlockId, front: frontText, frontContent }),
+              }}
+            >
+              <BlockNoteView
+                editor={editor}
+                theme={theme}
+                formattingToolbar={false}
+                slashMenu={false}
+                sideMenu={false}
+              >
+                <LabEditorFormattingToolbar />
+                <LessonEditorSideMenuController />
+                <SuggestionMenuController
+                  triggerCharacter="/"
+                  getItems={async (query) =>
+                    filterSuggestionItems(getLessonEditorSlashMenuItems(editor), query)
+                  }
+                />
+              </BlockNoteView>
+            </FlashcardBridgeContext.Provider>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="flashcards" className="mt-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">Flashcards da Aula</h3>
+              <Button size="sm" onClick={() => setFlashcardPrefill({ lessonId, sourceBlockId: null, front: "", frontContent: null })}>
+                Novo Cartão
+              </Button>
+            </div>
+            <LessonFlashcardList lessonId={lessonId} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="questoes" className="mt-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">Questões da Aula</h3>
+              <Button size="sm" onClick={() => setCreatingQuestion(true)}>
+                Nova Questão
+              </Button>
+            </div>
+            <LessonQuestionList lessonId={lessonId} />
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <ConflictDialog
         open={!!autosave.conflict}
@@ -347,6 +388,32 @@ function LessonEditorLoaded({
         onOpenChange={(open) => !open && setFlashcardPrefill(null)}
         prefill={flashcardPrefill ?? undefined}
       />
+
+      <QuestionFormDialog
+        open={creatingQuestion}
+        onOpenChange={setCreatingQuestion}
+        prefill={{ lessonId }}
+      />
     </div>
   );
+}
+
+function LessonFlashcardList({ lessonId }: { lessonId: string }) {
+  const { data: cards, isLoading } = useFlashcards();
+  const lessonCards = useMemo(() => cards?.filter(c => c.lesson_id === lessonId) ?? [], [cards, lessonId]);
+
+  if (isLoading) return <Skeleton className="h-20 w-full" />;
+  if (lessonCards.length === 0) return <p className="text-xs text-muted-foreground text-center py-8">Nenhum cartão para esta aula.</p>;
+
+  return <FlashcardList cards={lessonCards} />;
+}
+
+function LessonQuestionList({ lessonId }: { lessonId: string }) {
+  const { data: questions, isLoading } = useQuestions();
+  const lessonQuestions = useMemo(() => questions?.filter(q => q.lesson_id === lessonId) ?? [], [questions, lessonId]);
+
+  if (isLoading) return <Skeleton className="h-20 w-full" />;
+  if (lessonQuestions.length === 0) return <p className="text-xs text-muted-foreground text-center py-8">Nenhuma questão para esta aula.</p>;
+
+  return <QuestionList questions={lessonQuestions} />;
 }
