@@ -11,3 +11,4 @@
 ## Memories
 - [Phase 06 Plan](mem://features/phase-06-plan) — Study schedule, calendar, and planned revisions.
 - [Dominus Intelligence](mem://reference/dominus-intelligence) — Strategic vision and cognitive principles.
+- [Dominus Navigation](mem://reference/dominus-navigation) — Sidebar architecture and navigation flow.
