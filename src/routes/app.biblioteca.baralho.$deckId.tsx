@@ -111,28 +111,15 @@ function DeckDetailPage() {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Button 
-            variant="outline" 
+            variant="ghost" 
             size="sm" 
-            className="gap-2"
-            disabled={deckCards.length === 0}
-            onClick={() => navigate({ 
-              to: "/app/estudar", 
-              search: { method: "recordacao_ativa", deckId, mode: "training" } 
-            })}
-          >
-            <Play className="h-4 w-4" /> Treinar
-          </Button>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="gap-2"
-            disabled={deckCards.length === 0}
+            className="gap-2 text-muted-foreground hover:text-foreground"
             onClick={() => navigate({ 
               to: "/app/estudar", 
               search: { method: "recordacao_ativa", deckId, mode: "review" } 
             })}
           >
-            <RotateCcw className="h-4 w-4" /> Revisar
+            <RotateCcw className="h-4 w-4" /> Estudar este baralho
           </Button>
           <Button onClick={() => setAddDialogOpen(true)} size="sm" className="gap-2">
             <Plus className="h-4 w-4" /> Adicionar
