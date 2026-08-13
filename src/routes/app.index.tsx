@@ -45,29 +45,29 @@ function DashboardPage() {
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-5 w-48" />
         </div>
-        <Skeleton className="h-72 w-full rounded-3xl" />
+        <Skeleton className="h-48 w-full rounded-3xl" />
         <div className="space-y-4">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-20 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12 pb-20 px-4 md:px-0">
-      {/* Header Contextual */}
-      <div className="space-y-2">
-        <h1 className="text-4xl font-black tracking-tight text-foreground">{greeting}, {displayName}.</h1>
-        <p className="text-xl text-muted-foreground font-medium tracking-tight">O que vamos aprender hoje?</p>
+    <div className="max-w-4xl mx-auto space-y-8 pb-20 px-4 md:px-0">
+      {/* Header Contextual - Mais compacto */}
+      <div className="space-y-1">
+        <h1 className="text-3xl font-black tracking-tight text-foreground">{greeting}, {displayName}.</h1>
+        <p className="text-lg text-muted-foreground font-medium tracking-tight">O que vamos aprender hoje?</p>
       </div>
 
-      {/* 1. HERO — AÇÃO PRINCIPAL */}
+      {/* 1. HERO — AÇÃO PRINCIPAL (Reduzido e Compacto) */}
       {priority === "review" && (
         <NextStepAction
           title="Sua Próxima Ação"
           subtitle="Revisar agora"
-          description={`Você tem ${data.count} revisões pendentes. Recupere esses conceitos antes de continuar avançando.`}
+          description={`Você tem ${data.count} revisões pendentes. Recupere esses conceitos antes de avançar.`}
           ctaText="Começar revisão"
           to="/app/revisar"
           estimatedMinutes={data.estimatedMinutes}
@@ -79,7 +79,7 @@ function DashboardPage() {
         <NextStepAction
           title="Sua Próxima Ação"
           subtitle={`Retomar ${STUDY_METHOD_LABELS[data.session.method]}`}
-          description="Você tem uma sessão de estudo em andamento. Não perca o ritmo e finalize agora."
+          description="Você tem uma sessão em andamento. Finalize agora para manter o ritmo."
           ctaText="Continuar agora"
           to="/app/estudar"
           search={{ method: data.session.method }}
@@ -91,7 +91,7 @@ function DashboardPage() {
         <NextStepAction
           title="Sua Próxima Ação"
           subtitle={`Continuar ${data.course.name}`}
-          description={`Seu progresso atual é de ${data.progress.percent}%. Vamos para o próximo módulo?`}
+          description={`Progresso de ${data.progress.percent}%. Vamos para o próximo módulo?`}
           ctaText="Estudar agora"
           to="/app/meus-estudos/$areaId/cursos/$courseId"
           params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
@@ -103,7 +103,7 @@ function DashboardPage() {
         <NextStepAction
           title="Sua Próxima Ação"
           subtitle={`Iniciar ${data.course.name}`}
-          description="Você já tem conteúdo disponível. Escolha um método e inicie sua primeira sessão."
+          description="Conteúdo disponível. Escolha um método e inicie sua primeira sessão."
           ctaText="Começar estudo"
           to="/app/meus-estudos/$areaId/cursos/$courseId"
           params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
@@ -114,9 +114,9 @@ function DashboardPage() {
       {priority === "onboarding" && (
         <NextStepAction
           title="Primeiro Passo"
-          subtitle="Vamos começar sua jornada?"
-          description="Crie sua primeira área de estudo ou curso para ativar o DominusApp."
-          ctaText="Criar primeira área"
+          subtitle="Vamos começar?"
+          description="Crie sua primeira área de estudo para ativar o DominusApp."
+          ctaText="Criar área"
           to="/app/meus-estudos"
           icon={Sparkles}
         />
@@ -124,7 +124,7 @@ function DashboardPage() {
 
       {priority === "maintenance" && (
         <NextStepAction
-          title="Você está em dia"
+          title="Em dia"
           subtitle="Nenhuma pendência urgente"
           description="Que tal cadastrar um novo curso ou revisar seus materiais?"
           ctaText="Abrir biblioteca"
@@ -133,38 +133,28 @@ function DashboardPage() {
         />
       )}
 
-      {/* 2. SEU DIA (Compacto e Sem Redundância) */}
-      <DayProgress current={studyMinutes} goal={studyGoal} reviews={reviewsCount} />
+      {/* 2. SEU DIA & 3. SEU DOMÍNIO (Grid Refinado) */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="md:col-span-3">
+          <DayProgress current={studyMinutes} goal={studyGoal} reviews={reviewsCount} />
+        </div>
+        <div className="md:col-span-2">
+          <MasteryCard />
+        </div>
+      </div>
 
-      {/* 3. SEU DOMÍNIO */}
-      <MasteryCard />
-
-      {/* 4. PRIMEIRO ESTUDO / ESTADO VAZIO INTELIGENTE */}
+      {/* 4. PRIMEIRO ESTUDO (Apenas se necessário) */}
       {!hasActivity && priority !== "review" && priority !== "resume" && (
-        <div className="space-y-4">
-          <SectionHeader title="Comece a Estudar" />
+        <div className="pt-4 border-t border-border/20">
+          <SectionHeader title="Conteúdo inicial" />
           <SimpleEmptyState 
-            title="Você ainda não iniciou um estudo."
+            title="Ainda não iniciou um estudo."
             description="Escolha um assunto e comece sua primeira sessão para o domínio."
             ctaText="Explorar meus estudos"
             to="/app/meus-estudos"
           />
         </div>
       )}
-
-      {/* Atalhos Secundários (Apenas o essencial) */}
-      <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border/20">
-        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mr-2">Acesso Rápido</span>
-        <Button asChild variant="ghost" size="sm" className="rounded-full text-xs font-bold hover:bg-primary/5 hover:text-primary">
-          <Link to="/app/meus-estudos">Adicionar conteúdo</Link>
-        </Button>
-        <Button asChild variant="ghost" size="sm" className="rounded-full text-xs font-bold hover:bg-primary/5 hover:text-primary">
-          <Link to="/app/planejamento">Planejar semana</Link>
-        </Button>
-        <Button asChild variant="ghost" size="sm" className="rounded-full text-xs font-bold hover:bg-primary/5 hover:text-primary">
-          <Link to="/app/biblioteca" search={{ tab: "flashcards" }}>Biblioteca</Link>
-        </Button>
-      </div>
     </div>
   );
 }
