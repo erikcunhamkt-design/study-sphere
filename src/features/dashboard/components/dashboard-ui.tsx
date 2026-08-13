@@ -11,6 +11,7 @@ export function NextStepAction({
   ctaText,
   to,
   search,
+  params,
   icon: Icon = Sparkles,
 }: {
   title: string;
@@ -19,6 +20,7 @@ export function NextStepAction({
   ctaText: string;
   to: string;
   search?: any;
+  params?: any;
   icon?: React.ElementType;
 }) {
   return (
@@ -34,7 +36,7 @@ export function NextStepAction({
           <p className="mt-2 text-base text-muted-foreground max-w-md">{description}</p>
         </div>
         <Button asChild size="lg" className="rounded-full px-8">
-          <Link to={to} search={search}>
+          <Link to={to} search={search} params={params}>
             {ctaText} <ChevronRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
@@ -55,3 +57,4 @@ export function MiniStatCard({ title, value, unit, description }: { title: strin
     </div>
   );
 }
+
