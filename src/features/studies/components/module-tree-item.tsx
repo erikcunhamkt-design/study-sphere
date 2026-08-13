@@ -133,7 +133,7 @@ export function ModuleTreeItem({
         </CollapsibleTrigger>
 
         <Link
-          to="/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId"
+          to="/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId"
           params={{ areaId, courseId, moduleId: courseModule.id }}
           className="min-w-0 flex-1 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >

@@ -77,7 +77,7 @@ export function LessonRow({
       />
 
       <Link
-        to="/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId"
+        to="/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId"
         params={{ areaId, courseId, moduleId: lesson.module_id, lessonId: lesson.id }}
         className="min-w-0 flex-1 space-y-0.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >

@@ -154,7 +154,7 @@ export function CourseFormDialog({
             </p>
             <DialogFooter>
               <Button asChild>
-                <Link to="/app/estudos">Ir para Estudos</Link>
+                <Link to="/app/meus-estudos">Ir para Estudos</Link>
               </Button>
             </DialogFooter>
           </div>

@@ -128,7 +128,7 @@ function ModuleNotFound({ areaId, courseId }: { areaId: string; courseId: string
         </p>
         <div className="mt-6">
           <Button asChild>
-            <Link to="/app/estudos/$areaId/cursos/$courseId" params={{ areaId, courseId }}>
+            <Link to="/app/meus-estudos/$areaId/cursos/$courseId" params={{ areaId, courseId }}>
               Voltar para o curso
             </Link>
           </Button>
@@ -263,13 +263,13 @@ function ModuleContent({
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/app/estudos">Estudos</Link>
+              <Link to="/app/meus-estudos">Estudos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/app/estudos/$areaId" params={{ areaId }}>
+              <Link to="/app/meus-estudos/$areaId" params={{ areaId }}>
                 {area.name}
               </Link>
             </BreadcrumbLink>
@@ -277,7 +277,7 @@ function ModuleContent({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/app/estudos/$areaId/cursos/$courseId" params={{ areaId, courseId }}>
+              <Link to="/app/meus-estudos/$areaId/cursos/$courseId" params={{ areaId, courseId }}>
                 {course.name}
               </Link>
             </BreadcrumbLink>
@@ -448,7 +448,7 @@ function ModuleContent({
         courseModule={courseModule}
         lessonCount={lessons?.length ?? 0}
         onDeleted={() =>
-          navigate({ to: "/app/estudos/$areaId/cursos/$courseId", params: { areaId, courseId } })
+          navigate({ to: "/app/meus-estudos/$areaId/cursos/$courseId", params: { areaId, courseId } })
         }
       />
       <LessonFormDialog

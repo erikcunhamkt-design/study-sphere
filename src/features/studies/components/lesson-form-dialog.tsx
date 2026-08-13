@@ -154,7 +154,7 @@ export function LessonFormDialog({
             </p>
             <DialogFooter>
               <Button asChild>
-                <Link to="/app/estudos">Ir para Estudos</Link>
+                <Link to="/app/meus-estudos">Ir para Estudos</Link>
               </Button>
             </DialogFooter>
           </div>
@@ -214,7 +214,7 @@ export function LessonFormDialog({
                     <p className="text-xs text-muted-foreground">
                       Este curso ainda não tem módulos.{" "}
                       <Link
-                        to="/app/estudos/$areaId/cursos/$courseId"
+                        to="/app/meus-estudos/$areaId/cursos/$courseId"
                         params={{ areaId: selectedAreaId, courseId: form.course_id }}
                         className="underline"
                       >

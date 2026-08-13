@@ -145,7 +145,7 @@ export function CourseModuleFormDialog({
             </p>
             <DialogFooter>
               <Button asChild>
-                <Link to="/app/estudos">Ir para Estudos</Link>
+                <Link to="/app/meus-estudos">Ir para Estudos</Link>
               </Button>
             </DialogFooter>
           </div>
@@ -180,7 +180,7 @@ export function CourseModuleFormDialog({
                     <p className="text-xs text-muted-foreground">
                       Esta área ainda não tem cursos.{" "}
                       <Link
-                        to="/app/estudos/$areaId"
+                        to="/app/meus-estudos/$areaId"
                         params={{ areaId: selectedAreaId }}
                         className="underline"
                       >
