@@ -353,7 +353,7 @@ export function UserMenu() {
           {user?.email}
         </div>
         <DropdownMenuItem asChild>
-          <Link to="/app/perfil" className="cursor-pointer">
+          <Link to="/app/configuracoes" className="cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" /> Perfil
           </Link>
         </DropdownMenuItem>
