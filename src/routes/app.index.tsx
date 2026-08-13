@@ -162,7 +162,7 @@ function DashboardPage() {
           <Link to="/app/planejamento">Planejar semana</Link>
         </Button>
         <Button asChild variant="ghost" size="sm" className="rounded-full text-xs font-bold hover:bg-primary/5 hover:text-primary">
-          <Link to="/app/biblioteca">Biblioteca</Link>
+          <Link to="/app/biblioteca" search={{ tab: "flashcards" }}>Biblioteca</Link>
         </Button>
       </div>
     </div>
