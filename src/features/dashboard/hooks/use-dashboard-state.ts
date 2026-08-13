@@ -25,6 +25,8 @@ export function useDashboardState() {
     loadingModules ||
     loadingRecent;
 
+  const hasActivity = (recentSessions?.length ?? 0) > 0;
+  
   const state = useMemo(() => {
     if (isLoading) return { priority: "loading" as const, data: {} };
 
@@ -118,31 +120,29 @@ export function useDashboardState() {
     }
 
     // 4. Prioridade: Primeiro Estudo (Possui conteúdo mas nada em andamento)
-    if (activeCourses.length > 0) {
-      // Validar se o curso é semântico (não é apenas ruído de teste)
-      const validCourses = activeCourses.filter(c => 
-        c.name.trim().length > 2 && 
-        !/^(teste|test|abc|sdfsd|asdad)$/i.test(c.name)
-      );
+    const validCourses = (activeCourses ?? []).filter(c => 
+      c.name.trim().length > 2 && 
+      !/^(teste|test|abc|sdfsd|asdad)$/i.test(c.name)
+    );
 
-      if (validCourses.length > 0) {
+    if (validCourses.length > 0) {
+      // Verificar se já houve algum estudo (mesmo que não esteja em andamento agora)
+      if (hasActivity) {
         return {
-          priority: "start_study" as const,
-          data: { course: validCourses[0] },
+          priority: "maintenance" as const,
+          data: { course: validCourses[0] }
         };
       }
+
+      return {
+        priority: "start_study" as const,
+        data: { course: validCourses[0] },
+      };
     }
 
-    // 5. Prioridade: Manutenção / Novo Usuário (Sem conteúdo)
-    const hasAreas = (areas?.length ?? 0) > 0;
-    if (!hasAreas) {
-      return { priority: "onboarding" as const, data: {} };
-    }
-
-    return { priority: "maintenance" as const, data: {} };
-  }, [isLoading, dueFlashcards, inProgressSessions, courses, allLessons, areas, modules]);
-
-  const hasActivity = (recentSessions?.length ?? 0) > 0;
+    // 5. Prioridade: Onboarding (Sem conteúdo)
+    return { priority: "onboarding" as const, data: {} };
+  }, [isLoading, dueFlashcards, inProgressSessions, courses, allLessons, areas, modules, hasActivity]);
 
   return { ...state, isLoading, dueFlashcards, courses, allLessons, modules, hasActivity };
 }
