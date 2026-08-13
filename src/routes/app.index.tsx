@@ -64,23 +64,7 @@ function DashboardPage() {
         <p className="text-lg text-muted-foreground font-medium tracking-tight">O que vamos aprender hoje?</p>
       </div>
 
-      {/* 1. HERO — AÇÃO PRINCIPAL (Reduzido e Compacto) */}
-      {priority === "review" && (
-        <NextStepAction
-          title="Revisão"
-          subtitle="Revisar agora"
-          description={
-            reviewsCount > 0 
-              ? `Você tem ${reviewsCount} revisões pendentes. Recupere esses conceitos antes de avançar.`
-              : "Tudo em dia! Suas revisões foram concluídas."
-          }
-          ctaText="Começar revisão"
-          to="/app/revisar"
-          estimatedMinutes={data.estimatedMinutes}
-          icon={Layers}
-        />
-      )}
-
+      {/* 1. HERO — AÇÃO PRINCIPAL */}
       {priority === "resume" && (
         <NextStepAction
           title="Retomar"
@@ -88,12 +72,10 @@ function DashboardPage() {
           context={data.displayContext}
           description={
             data.displaySecondary 
-              ? `${data.displaySecondary}. Você parou aqui. Continue para finalizar sua sessão.`
+              ? `${data.displaySecondary}. Continue de onde parou.`
               : data.isFree
-                ? "Estude livremente sem vincular esta sessão a um conteúdo específico."
-                : data.session.method !== 'livre' 
-                  ? `Sessão de ${STUDY_METHOD_LABELS[data.session.method as keyof typeof STUDY_METHOD_LABELS]} em andamento. Continue de onde parou.`
-                  : "Retome sua sessão para registrar seu progresso."
+                ? "Continue sua sessão de estudo livre."
+                : "Retome sua sessão para registrar seu progresso."
           }
           ctaText="Continuar agora"
           to="/app/estudar"
@@ -114,9 +96,21 @@ function DashboardPage() {
         />
       )}
 
+      {priority === "review" && (
+        <NextStepAction
+          title="Sua próxima ação"
+          subtitle="Revisar agora"
+          description={`Você tem ${reviewsCount} ${reviewsCount === 1 ? 'revisão pendente' : 'revisões pendentes'}. Recupere esses conceitos antes de avançar.`}
+          ctaText="Começar revisão"
+          to="/app/revisar"
+          estimatedMinutes={data.estimatedMinutes}
+          icon={Layers}
+        />
+      )}
+
       {priority === "recommendation" && (
         <NextStepAction
-          title="Recomendação"
+          title="Próxima recomendação"
           subtitle={`Continuar ${data.course.name}`}
           description={`Você já concluiu ${data.progress.percent}% deste curso. Vamos para a próxima etapa?`}
           ctaText="Estudar agora"
@@ -128,10 +122,10 @@ function DashboardPage() {
 
       {priority === "start_study" && (
         <NextStepAction
-          title="Pronto para estudar?"
-          subtitle={`Iniciar ${data.course.name}`}
+          title="Próximo passo"
+          subtitle="Escolha seu primeiro estudo"
           description="Você já possui conteúdo disponível. Escolha por onde começar."
-          ctaText="Escolher estudo"
+          ctaText="Começar estudo"
           to="/app/meus-estudos/$areaId/cursos/$courseId"
           params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
           icon={BookOpen}
@@ -140,10 +134,10 @@ function DashboardPage() {
       
       {priority === "onboarding" && (
         <NextStepAction
-          title="Começar"
+          title="Comece sua jornada"
           subtitle="Comece seu primeiro estudo"
-          description="Escolha um conteúdo e comece sua primeira sessão."
-          ctaText="Começar estudo"
+          description="Adicione um conteúdo e dê início à sua primeira sessão."
+          ctaText="Adicionar conteúdo"
           to="/app/meus-estudos"
           icon={Sparkles}
         />
@@ -151,11 +145,15 @@ function DashboardPage() {
 
       {priority === "maintenance" && (
         <NextStepAction
-          title="Em dia"
-          subtitle="Nenhuma pendência urgente"
-          description="Seu ritmo está excelente. Que tal organizar novos materiais ou revisar sua biblioteca?"
-          ctaText="Abrir biblioteca"
-          to="/app/biblioteca"
+          title="Tudo em dia"
+          subtitle="Continue avançando"
+          description="Nenhuma revisão pendente. Escolha seu próximo passo de aprendizagem."
+          ctaText="Continuar estudando"
+          to="/app/meus-estudos/$areaId/cursos/$courseId"
+          params={{ 
+            areaId: data.course?.study_area_id, 
+            courseId: data.course?.id 
+          }}
           icon={ListChecks}
         />
       )}
