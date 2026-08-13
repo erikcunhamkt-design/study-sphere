@@ -82,7 +82,7 @@ function DashboardPage() {
       {priority === "resume" && (
         <NextStepAction
           title="Retomar"
-          subtitle={data.lesson?.name || data.course?.name || "Continuar estudo"}
+          subtitle={data.lesson?.title || data.course?.name || "Continuar estudo"}
           description={
             data.lesson && data.course 
               ? `${data.course.name}${data.module ? ` · ${data.module.name}` : ""}`
