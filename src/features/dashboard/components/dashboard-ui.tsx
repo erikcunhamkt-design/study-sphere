@@ -14,6 +14,7 @@ export function NextStepAction({
   search,
   params,
   estimatedMinutes,
+  icon: Icon = Sparkles,
   context,
   onSecondaryAction,
   secondaryActionLabel,
