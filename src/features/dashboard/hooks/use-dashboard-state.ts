@@ -119,10 +119,18 @@ export function useDashboardState() {
 
     // 4. Prioridade: Primeiro Estudo (Possui conteúdo mas nada em andamento)
     if (activeCourses.length > 0) {
-      return {
-        priority: "start_study" as const,
-        data: { course: activeCourses[0] },
-      };
+      // Validar se o curso é semântico (não é apenas ruído de teste)
+      const validCourses = activeCourses.filter(c => 
+        c.name.trim().length > 2 && 
+        !/^(teste|test|abc|sdfsd|asdad)$/i.test(c.name)
+      );
+
+      if (validCourses.length > 0) {
+        return {
+          priority: "start_study" as const,
+          data: { course: validCourses[0] },
+        };
+      }
     }
 
     // 5. Prioridade: Manutenção / Novo Usuário (Sem conteúdo)

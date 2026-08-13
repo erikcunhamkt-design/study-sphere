@@ -128,10 +128,10 @@ function DashboardPage() {
 
       {priority === "start_study" && (
         <NextStepAction
-          title="Conteúdo"
+          title="Pronto para estudar?"
           subtitle={`Iniciar ${data.course.name}`}
-          description="Seu material está pronto. Escolha um método e inicie sua primeira sessão."
-          ctaText="Começar estudo"
+          description="Você já possui conteúdo disponível. Escolha por onde começar."
+          ctaText="Escolher estudo"
           to="/app/meus-estudos/$areaId/cursos/$courseId"
           params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
           icon={BookOpen}
@@ -140,10 +140,10 @@ function DashboardPage() {
       
       {priority === "onboarding" && (
         <NextStepAction
-          title="Primeiro Passo"
-          subtitle="Vamos começar?"
-          description="Crie sua primeira área de estudo para ativar o DominusApp."
-          ctaText="Criar área"
+          title="Começar"
+          subtitle="Comece seu primeiro estudo"
+          description="Escolha um conteúdo e comece sua primeira sessão."
+          ctaText="Começar estudo"
           to="/app/meus-estudos"
           icon={Sparkles}
         />
