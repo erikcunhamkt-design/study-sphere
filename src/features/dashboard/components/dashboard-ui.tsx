@@ -60,6 +60,19 @@ export function NextStepAction({
           </Button>
         </div>
       </div>
+      
+      {onSecondaryAction && secondaryActionLabel && (
+        <div className="mt-4 flex justify-end">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-auto p-0 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 hover:text-muted-foreground hover:bg-transparent"
+            onClick={onSecondaryAction}
+          >
+            {secondaryActionLabel}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -15,8 +15,9 @@ import { useProfile, usePreferences } from "@/hooks/use-preferences";
 import { useAuth } from "@/hooks/use-auth";
 import { resolveTimezone, startOfDayIso } from "@/lib/timezone";
 import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
-import { useStudySessionSecondsSince } from "@/features/study-sessions/hooks";
+import { useStudySessionSecondsSince, useDeleteStudySession } from "@/features/study-sessions/hooks";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
@@ -27,6 +28,7 @@ function DashboardPage() {
   const { user } = useAuth();
   const { data: prefs } = usePreferences();
   const { priority, data, isLoading, dueFlashcards, hasActivity } = useDashboardState();
+  const deleteSession = useDeleteStudySession();
   
   const sinceIso = useMemo(() => startOfDayIso(profile?.timezone), [profile?.timezone]);
   const { data: todaySeconds } = useStudySessionSecondsSince(sinceIso);
@@ -87,9 +89,11 @@ function DashboardPage() {
           description={
             data.displaySecondary 
               ? `${data.displaySecondary}. Você parou aqui. Continue para finalizar sua sessão.`
-              : data.session.method !== 'livre' 
-                ? `Sessão de ${STUDY_METHOD_LABELS[data.session.method as keyof typeof STUDY_METHOD_LABELS]} em andamento. Continue de onde parou.`
-                : "Sessão sem conteúdo vinculado. Continue para registrar seu progresso."
+              : data.isFree
+                ? "Estude livremente sem vincular esta sessão a um conteúdo específico."
+                : data.session.method !== 'livre' 
+                  ? `Sessão de ${STUDY_METHOD_LABELS[data.session.method as keyof typeof STUDY_METHOD_LABELS]} em andamento. Continue de onde parou.`
+                  : "Retome sua sessão para registrar seu progresso."
           }
           ctaText="Continuar agora"
           to="/app/estudar"
@@ -98,6 +102,15 @@ function DashboardPage() {
             lessonId: data.session.lesson_id 
           }}
           icon={Play}
+          onSecondaryAction={data.isFree ? async () => {
+            try {
+              await deleteSession.mutateAsync(data.session.id);
+              toast.success("Sessão encerrada");
+            } catch (err) {
+              toast.error("Erro ao encerrar sessão");
+            }
+          } : undefined}
+          secondaryActionLabel={data.isFree ? "Encerrar sessão" : undefined}
         />
       )}
 
