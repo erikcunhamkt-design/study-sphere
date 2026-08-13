@@ -145,63 +145,6 @@ function DashboardPage() {
   );
 }
 
-/**
- * Sempre visível com números reais, mesmo em 0 min — diferente da taxa de
- * retenção de flashcards (indefinida sem revisões), 0 minutos hoje contra
- * uma meta real é um "0%" honesto, não um dado fabricado.
- */
-function DailyGoalProgress({
-  todaySeconds,
-  goalMinutes,
-}: {
-  todaySeconds: number;
-  goalMinutes: number;
-}) {
-  const todayMinutes = Math.round(todaySeconds / 60);
-  const goalSeconds = goalMinutes * 60;
-  const percent =
-    goalSeconds > 0 ? Math.min(100, Math.round((todaySeconds / goalSeconds) * 100)) : 0;
-
-  return (
-    <div className="space-y-4 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-5 shadow-sm">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-foreground">
-          {todayMinutes}/{goalMinutes} min
-        </span>
-        <span className="text-xs text-muted-foreground">{percent}%</span>
-      </div>
-      <Progress value={percent} />
-    </div>
-  );
-}
-
-function ShortcutCard({ 
-  to, 
-  title, 
-  icon, 
-  search 
-}: { 
-  to: string; 
-  title: string; 
-  icon: React.ReactNode;
-  search?: any;
-}) {
-  return (
-    <Link
-      to={to}
-      search={search}
-      className="group flex items-center gap-4 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-4 transition-all hover:border-primary/40 hover:bg-surface/60 hover:shadow-md active:scale-95"
-    >
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
-        {icon}
-      </span>
-      <span className="text-sm font-medium text-foreground group-hover:text-foreground">
-        {title}
-      </span>
-    </Link>
-  );
-}
-
 function greetingForNow(timezone?: string): string {
   const tz = resolveTimezone(timezone);
   try {
