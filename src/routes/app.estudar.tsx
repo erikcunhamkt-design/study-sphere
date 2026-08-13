@@ -14,19 +14,28 @@ import { ResumeBanner } from "@/features/study-sessions/resume-banner";
 import type { StudyMethod, StudySessionRow } from "@/features/study-sessions/types";
 
 export const Route = createFileRoute("/app/estudar")({
-  validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod } => {
+  validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; mode?: "review" | "training" } => {
     const plannedId = typeof search.plannedId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.plannedId) 
       ? search.plannedId 
+      : undefined;
+    
+    const deckId = typeof search.deckId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.deckId) 
+      ? search.deckId 
+      : undefined;
+
+    const mode = (search.mode === "review" || search.mode === "training")
+      ? (search.mode as "review" | "training")
       : undefined;
     
     const method = typeof search.method === "string" && METHODS.some(m => m.method === search.method)
       ? (search.method as StudyMethod)
       : undefined;
 
-    return { plannedId, method };
+    return { plannedId, method, deckId, mode };
   },
   component: EstudarPage,
 });
+
 
 const METHODS: { method: StudyMethod; description: string; icon: typeof Timer }[] = [
   {
@@ -92,7 +101,11 @@ function EstudarPage() {
         ) : activeMethod === "livre" ? (
           <LivreSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : (
-          <RecordacaoAtivaHub onBack={backToHub} />
+          <RecordacaoAtivaHub 
+            onBack={backToHub} 
+            deckId={Route.useSearch().deckId} 
+            mode={Route.useSearch().mode}
+          />
         )}
       </div>
     );

@@ -1,18 +1,33 @@
 import { useState } from "react";
 import { Layers, ListChecks, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDueFlashcards } from "@/features/flashcards/hooks";
+import { useDueFlashcards, useDueFlashcardsByDeck, useFlashcardsByDeck } from "@/features/flashcards/hooks";
 import { ReviewSession } from "@/features/flashcards/review-session";
 import { useExams, useStartExamAttempt } from "@/features/questions/hooks";
 import { ExamAttemptRunner } from "@/features/questions/exam-attempt-runner";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FinishExamAttemptResult } from "@/features/questions/types";
 
-type View = "hub" | "flashcards" | "questions_list" | "exam_runner";
+type View = "hub" | "flashcards" | "flashcards_training" | "questions_list" | "exam_runner";
 
-export function RecordacaoAtivaHub({ onBack }: { onBack: () => void }) {
-  const [view, setView] = useState<View>("hub");
-  const { data: dueFlashcards, isLoading: loadingFlashcards } = useDueFlashcards();
+export function RecordacaoAtivaHub({ 
+  onBack,
+  deckId,
+  mode
+}: { 
+  onBack: () => void;
+  deckId?: string;
+  mode?: "review" | "training";
+}) {
+  const [view, setView] = useState<View>(deckId ? (mode === "training" ? "flashcards_training" : "flashcards") : "hub");
+  const { data: globalDueFlashcards, isLoading: loadingFlashcards } = useDueFlashcards();
+  
+  // Queries específicas do baralho
+  const { data: deckDueFlashcards, isLoading: loadingDeckDue } = useDueFlashcardsByDeck(deckId);
+  const { data: deckAllFlashcards, isLoading: loadingDeckAll } = useFlashcardsByDeck(deckId);
+
+  const dueFlashcards = deckId ? deckDueFlashcards : globalDueFlashcards;
+
   const { data: exams, isLoading: loadingExams } = useExams();
   const startExam = useStartExamAttempt();
   const [activeAttempt, setActiveAttempt] = useState<{ exam: any; attempt: any } | null>(null);
@@ -26,6 +41,16 @@ export function RecordacaoAtivaHub({ onBack }: { onBack: () => void }) {
       console.error("Erro ao iniciar simulado:", error);
     }
   };
+
+  if (view === "flashcards_training" && deckAllFlashcards) {
+    return (
+      <ReviewSession 
+        queue={deckAllFlashcards} 
+        onFinish={() => onBack()} 
+        isTrainingMode={true}
+      />
+    );
+  }
 
   if (view === "flashcards" && dueFlashcards) {
     return (

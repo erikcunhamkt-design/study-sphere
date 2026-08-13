@@ -6,9 +6,12 @@ import {
   Layers, 
   Search,
   CheckCircle2,
-  X
+  X,
+  Play,
+  RotateCcw
 } from "lucide-react";
 import { toast } from "sonner";
+
 
 import { PageHeader } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -106,11 +109,36 @@ function DeckDetailPage() {
             description={`${deckCards.length} cartões neste baralho`} 
           />
         </div>
-        <div className="ml-auto">
-          <Button onClick={() => setAddDialogOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" /> Adicionar cartões
+        <div className="ml-auto flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            disabled={deckCards.length === 0}
+            onClick={() => navigate({ 
+              to: "/app/estudar", 
+              search: { method: "recordacao_ativa", deckId, mode: "training" } 
+            })}
+          >
+            <Play className="h-4 w-4" /> Treinar
+          </Button>
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            className="gap-2"
+            disabled={deckCards.length === 0}
+            onClick={() => navigate({ 
+              to: "/app/estudar", 
+              search: { method: "recordacao_ativa", deckId, mode: "review" } 
+            })}
+          >
+            <RotateCcw className="h-4 w-4" /> Revisar
+          </Button>
+          <Button onClick={() => setAddDialogOpen(true)} size="sm" className="gap-2">
+            <Plus className="h-4 w-4" /> Adicionar
           </Button>
         </div>
+
       </div>
       
       {deckCards.length > 0 ? (

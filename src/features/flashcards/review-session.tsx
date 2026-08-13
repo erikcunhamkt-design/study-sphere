@@ -21,9 +21,15 @@ interface ReviewSessionProps {
    * revisão real ainda é enviada e persistida imediatamente. */
   queue: FlashcardRow[];
   onFinish: () => void;
+  isTrainingMode?: boolean;
 }
 
-export function ReviewSession({ queue: initialQueue, onFinish }: ReviewSessionProps) {
+export function ReviewSession({ 
+  queue: initialQueue, 
+  onFinish,
+  isTrainingMode = false
+}: ReviewSessionProps) {
+
   const [queue, setQueue] = useState(initialQueue);
   const [showBack, setShowBack] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
@@ -34,7 +40,10 @@ export function ReviewSession({ queue: initialQueue, onFinish }: ReviewSessionPr
   async function handleRate(rating: FlashcardRating) {
     if (!current) return;
     try {
-      await submitReview.mutateAsync({ flashcardId: current.id, rating });
+      if (!isTrainingMode) {
+        await submitReview.mutateAsync({ flashcardId: current.id, rating });
+      }
+
       setReviewedCount((n) => n + 1);
       setQueue((q) => q.slice(1));
       setShowBack(false);

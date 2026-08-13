@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Archive, ArchiveRestore, Pencil, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Pencil, Trash2, GraduationCap, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+
 
 import {
   AlertDialog,
@@ -18,7 +19,9 @@ import { cn } from "@/lib/utils";
 import { textFromInlineContent } from "./schema";
 import { FlashcardFormDialog } from "./flashcard-form-dialog";
 import { useDeleteFlashcard, useSetFlashcardArchived } from "./hooks";
+import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import type { FlashcardRow, FlashcardState } from "./types";
+
 
 const STATE_LABELS: Record<FlashcardState, string> = {
   novo: "Novo",
@@ -73,6 +76,10 @@ function FlashcardRowItem({
   onDelete: () => void;
 }) {
   const setArchived = useSetFlashcardArchived(card.id);
+  const { data: lessons } = useAllLessons();
+  const lesson = card.lesson_id ? lessons?.find((l) => l.id === card.lesson_id) : null;
+
+
 
   async function handleToggleArchive() {
     try {
@@ -87,21 +94,33 @@ function FlashcardRowItem({
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-3">
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-medium text-foreground">
-            {textFromInlineContent(card.front)}
-          </p>
-          <Badge variant="secondary" className="shrink-0 text-[10px]">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          {lesson ? (
+            <Badge variant="outline" className="gap-1 border-primary/20 text-primary/80 text-[10px] py-0">
+              <GraduationCap className="h-3 w-3" />
+              {lesson.title}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="gap-1 text-muted-foreground text-[10px] py-0">
+              <BookOpen className="h-3 w-3" />
+              Avulso
+            </Badge>
+          )}
+          <Badge variant="secondary" className="shrink-0 text-[10px] py-0">
             {STATE_LABELS[card.state]}
           </Badge>
           {card.is_archived ? (
-            <Badge variant="secondary" className="shrink-0 text-[10px]">
+            <Badge variant="secondary" className="shrink-0 text-[10px] py-0">
               Arquivado
             </Badge>
           ) : null}
         </div>
+        <p className="truncate text-sm font-medium text-foreground">
+          {textFromInlineContent(card.front)}
+        </p>
         <p className="truncate text-xs text-muted-foreground">{textFromInlineContent(card.back)}</p>
       </div>
+
       <div className="flex shrink-0 items-center gap-1">
         <Button variant="ghost" size="icon" aria-label="Editar cartão" onClick={onEdit}>
           <Pencil className="h-4 w-4" aria-hidden />

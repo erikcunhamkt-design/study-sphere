@@ -30,7 +30,35 @@ export async function fetchDueFlashcards(userId: string): Promise<FlashcardRow[]
   return (data ?? []) as unknown as FlashcardRow[];
 }
 
+export async function fetchFlashcardsByDeck(userId: string, deckId: string): Promise<FlashcardRow[]> {
+  const { data, error } = await supabase
+    .from("flashcards")
+    .select(FLASHCARD_COLUMNS)
+    .eq("user_id", userId)
+    .eq("deck_id", deckId)
+    .eq("is_archived", false)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as FlashcardRow[];
+}
+
+/** Fila de revisão de um baralho específico. */
+export async function fetchDueFlashcardsByDeck(userId: string, deckId: string): Promise<FlashcardRow[]> {
+  const nowIso = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("flashcards")
+    .select(FLASHCARD_COLUMNS)
+    .eq("user_id", userId)
+    .eq("deck_id", deckId)
+    .eq("is_archived", false)
+    .or(`state.eq.novo,due_at.lte.${nowIso}`)
+    .order("due_at", { ascending: true, nullsFirst: true });
+  if (error) throw error;
+  return (data ?? []) as unknown as FlashcardRow[];
+}
+
 export interface CreateFlashcardInput {
+
   lessonId: string | null;
   deckId: string | null;
   sourceBlockId: string | null;
