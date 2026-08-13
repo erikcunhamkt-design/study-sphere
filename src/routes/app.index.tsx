@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, Clock, Layers, ListChecks, PlayCircle, Sparkles, Target } from "lucide-react";
+import { BookOpen, Clock, Layers, ListChecks, Play, Sparkles, Target } from "lucide-react";
 import { useMemo } from "react";
+import { useDashboardState } from "@/features/dashboard/hooks/use-dashboard-state";
+import { NextStepAction, MiniStatCard } from "@/features/dashboard/components/dashboard-ui";
 
 import { EmptyState, PageHeader, Section } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
