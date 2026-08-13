@@ -242,6 +242,7 @@ export function FlashcardFormDialog({
                 ))}
               </SelectContent>
             </Select>
+          </div>
 
           <DialogFooter>
             <Button type="submit" disabled={isPending}>
