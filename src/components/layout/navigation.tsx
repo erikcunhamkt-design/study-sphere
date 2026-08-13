@@ -349,17 +349,23 @@ export function UserMenu() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user?.email}</div>
-        <DropdownMenuSeparator />
+        <div className="px-3 py-2 text-xs text-muted-foreground truncate border-b border-sidebar-border/50">
+          {user?.email}
+        </div>
         <DropdownMenuItem asChild>
-          <Link to="/app/configuracoes">
-            <UserIcon className="mr-2 h-4 w-4" aria-hidden /> Configurações
+          <Link to="/app/perfil" className="cursor-pointer">
+            <UserIcon className="mr-2 h-4 w-4" /> Perfil
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/app/configuracoes" className="cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" /> Configurações
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut()}
-          className="text-destructive focus:text-destructive"
+          className="text-destructive focus:text-destructive cursor-pointer"
         >
           <LogOut className="mr-2 h-4 w-4" aria-hidden /> Sair
         </DropdownMenuItem>
