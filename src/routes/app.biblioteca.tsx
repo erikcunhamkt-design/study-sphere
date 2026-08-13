@@ -52,8 +52,7 @@ function LibraryPage() {
   const unlinkedQuestions = questions.filter(
     (q) => q.lesson_id === null && !q.is_archived
   );
-  // Exams do not have lesson_id in the schema (they are global/user-scoped)
-  const unlinkedExams = exams.filter(
+  const activeExams = exams.filter(
     (e) => !e.is_archived
   );
 
@@ -66,7 +65,7 @@ function LibraryPage() {
     q.statement.toLowerCase().includes(search.toLowerCase())
   );
 
-  const filteredExams = unlinkedExams.filter((e) =>
+  const filteredExams = activeExams.filter((e) =>
     e.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -121,7 +120,7 @@ function LibraryPage() {
             >
               <GraduationCap className="mr-2 h-4 w-4" /> Simulados
               <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                {unlinkedExams.length}
+                {activeExams.length}
               </span>
             </TabsTrigger>
           </TabsList>
@@ -174,8 +173,8 @@ function LibraryPage() {
             <ExamList 
               exams={filteredExams} 
               onStart={(exam) => navigate({ 
-                to: `/app/questoes/simulado/${exam.id}`,
-                search: (prev) => prev
+                to: "/app/estudar",
+                search: { method: "recordacao_ativa" }
               })} 
             />
           ) : (
