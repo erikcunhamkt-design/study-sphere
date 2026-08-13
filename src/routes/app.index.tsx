@@ -32,9 +32,25 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
   const { data: prefs } = usePreferences();
-  const state = useDashboardState();
+  const { priority, data, isLoading, dueFlashcards } = useDashboardState();
+  
+  const sinceIso = useMemo(() => startOfDayIso(profile?.timezone), [profile?.timezone]);
+  const { data: todaySeconds } = useStudySessionSecondsSince(sinceIso);
+  
   const greeting = greetingForNow(profile?.timezone);
   const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="space-y-1">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-64 w-full rounded-3xl" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -43,10 +59,10 @@ function DashboardPage() {
         <p className="text-muted-foreground">O que vamos aprender hoje?</p>
       </div>
 
-      {state.priority === "review" && (
+      {priority === "review" && (
         <NextStepAction
           title="Revisão Urgente"
-          subtitle={`🧠 Revisar agora (${state.data.count} cartões)`}
+          subtitle={`🧠 Revisar agora (${data.count} cartões)`}
           description="Você tem revisões pendentes. Recupere esse conhecimento antes de seguir."
           ctaText="Revisar agora"
           to="/app/revisar"
@@ -54,32 +70,76 @@ function DashboardPage() {
         />
       )}
 
-      {state.priority === "resume" && (
+      {priority === "resume" && (
         <NextStepAction
           title="Continue de onde parou"
-          subtitle={STUDY_METHOD_LABELS[state.data.session.method]}
+          subtitle={STUDY_METHOD_LABELS[data.session.method]}
           description="Você tem uma sessão de estudo não finalizada."
-          ctaText="Continuar sessão"
+          ctaText="Retomar agora"
           to="/app/estudar"
-          search={{ method: state.data.session.method }}
+          search={{ method: data.session.method }}
           icon={Play}
         />
       )}
+
+      {priority === "recommendation" && (
+        <NextStepAction
+          title="Próximo passo recomendado"
+          subtitle={`Continuar ${data.course.name}`}
+          description={`Seu progresso atual é de ${data.progress.percent}%.`}
+          ctaText="Estudar agora"
+          to="/app/meus-estudos/$areaId/cursos/$courseId"
+          params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
+          icon={Target}
+        />
+      )}
+
+      {priority === "start_study" && (
+        <NextStepAction
+          title="Começar a estudar"
+          subtitle={`Iniciar ${data.course.name}`}
+          description="Você já tem conteúdo disponível. Escolha um método e comece agora."
+          ctaText="Começar estudo"
+          to="/app/meus-estudos/$areaId/cursos/$courseId"
+          params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
+          icon={BookOpen}
+        />
+      )}
       
-      {state.priority === "onboarding" && (
+      {priority === "onboarding" && (
         <NextStepAction
           title="Seu primeiro passo"
-          subtitle="Vamos começar?"
+          subtitle="Vamos começar sua jornada?"
           description="Crie sua primeira área de estudo ou curso para ativar o DominusApp."
-          ctaText="Adicionar conteúdo"
+          ctaText="Criar primeira área"
           to="/app/meus-estudos"
           icon={Sparkles}
         />
       )}
 
-      <div className="grid grid-cols-2 gap-4">
-          <MiniStatCard title="Estudos hoje" value="0" unit="min" />
-          <MiniStatCard title="Revisões" value={state.priority === "review" ? state.data.count : 0} />
+      {priority === "maintenance" && (
+        <NextStepAction
+          title="Você está em dia"
+          subtitle="Nenhuma pendência urgente"
+          description="Que tal cadastrar um novo curso ou revisar seus materiais?"
+          ctaText="Abrir biblioteca"
+          to="/app/biblioteca"
+          icon={ListChecks}
+        />
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <MiniStatCard 
+            title="Estudos hoje" 
+            value={Math.round((todaySeconds ?? 0) / 60)} 
+            unit="min" 
+            description={`Meta: ${prefs?.daily_study_goal_minutes ?? 60} min`}
+          />
+          <MiniStatCard 
+            title="Revisões" 
+            value={dueFlashcards?.length ?? 0} 
+            description={dueFlashcards?.length ? "Cartões pendentes" : "Tudo em dia"}
+          />
       </div>
     </div>
   );
