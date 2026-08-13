@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { textFromInlineContent } from "./schema";
 import { FlashcardFormDialog } from "./flashcard-form-dialog";
 import { useDeleteFlashcard, useSetFlashcardArchived } from "./hooks";
-import { useLessons } from "@/features/lesson-editor/hooks";
+import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import type { FlashcardRow, FlashcardState } from "./types";
 
 
@@ -76,8 +76,9 @@ function FlashcardRowItem({
   onDelete: () => void;
 }) {
   const setArchived = useSetFlashcardArchived(card.id);
-  const { data: lessons } = useLessons();
+  const { data: lessons } = useAllLessons();
   const lesson = card.lesson_id ? lessons?.find((l) => l.id === card.lesson_id) : null;
+
 
 
   async function handleToggleArchive() {
