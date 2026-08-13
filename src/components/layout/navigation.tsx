@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { AppBrand } from "./app-brand";
 import {
   BookOpen,
   Home,
