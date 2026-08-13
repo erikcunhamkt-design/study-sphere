@@ -71,7 +71,7 @@ const METHODS: { method: StudyMethod; description: string; icon: typeof Timer }[
 ];
 
 function EstudarPage() {
-  const { plannedId, method: initialMethod } = Route.useSearch();
+  const { plannedId, method: initialMethod, deckId, mode } = Route.useSearch();
   const [activeMethod, setActiveMethod] = useState<StudyMethod | null>(initialMethod ?? null);
   const [resumingSession, setResumingSession] = useState<StudySessionRow | null>(null);
 
@@ -101,11 +101,7 @@ function EstudarPage() {
         ) : activeMethod === "livre" ? (
           <LivreSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : (
-          <RecordacaoAtivaHub 
-            onBack={backToHub} 
-            deckId={Route.useSearch().deckId} 
-            mode={Route.useSearch().mode}
-          />
+          <RecordacaoAtivaHub onBack={backToHub} deckId={deckId} mode={mode} />
         )}
       </div>
     );
