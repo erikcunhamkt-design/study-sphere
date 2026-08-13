@@ -25,10 +25,13 @@ import { toast } from "sonner";
 
 const deckSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório").max(255),
-  color: z.string().default("#3b82f6"),
+  color: z.string(),
 });
 
-type DeckFormValues = z.infer<typeof deckSchema>;
+type DeckFormValues = {
+  name: string;
+  color: string;
+};
 
 interface DeckFormDialogProps {
   open: boolean;
