@@ -28,10 +28,10 @@ const deckSchema = z.object({
   color: z.string(),
 });
 
-type DeckFormValues = {
+interface DeckFormValues {
   name: string;
   color: string;
-};
+}
 
 interface DeckFormDialogProps {
   open: boolean;
