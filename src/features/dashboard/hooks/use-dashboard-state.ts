@@ -35,13 +35,18 @@ export function useDashboardState() {
       const course = courses?.find(c => c.id === lesson?.course_id);
       const module = modules?.find(m => m.id === lesson?.module_id);
 
+      // Metadados reais da sessão (details pode conter informações extras dependendo do método)
+      const details = session.details as any;
+      
       return {
         priority: "resume" as const,
         data: { 
           session,
           lesson,
           course,
-          module
+          module,
+          // Se for uma sessão planejada mas sem lesson_id direto, podemos tentar inferir do planejamento
+          // (mas a Fase 06.2 vincula lesson_id no start_planned_study se o planejamento tiver course_id)
         },
       };
     }

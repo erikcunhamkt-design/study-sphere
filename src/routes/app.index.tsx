@@ -82,13 +82,14 @@ function DashboardPage() {
       {priority === "resume" && (
         <NextStepAction
           title="Retomar"
-          subtitle={data.lesson?.title || data.course?.name || "Continuar estudo"}
+          subtitle={data.lesson?.title || data.course?.name || (data.session.method === 'livre' ? "Sessão Livre" : "Retomar sessão")}
+          context={data.course?.name && data.lesson?.title ? data.course.name : undefined}
           description={
             data.lesson && data.course 
-              ? `${data.course.name}${data.module ? ` · ${data.module.name}` : ""}`
+              ? `${data.module ? `${data.module.name} · ` : ""}Você parou aqui. Continue para finalizar sua sessão.`
               : data.session.method !== 'livre' 
-                ? `Você tem uma sessão de ${STUDY_METHOD_LABELS[data.session.method]} em andamento.`
-                : "Continue de onde parou para concluir esta sessão."
+                ? `Sessão de ${STUDY_METHOD_LABELS[data.session.method]} em andamento. Continue de onde parou.`
+                : "Sessão sem conteúdo vinculado. Continue para registrar seu progresso."
           }
           ctaText="Continuar agora"
           to="/app/estudar"
@@ -96,6 +97,7 @@ function DashboardPage() {
             method: data.session.method,
             lessonId: data.session.lesson_id 
           }}
+          estimatedMinutes={undefined} // Poderia ser calculado se tivéssemos progresso real no details
           icon={Play}
         />
       )}
