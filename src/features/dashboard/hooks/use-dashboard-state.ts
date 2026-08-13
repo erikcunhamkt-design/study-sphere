@@ -28,12 +28,12 @@ export function useDashboardState() {
     }
 
     // 3. Prioridade: Conteúdo Disponível (Não iniciado ou em dia)
-    const activeCourses = (courses ?? []).filter(c => !c.is_archived);
+    const activeCourses = (courses ?? []).filter((c) => !c.is_archived);
     if (activeCourses.length > 0) {
-        return {
-            priority: "next_study" as const,
-            data: { course: activeCourses[0] }
-        }
+      return {
+        priority: "next_study" as const,
+        data: { course: activeCourses[0] },
+      };
     }
 
     // 4. Prioridade: Novo Usuário
