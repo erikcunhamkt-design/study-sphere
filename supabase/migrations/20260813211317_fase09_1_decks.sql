@@ -26,13 +26,13 @@ CREATE INDEX decks_listing_idx ON public.decks(user_id, is_archived);
 -- 3. RLS
 ALTER TABLE public.decks ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY 'decks_select_own' ON public.decks
+CREATE POLICY "decks_select_own" ON public.decks
   FOR SELECT TO authenticated USING (auth.uid() = user_id);
-CREATE POLICY 'decks_insert_own' ON public.decks
+CREATE POLICY "decks_insert_own" ON public.decks
   FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
-CREATE POLICY 'decks_update_own' ON public.decks
+CREATE POLICY "decks_update_own" ON public.decks
   FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY 'decks_delete_own' ON public.decks
+CREATE POLICY "decks_delete_own" ON public.decks
   FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
 -- 4. Grants
