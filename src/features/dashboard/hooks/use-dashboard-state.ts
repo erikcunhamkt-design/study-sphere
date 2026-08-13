@@ -25,6 +25,8 @@ export function useDashboardState() {
     loadingModules ||
     loadingRecent;
 
+  const hasActivity = (recentSessions?.length ?? 0) > 0;
+  
   const state = useMemo(() => {
     if (isLoading) return { priority: "loading" as const, data: {} };
 
