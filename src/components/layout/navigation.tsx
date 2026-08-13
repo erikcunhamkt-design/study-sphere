@@ -13,6 +13,7 @@ import {
   Settings,
   Target,
   User as UserIcon,
+  RefreshCcw,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 
@@ -39,14 +40,42 @@ type NavItem = {
   mobile?: boolean;
 };
 
-export const NAV_ITEMS: NavItem[] = [
-  { to: "/app", label: "Início", icon: Home, mobile: true },
-  { to: "/app/estudos", label: "Estudos", icon: BookOpen, mobile: true },
-  { to: "/app/estudar", label: "Estudar", icon: Play, mobile: true },
-  { to: "/app/planejamento", label: "Planejamento", icon: Target },
-  { to: "/app/biblioteca", label: "Biblioteca", icon: Library },
-  { to: "/app/desempenho", label: "Desempenho", icon: LineChart, mobile: true },
+export const NAV_GROUPS = [
+  {
+    label: "PRINCIPAL",
+    items: [
+      { to: "/app", label: "Início", icon: Home, mobile: true },
+    ],
+  },
+  {
+    label: "APRENDER",
+    items: [
+      { to: "/app/estudar", label: "Estudar", icon: Play, mobile: true },
+      { to: "/app/estudar?view=hub", label: "Revisar", icon: RefreshCcw, mobile: true },
+    ],
+  },
+  {
+    label: "CONTEÚDO",
+    items: [
+      { to: "/app/meus-estudos", label: "Meus estudos", icon: BookOpen, mobile: true },
+      { to: "/app/biblioteca", label: "Biblioteca", icon: Library },
+    ],
+  },
+  {
+    label: "ORGANIZAÇÃO",
+    items: [
+      { to: "/app/planejamento", label: "Planejamento", icon: Target },
+    ],
+  },
+  {
+    label: "PROGRESSO",
+    items: [
+      { to: "/app/desempenho", label: "Desempenho", icon: LineChart, mobile: true },
+    ],
+  },
 ];
+
+export const NAV_ITEMS = NAV_GROUPS.flatMap(g => g.items);
 
 const ROUTE_LABELS: Record<string, string> = Object.fromEntries(
   [...NAV_ITEMS, { to: "/app/configuracoes", label: "Configurações", icon: Settings }].map((i) => [
@@ -68,33 +97,48 @@ export function SidebarNav({ collapsed }: { collapsed: boolean }) {
   const path = useCurrentPath();
   return (
     <TooltipProvider delayDuration={100}>
-      <nav aria-label="Navegação principal" className="flex flex-col gap-1">
-        {NAV_ITEMS.map((item) => {
-          const active = path === item.to;
-          const link = (
-            <Link
-              to={item.to}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent",
-                active && "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
-                collapsed && "justify-center px-0",
-              )}
-              aria-current={active ? "page" : undefined}
-            >
-              <item.icon aria-hidden className="h-4 w-4 shrink-0" />
-              {!collapsed && <span className="truncate">{item.label}</span>}
-            </Link>
-          );
-          return collapsed ? (
-            <Tooltip key={item.to}>
-              <TooltipTrigger asChild>{link}</TooltipTrigger>
-              <TooltipContent side="right">{item.label}</TooltipContent>
-            </Tooltip>
-          ) : (
-            <div key={item.to}>{link}</div>
-          );
-        })}
+      <nav aria-label="Navegação principal" className="flex flex-col gap-6">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label} className="flex flex-col gap-1">
+            {!collapsed && (
+              <h3 className="px-3 text-[10px] font-bold tracking-wider text-muted-foreground/50 mb-1">
+                {group.label}
+              </h3>
+            )}
+            {group.items.map((item) => {
+              const active = path === item.to || (item.to.includes('?') && path + useRouterState({ select: s => s.location.search }) === item.to);
+              const link = (
+                <Link
+                  to={item.to}
+                  className={cn(
+                    "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-all duration-200",
+                    "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
+                    active && "bg-sidebar-accent/80 text-sidebar-accent-foreground font-semibold shadow-sm",
+                    collapsed && "justify-center px-0",
+                  )}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <item.icon aria-hidden className={cn(
+                    "h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110",
+                    active && "text-primary"
+                  )} />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                  {active && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-primary rounded-r-full" />
+                  )}
+                </Link>
+              );
+              return collapsed ? (
+                <Tooltip key={item.to}>
+                  <TooltipTrigger asChild>{link}</TooltipTrigger>
+                  <TooltipContent side="right">{item.label}</TooltipContent>
+                </Tooltip>
+              ) : (
+                <div key={item.to}>{link}</div>
+              );
+            })}
+          </div>
+        ))}
       </nav>
     </TooltipProvider>
   );
@@ -155,52 +199,47 @@ function SidebarFooter({
   return (
     <TooltipProvider delayDuration={100}>
       <div className="flex flex-col gap-1">
-        <Link
-          to="/app/configuracoes"
-          className={cn(
-            "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent",
-            settingsActive && "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
-            collapsed && "justify-center px-0",
-          )}
-        >
-          <Settings aria-hidden className="h-4 w-4" />
-          {!collapsed && <span>Configurações</span>}
-        </Link>
-
-        <div
-          className={cn(
-            "flex items-center gap-3 rounded-md px-3 py-2",
-            collapsed && "justify-center px-0",
-          )}
-        >
-          <Avatar className="h-7 w-7">
-            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-          </Avatar>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm truncate">{profile?.full_name || "Estudante"}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-            </div>
-          )}
-        </div>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <button
               type="button"
-              onClick={() => signOut()}
-              aria-label={collapsed ? "Sair" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/80 hover:text-destructive hover:bg-destructive/10",
-                collapsed && "justify-center px-0",
+                "flex items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-sidebar-accent transition-colors",
+                collapsed && "justify-center px-0"
               )}
             >
-              <LogOut aria-hidden className="h-4 w-4" />
-              {!collapsed && <span>Sair</span>}
+              <Avatar className="h-8 w-8 shrink-0">
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">{initials}</AvatarFallback>
+              </Avatar>
+              {!collapsed && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate leading-none mb-1">
+                    {profile?.full_name || "Estudante"}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate leading-none">
+                    {user?.email}
+                  </p>
+                </div>
+              )}
             </button>
-          </TooltipTrigger>
-          {collapsed && <TooltipContent side="right">Sair</TooltipContent>}
-        </Tooltip>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side={collapsed ? "right" : "top"} align={collapsed ? "start" : "end"} className="w-56">
+            <DropdownMenuItem asChild>
+              <Link to="/app/configuracoes" className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                Configurações
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => signOut()}
+              className="text-destructive focus:text-destructive cursor-pointer"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sair
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </TooltipProvider>
   );
