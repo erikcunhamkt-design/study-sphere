@@ -34,7 +34,26 @@ export function useDueFlashcards() {
   });
 }
 
+export function useFlashcardsByDeck(deckId: string | undefined) {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: !!user && !!deckId,
+    queryKey: [...flashcardsKey(user?.id), deckId],
+    queryFn: () => api.fetchFlashcardsByDeck(user!.id, deckId!),
+  });
+}
+
+export function useDueFlashcardsByDeck(deckId: string | undefined) {
+  const { user } = useAuth();
+  return useQuery({
+    enabled: !!user && !!deckId,
+    queryKey: [...dueFlashcardsKey(user?.id), deckId],
+    queryFn: () => api.fetchDueFlashcardsByDeck(user!.id, deckId!),
+  });
+}
+
 /** `sinceIso` fixo por render (não `new Date()` direto) evita invalidar/refazer a query a cada rerender. */
+
 export function useFlashcardReviews(sinceIso: string | undefined) {
   const { user } = useAuth();
   return useQuery({

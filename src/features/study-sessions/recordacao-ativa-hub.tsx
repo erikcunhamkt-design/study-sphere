@@ -27,6 +27,16 @@ export function RecordacaoAtivaHub({ onBack }: { onBack: () => void }) {
     }
   };
 
+  if (view === "flashcards_training" && deckAllFlashcards) {
+    return (
+      <ReviewSession 
+        queue={deckAllFlashcards} 
+        onFinish={() => onBack()} 
+        isTrainingMode={true}
+      />
+    );
+  }
+
   if (view === "flashcards" && dueFlashcards) {
     return (
       <ReviewSession 
