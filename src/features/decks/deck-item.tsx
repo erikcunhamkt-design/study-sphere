@@ -27,7 +27,7 @@ export function DeckItem({ deck, onEdit }: DeckItemProps) {
       <Link 
         to="/app/biblioteca/baralho/$deckId" 
         params={{ deckId: deck.id }}
-        search={{ tab: "decks" }}
+        search={(prev: any) => ({ ...prev, tab: "decks" })}
         className="flex items-center gap-3 flex-1"
       >
         <div 
