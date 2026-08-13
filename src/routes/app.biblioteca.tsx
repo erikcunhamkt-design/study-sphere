@@ -49,6 +49,8 @@ function LibraryPage() {
   const [search, setSearch] = useState("");
 
   const [flashcardFormOpen, setFlashcardFormOpen] = useState(false);
+  const [deckFormOpen, setDeckFormOpen] = useState(false);
+  const [editingDeck, setEditingDeck] = useState<DeckRow | null>(null);
   const [questionFormOpen, setQuestionFormOpen] = useState(false);
   const [examFormOpen, setExamFormOpen] = useState(false);
   const [materialFormOpen, setMaterialFormOpen] = useState(false);
