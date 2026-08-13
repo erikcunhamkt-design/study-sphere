@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { AppBrand } from "./app-brand";
 import {
   BookOpen,
   Home,
@@ -114,25 +115,8 @@ export function DesktopSidebar({
         collapsed ? "w-16" : "w-64",
       )}
     >
-      <div
-        className={cn(
-          "flex items-center gap-2 p-4 border-b border-sidebar-border",
-          collapsed && "justify-center",
-        )}
-      >
-        <img
-          src="/logo-dominus.png"
-          alt="DominusApp Logo"
-          className="h-9 w-9 object-contain"
-        />
-        {!collapsed && (
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-              Dominus<span className="text-primary">App</span>
-            </p>
-            <p className="text-xs text-muted-foreground truncate">Do estudo ao domínio.</p>
-          </div>
-        )}
+      <div className="border-b border-sidebar-border p-4">
+        <AppBrand isCollapsed={collapsed} />
       </div>
       <div className="flex-1 overflow-y-auto p-3">
         <SidebarNav collapsed={collapsed} />
