@@ -74,7 +74,7 @@ import {
   searchLessons,
 } from "@/features/studies/utils";
 
-export const Route = createFileRoute("/app/estudos/$areaId/cursos/$courseId/")({
+export const Route = createFileRoute("/app/meus-estudos/$areaId/cursos/$courseId/")({
   component: CourseDetailPage,
 });
 

@@ -48,7 +48,7 @@ import {
 } from "@/features/studies/utils";
 
 export const Route = createFileRoute(
-  "/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId",
+  "/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId",
 )({
   // O caderno da aula (BlockNote) não pode rodar no servidor — mesmo
   // motivo do /app/lab/editor (Fase 03.0): acessa window/document na
