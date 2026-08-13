@@ -88,7 +88,7 @@ function DashboardPage() {
             data.displaySecondary 
               ? `${data.displaySecondary}. Você parou aqui. Continue para finalizar sua sessão.`
               : data.session.method !== 'livre' 
-                ? `Sessão de ${STUDY_METHOD_LABELS[data.session.method]} em andamento. Continue de onde parou.`
+                ? `Sessão de ${STUDY_METHOD_LABELS[data.session.method as keyof typeof STUDY_METHOD_LABELS]} em andamento. Continue de onde parou.`
                 : "Sessão sem conteúdo vinculado. Continue para registrar seu progresso."
           }
           ctaText="Continuar agora"

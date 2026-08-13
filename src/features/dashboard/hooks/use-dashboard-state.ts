@@ -30,6 +30,7 @@ export function useDashboardState() {
 
     // 1. Prioridade: Conteúdo Interrompido (Sessão em andamento)
     if (inProgressSessions && inProgressSessions.length > 0) {
+      const session = inProgressSessions[0];
       const lesson = allLessons?.find(l => l.id === session.lesson_id);
       const course = courses?.find(c => c.id === lesson?.course_id);
       const module = modules?.find(m => m.id === lesson?.module_id);
