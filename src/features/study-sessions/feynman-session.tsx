@@ -31,6 +31,7 @@ export function FeynmanSession({ resumingSession, onDone, plannedId }: FeynmanSe
       const created = await createSession.mutateAsync({
         method: "feynman",
         lessonId,
+        isFreeSession: !lessonId,
         details: initialDetailsForMethod("feynman"),
       });
       setSession(created);

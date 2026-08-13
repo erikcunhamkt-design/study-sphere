@@ -30,31 +30,61 @@ export function useDashboardState() {
 
     // 1. Prioridade: Conteúdo Interrompido (Sessão em andamento)
     if (inProgressSessions && inProgressSessions.length > 0) {
-      const session = inProgressSessions[0];
-      const lesson = allLessons?.find(l => l.id === session.lesson_id);
-      const course = courses?.find(c => c.id === lesson?.course_id);
-      const module = modules?.find(m => m.id === lesson?.module_id);
+      // Filtrar sessões válidas para a Home
+      // Válida = (Tem aula) OU (É sessão livre intencional)
+      const validSessions = inProgressSessions.filter(s => {
+        // Ignorar sessões finalizadas (redundância de segurança)
+        if (s.ended_at) return false;
 
-      // Metadados reais da sessão
-      const details = session.details as any;
-      
-      // Tentar encontrar título real (preferência: Lesson -> Course -> Planned Title -> Fallback)
-      const displayTitle = lesson?.title || course?.name || (session as any).planned_title || (session.method === 'livre' ? "Sessão Livre" : "Retomar sessão");
-      const displayContext = lesson?.title && course?.name ? course.name : undefined;
-      const displaySecondary = lesson && module ? `${module.name} · Aula ${lesson.position + 1}` : undefined;
+        // Abandono por tempo (ex: 4 horas de inatividade)
+        const lastUpdate = new Date(s.updated_at).getTime();
+        const fourHours = 4 * 60 * 60 * 1000;
+        if (Date.now() - lastUpdate > fourHours) return false;
 
-      return {
-        priority: "resume" as const,
-        data: { 
-          session,
-          lesson,
-          course,
-          module,
-          displayTitle,
-          displayContext,
-          displaySecondary
-        },
-      };
+        // Sessão de conteúdo real
+        if (s.lesson_id) return true;
+        
+        // Sessão livre intencional
+        if (s.is_free_session) return true;
+
+        return false;
+      });
+
+      if (validSessions.length > 0) {
+        const session = validSessions[0];
+        const lesson = allLessons?.find(l => l.id === session.lesson_id);
+        const course = courses?.find(c => c.id === lesson?.course_id);
+        const module = modules?.find(m => m.id === lesson?.module_id);
+
+        // Tentar encontrar título real (preferência: Lesson -> Course -> Planned Title -> Fallback)
+        let displayTitle = lesson?.title || course?.name || (session as any).planned_title;
+        
+        if (!displayTitle) {
+          if (session.is_free_session) {
+            displayTitle = "Sessão Livre";
+          } else {
+            // Último caso: se chegamos aqui, algo está errado, mas usamos o fallback seguro
+            displayTitle = "Retomar sessão";
+          }
+        }
+
+        const displayContext = lesson?.title && course?.name ? course.name : undefined;
+        const displaySecondary = lesson && module ? `${module.name} · Aula ${lesson.position + 1}` : undefined;
+
+        return {
+          priority: "resume" as const,
+          data: { 
+            session,
+            lesson,
+            course,
+            module,
+            displayTitle,
+            displayContext,
+            displaySecondary,
+            isFree: session.is_free_session && !session.lesson_id
+          },
+        };
+      }
     }
 
     // 2. Prioridade: Revisão Urgente

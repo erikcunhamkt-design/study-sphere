@@ -34,6 +34,7 @@ export function CornellSession({ resumingSession, onDone, plannedId }: CornellSe
       const created = await createSession.mutateAsync({
         method: "cornell",
         lessonId,
+        isFreeSession: !lessonId,
         details: initialDetailsForMethod("cornell"),
       });
       setSession(created);

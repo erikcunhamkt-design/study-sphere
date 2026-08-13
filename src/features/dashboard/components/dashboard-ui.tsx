@@ -16,6 +16,8 @@ export function NextStepAction({
   estimatedMinutes,
   icon: Icon = Sparkles,
   context,
+  onSecondaryAction,
+  secondaryActionLabel,
 }: {
   title: string;
   subtitle?: string;
@@ -27,6 +29,8 @@ export function NextStepAction({
   estimatedMinutes?: number;
   icon?: React.ElementType;
   context?: string;
+  onSecondaryAction?: () => void;
+  secondaryActionLabel?: string;
 }) {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-surface/40 to-surface/80 p-6 md:px-8 md:py-6 shadow-sm transition-all hover:shadow-md">
@@ -60,6 +64,19 @@ export function NextStepAction({
           </Button>
         </div>
       </div>
+      
+      {onSecondaryAction && secondaryActionLabel && (
+        <div className="mt-4 flex justify-end">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-auto p-0 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 hover:text-muted-foreground hover:bg-transparent"
+            onClick={onSecondaryAction}
+          >
+            {secondaryActionLabel}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
