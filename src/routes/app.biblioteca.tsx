@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { 
-  Library, 
   Plus, 
   Search,
   Layers,
@@ -53,8 +52,9 @@ function LibraryPage() {
   const unlinkedQuestions = questions.filter(
     (q) => q.lesson_id === null && !q.is_archived
   );
+  // Exams do not have lesson_id in the schema (they are global/user-scoped)
   const unlinkedExams = exams.filter(
-    (e) => e.lesson_id === null && !e.is_archived
+    (e) => !e.is_archived
   );
 
   const filteredFlashcards = unlinkedFlashcards.filter((c) => 
@@ -96,10 +96,10 @@ function LibraryPage() {
         className="w-full"
       >
         <div className="flex items-center justify-between border-b border-border pb-1">
-          <TabsList className="bg-transparent h-auto p-0 gap-6">
+          <TabsList className="bg-transparent h-auto p-0 gap-6 overflow-x-auto no-scrollbar">
             <TabsTrigger 
               value="flashcards"
-              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
               <Layers className="mr-2 h-4 w-4" /> Flashcards
               <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
@@ -108,7 +108,7 @@ function LibraryPage() {
             </TabsTrigger>
             <TabsTrigger 
               value="questions"
-              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
               <ListChecks className="mr-2 h-4 w-4" /> Questões
               <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
@@ -117,7 +117,7 @@ function LibraryPage() {
             </TabsTrigger>
             <TabsTrigger 
               value="exams"
-              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
               <GraduationCap className="mr-2 h-4 w-4" /> Simulados
               <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
@@ -126,7 +126,7 @@ function LibraryPage() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             {tab === "flashcards" && (
               <Button onClick={() => setFlashcardFormOpen(true)} size="sm" className="gap-2">
                 <Plus className="h-4 w-4" /> Novo flashcard
@@ -173,7 +173,10 @@ function LibraryPage() {
           {filteredExams.length > 0 ? (
             <ExamList 
               exams={filteredExams} 
-              onStart={(exam) => navigate({ to: `/app/questoes/simulado/${exam.id}` })} 
+              onStart={(exam) => navigate({ 
+                to: `/app/questoes/simulado/${exam.id}`,
+                search: (prev) => prev
+              })} 
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
@@ -188,7 +191,12 @@ function LibraryPage() {
       <FlashcardFormDialog 
         open={flashcardFormOpen} 
         onOpenChange={setFlashcardFormOpen}
-        lessonId={null}
+        prefill={{
+          lessonId: null,
+          sourceBlockId: null,
+          front: "",
+          frontContent: null
+        }}
       />
       <QuestionFormDialog 
         open={questionFormOpen} 
@@ -198,7 +206,6 @@ function LibraryPage() {
       <ExamFormDialog 
         open={examFormOpen} 
         onOpenChange={setExamFormOpen}
-        lessonId={null}
       />
     </div>
   );
