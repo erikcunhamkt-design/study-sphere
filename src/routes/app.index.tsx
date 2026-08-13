@@ -65,9 +65,13 @@ function DashboardPage() {
       {/* 1. HERO — AÇÃO PRINCIPAL (Reduzido e Compacto) */}
       {priority === "review" && (
         <NextStepAction
-          title="Sua Próxima Ação"
+          title="Revisão"
           subtitle="Revisar agora"
-          description={`Você tem ${data.count} revisões pendentes. Recupere esses conceitos antes de avançar.`}
+          description={
+            reviewsCount > 0 
+              ? `Você tem ${reviewsCount} revisões pendentes. Recupere esses conceitos antes de avançar.`
+              : "Tudo em dia! Suas revisões foram concluídas."
+          }
           ctaText="Começar revisão"
           to="/app/revisar"
           estimatedMinutes={data.estimatedMinutes}
@@ -77,21 +81,30 @@ function DashboardPage() {
 
       {priority === "resume" && (
         <NextStepAction
-          title="Sua Próxima Ação"
-          subtitle={`Retomar ${STUDY_METHOD_LABELS[data.session.method]}`}
-          description="Você tem uma sessão em andamento. Finalize agora para manter o ritmo."
+          title="Retomar"
+          subtitle={data.lesson?.title || data.course?.name || "Continuar estudo"}
+          description={
+            data.lesson && data.course 
+              ? `${data.course.name}${data.module ? ` · ${data.module.name}` : ""}`
+              : data.session.method !== 'livre' 
+                ? `Você tem uma sessão de ${STUDY_METHOD_LABELS[data.session.method]} em andamento.`
+                : "Continue de onde parou para concluir esta sessão."
+          }
           ctaText="Continuar agora"
           to="/app/estudar"
-          search={{ method: data.session.method }}
+          search={{ 
+            method: data.session.method,
+            lessonId: data.session.lesson_id 
+          }}
           icon={Play}
         />
       )}
 
       {priority === "recommendation" && (
         <NextStepAction
-          title="Sua Próxima Ação"
+          title="Recomendação"
           subtitle={`Continuar ${data.course.name}`}
-          description={`Progresso de ${data.progress.percent}%. Vamos para o próximo módulo?`}
+          description={`Você já concluiu ${data.progress.percent}% deste curso. Vamos para a próxima etapa?`}
           ctaText="Estudar agora"
           to="/app/meus-estudos/$areaId/cursos/$courseId"
           params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
@@ -101,9 +114,9 @@ function DashboardPage() {
 
       {priority === "start_study" && (
         <NextStepAction
-          title="Sua Próxima Ação"
+          title="Conteúdo"
           subtitle={`Iniciar ${data.course.name}`}
-          description="Conteúdo disponível. Escolha um método e inicie sua primeira sessão."
+          description="Seu material está pronto. Escolha um método e inicie sua primeira sessão."
           ctaText="Começar estudo"
           to="/app/meus-estudos/$areaId/cursos/$courseId"
           params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
@@ -126,7 +139,7 @@ function DashboardPage() {
         <NextStepAction
           title="Em dia"
           subtitle="Nenhuma pendência urgente"
-          description="Que tal cadastrar um novo curso ou revisar seus materiais?"
+          description="Seu ritmo está excelente. Que tal organizar novos materiais ou revisar sua biblioteca?"
           ctaText="Abrir biblioteca"
           to="/app/biblioteca"
           icon={ListChecks}

@@ -74,7 +74,9 @@ export function DayProgress({ current, goal, reviews }: { current: number; goal:
         </div>
         <div className="text-right">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Pendente</p>
-          <p className="text-sm font-bold text-primary">{reviews} revisões</p>
+          <p className={cn("text-sm font-bold", reviews > 0 ? "text-primary" : "text-emerald-500")}>
+            {reviews > 0 ? `${reviews} revisões` : "Em dia"}
+          </p>
         </div>
       </div>
       
@@ -91,15 +93,18 @@ export function SectionHeader({ title }: { title: string }) {
 
 export function MasteryCard({ percent, trend }: { percent?: number; trend?: number }) {
   return (
-    <div className="rounded-2xl border border-border/50 bg-surface/20 p-5 shadow-sm hover:border-primary/20 transition-colors">
+    <div className="rounded-2xl border border-border/50 bg-surface/20 p-5 shadow-sm hover:border-primary/20 transition-colors h-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Mapa de Domínio</h3>
         <Brain className="h-4 w-4 text-muted-foreground/40" />
       </div>
       {percent === undefined ? (
         <div className="space-y-1">
-          <p className="text-sm font-bold text-foreground">Inicie sua primeira sessão</p>
-          <p className="text-xs text-muted-foreground leading-relaxed">Seu nível será calculado automaticamente após os primeiros estudos.</p>
+          <p className="text-sm font-bold text-foreground">Seu nível ainda está sendo construído.</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            O Dominus começará a identificar seus pontos fortes e lacunas conforme você estudar e responder questões.
+          </p>
+          <p className="pt-2 text-[10px] font-bold text-primary uppercase tracking-wider">Primeira sessão necessária</p>
         </div>
       ) : (
         <div className="flex items-end justify-between">

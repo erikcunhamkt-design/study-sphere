@@ -28,7 +28,25 @@ export function useDashboardState() {
   const state = useMemo(() => {
     if (isLoading) return { priority: "loading" as const, data: {} };
 
-    // 1. Prioridade: Revisão Urgente
+    // 1. Prioridade: Conteúdo Interrompido (Sessão em andamento)
+    if (inProgressSessions && inProgressSessions.length > 0) {
+      const session = inProgressSessions[0];
+      const lesson = allLessons?.find(l => l.id === session.lesson_id);
+      const course = courses?.find(c => c.id === lesson?.course_id);
+      const module = modules?.find(m => m.id === lesson?.module_id);
+
+      return {
+        priority: "resume" as const,
+        data: { 
+          session,
+          lesson,
+          course,
+          module
+        },
+      };
+    }
+
+    // 2. Prioridade: Revisão Urgente
     if (dueFlashcards && dueFlashcards.length > 0) {
       // Estimativa: 4 min a cada 1 pendente (exemplo heurístico sugerido "8 min para 2")
       const estimatedMinutes = Math.max(dueFlashcards.length * 4, 1);
@@ -39,14 +57,6 @@ export function useDashboardState() {
           count: dueFlashcards.length,
           estimatedMinutes
         },
-      };
-    }
-
-    // 2. Prioridade: Conteúdo Interrompido
-    if (inProgressSessions && inProgressSessions.length > 0) {
-      return {
-        priority: "resume" as const,
-        data: { session: inProgressSessions[0] },
       };
     }
 
