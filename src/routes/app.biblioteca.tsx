@@ -211,6 +211,18 @@ function LibraryPage() {
           )}
         </TabsContent>
 
+        <TabsContent value="decks" className="pt-6">
+          {filteredDecks.length > 0 ? (
+            <DeckList decks={filteredDecks} onEdit={(d) => setEditingDeck(d)} />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
+              <Layers className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
+              <p className="text-muted-foreground">Nenhum baralho encontrado.</p>
+              <Button variant="link" onClick={() => setDeckFormOpen(true)}>Criar primeiro baralho</Button>
+            </div>
+          )}
+        </TabsContent>
+
         <TabsContent value="questions" className="pt-6">
           {filteredQuestions.length > 0 ? (
             <QuestionList questions={filteredQuestions} />
