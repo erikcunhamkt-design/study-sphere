@@ -905,6 +905,7 @@ export type Database = {
           duration_seconds: number | null
           ended_at: string | null
           id: string
+          is_free_session: boolean | null
           lesson_id: string | null
           method: string
           started_at: string
@@ -917,6 +918,7 @@ export type Database = {
           duration_seconds?: number | null
           ended_at?: string | null
           id?: string
+          is_free_session?: boolean | null
           lesson_id?: string | null
           method: string
           started_at?: string
@@ -929,6 +931,7 @@ export type Database = {
           duration_seconds?: number | null
           ended_at?: string | null
           id?: string
+          is_free_session?: boolean | null
           lesson_id?: string | null
           method?: string
           started_at?: string

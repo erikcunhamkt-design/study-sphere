@@ -44,6 +44,7 @@ export interface StudySessionRow {
   user_id: string;
   lesson_id: string | null;
   method: StudyMethod;
+  is_free_session: boolean;
   started_at: string;
   ended_at: string | null;
   duration_seconds: number | null;
