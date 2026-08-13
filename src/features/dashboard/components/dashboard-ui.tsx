@@ -14,8 +14,9 @@ export function NextStepAction({
   search,
   params,
   estimatedMinutes,
-  icon: Icon = Sparkles,
   context,
+  onSecondaryAction,
+  secondaryActionLabel,
 }: {
   title: string;
   subtitle?: string;
@@ -27,6 +28,8 @@ export function NextStepAction({
   estimatedMinutes?: number;
   icon?: React.ElementType;
   context?: string;
+  onSecondaryAction?: () => void;
+  secondaryActionLabel?: string;
 }) {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-surface/40 to-surface/80 p-6 md:px-8 md:py-6 shadow-sm transition-all hover:shadow-md">
