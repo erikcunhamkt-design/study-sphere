@@ -82,11 +82,11 @@ function DashboardPage() {
       {priority === "resume" && (
         <NextStepAction
           title="Retomar"
-          subtitle={data.lesson?.title || data.course?.name || (data.session.method === 'livre' ? "Sessão Livre" : "Retomar sessão")}
-          context={data.course?.name && data.lesson?.title ? data.course.name : undefined}
+          subtitle={data.displayTitle}
+          context={data.displayContext}
           description={
-            data.lesson && data.course 
-              ? `${data.module ? `${data.module.name} · ` : ""}Você parou aqui. Continue para finalizar sua sessão.`
+            data.displaySecondary 
+              ? `${data.displaySecondary}. Você parou aqui. Continue para finalizar sua sessão.`
               : data.session.method !== 'livre' 
                 ? `Sessão de ${STUDY_METHOD_LABELS[data.session.method]} em andamento. Continue de onde parou.`
                 : "Sessão sem conteúdo vinculado. Continue para registrar seu progresso."
@@ -97,7 +97,6 @@ function DashboardPage() {
             method: data.session.method,
             lessonId: data.session.lesson_id 
           }}
-          estimatedMinutes={undefined} // Poderia ser calculado se tivéssemos progresso real no details
           icon={Play}
         />
       )}

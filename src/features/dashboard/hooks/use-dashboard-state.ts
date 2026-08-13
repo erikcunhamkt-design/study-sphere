@@ -30,14 +30,18 @@ export function useDashboardState() {
 
     // 1. Prioridade: Conteúdo Interrompido (Sessão em andamento)
     if (inProgressSessions && inProgressSessions.length > 0) {
-      const session = inProgressSessions[0];
       const lesson = allLessons?.find(l => l.id === session.lesson_id);
       const course = courses?.find(c => c.id === lesson?.course_id);
       const module = modules?.find(m => m.id === lesson?.module_id);
 
-      // Metadados reais da sessão (details pode conter informações extras dependendo do método)
+      // Metadados reais da sessão
       const details = session.details as any;
       
+      // Tentar encontrar título real (preferência: Lesson -> Course -> Planned Title -> Fallback)
+      const displayTitle = lesson?.title || course?.name || (session as any).planned_title || (session.method === 'livre' ? "Sessão Livre" : "Retomar sessão");
+      const displayContext = lesson?.title && course?.name ? course.name : undefined;
+      const displaySecondary = lesson && module ? `${module.name} · Aula ${lesson.position + 1}` : undefined;
+
       return {
         priority: "resume" as const,
         data: { 
@@ -45,8 +49,9 @@ export function useDashboardState() {
           lesson,
           course,
           module,
-          // Se for uma sessão planejada mas sem lesson_id direto, podemos tentar inferir do planejamento
-          // (mas a Fase 06.2 vincula lesson_id no start_planned_study se o planejamento tiver course_id)
+          displayTitle,
+          displayContext,
+          displaySecondary
         },
       };
     }
