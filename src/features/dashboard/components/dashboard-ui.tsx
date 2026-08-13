@@ -15,6 +15,7 @@ export function NextStepAction({
   params,
   estimatedMinutes,
   icon: Icon = Sparkles,
+  context,
 }: {
   title: string;
   subtitle?: string;
@@ -25,6 +26,7 @@ export function NextStepAction({
   params?: any;
   estimatedMinutes?: number;
   icon?: React.ElementType;
+  context?: string;
 }) {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-surface/40 to-surface/80 p-6 md:px-8 md:py-6 shadow-sm transition-all hover:shadow-md">
@@ -36,6 +38,9 @@ export function NextStepAction({
             {title}
           </div>
           <div>
+            {context && (
+              <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{context}</p>
+            )}
             <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">{subtitle}</h2>
             <p className="mt-1 text-sm text-muted-foreground max-w-lg leading-relaxed">{description}</p>
           </div>

@@ -35,13 +35,24 @@ export function useDashboardState() {
       const course = courses?.find(c => c.id === lesson?.course_id);
       const module = modules?.find(m => m.id === lesson?.module_id);
 
+      // Metadados reais da sessão
+      const details = session.details as any;
+      
+      // Tentar encontrar título real (preferência: Lesson -> Course -> Planned Title -> Fallback)
+      const displayTitle = lesson?.title || course?.name || (session as any).planned_title || (session.method === 'livre' ? "Sessão Livre" : "Retomar sessão");
+      const displayContext = lesson?.title && course?.name ? course.name : undefined;
+      const displaySecondary = lesson && module ? `${module.name} · Aula ${lesson.position + 1}` : undefined;
+
       return {
         priority: "resume" as const,
         data: { 
           session,
           lesson,
           course,
-          module
+          module,
+          displayTitle,
+          displayContext,
+          displaySecondary
         },
       };
     }
