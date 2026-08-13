@@ -32,6 +32,7 @@ export async function fetchDueFlashcards(userId: string): Promise<FlashcardRow[]
 
 export interface CreateFlashcardInput {
   lessonId: string | null;
+  deckId: string | null;
   sourceBlockId: string | null;
   front: FlashcardContent;
   back: FlashcardContent;
