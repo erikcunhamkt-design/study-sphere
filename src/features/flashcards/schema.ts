@@ -69,6 +69,7 @@ export const flashcardRatingSchema = z.enum(RATING_VALUES);
 
 export const flashcardFormSchema = z.object({
   lessonId: z.string().uuid().nullable(),
+  deckId: z.string().uuid().nullable(),
   sourceBlockId: z.string().nullable(),
   front: flashcardContentSchema,
   back: flashcardContentSchema,
