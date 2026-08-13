@@ -8,6 +8,8 @@ import {
   Moon,
   MonitorSmartphone,
   Target,
+  Layers,
+  ListChecks,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -166,7 +168,16 @@ function QuickCreate() {
           <DropdownMenuItem onClick={() => setCourseFormOpen(true)}>Novo curso</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setModuleFormOpen(true)}>Novo módulo</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setLessonFormOpen(true)}>Nova aula</DropdownMenuItem>
-          {/* Criação avulsa de flashcards/questões volta aqui quando a Biblioteca existir (Fase 08.x) */}
+          <DropdownMenuItem asChild>
+            <Link to="/app/biblioteca" search={{ tab: "flashcards" }}>
+              <Layers className="mr-2 h-4 w-4" aria-hidden /> Novo flashcard
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/app/biblioteca" search={{ tab: "questions" }}>
+              <ListChecks className="mr-2 h-4 w-4" aria-hidden /> Nova questão
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link to="/app/estudar">
