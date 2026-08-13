@@ -1,6 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, Layers, ListChecks, Play, Sparkles, Target } from "lucide-react";
-import { useMemo } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { 
+  BookOpen, 
+  Layers, 
+  ListChecks, 
+  Play, 
+  Sparkles, 
+  Target,
+  FileText,
+  Book,
+  Link as LinkIcon,
+  PlusCircle,
+  X
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { useDashboardState } from "@/features/dashboard/hooks/use-dashboard-state";
 import { 
   NextStepAction, 
@@ -18,6 +30,13 @@ import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
 import { useStudySessionSecondsSince, useDeleteStudySession } from "@/features/study-sessions/hooks";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription 
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
