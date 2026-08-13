@@ -1,87 +1,134 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { APP_CONFIG } from "@/lib/app-config";
+import { 
+  BookOpen, 
+  Layers, 
+  ListChecks, 
+  Zap, 
+  Calendar, 
+  ArrowRight 
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  component: () => (
-    <div className="flex min-h-screen items-center justify-center p-8 bg-zinc-950 text-zinc-50 font-sans">
-      <div className="max-w-3xl w-full space-y-8">
-        <header className="space-y-4">
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Dominus<span className="text-[#d9006e]">App</span>
-          </h1>
-          <p className="text-zinc-400 text-lg sm:text-xl italic">
-            "Do estudo ao domínio."
-          </p>
-        </header>
-
-        <section className="space-y-6">
-          <div className="p-8 rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-md space-y-6 overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4">
-              <span className="px-3 py-1 rounded-full bg-[#d9006e]/10 border border-[#d9006e]/20 text-[#d9006e] text-xs font-bold uppercase tracking-widest">
-                Fase 08 — FECHADA
-              </span>
-            </div>
-
-            <h2 className="text-2xl font-bold text-zinc-100 border-b border-zinc-800 pb-4">
-              Praticar vs. Gerenciar
-            </h2>
-            
-            <div className="space-y-6 text-zinc-300 leading-relaxed">
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-zinc-100">O que mudou</h3>
-                <p className="text-zinc-400">Reorganização de arquitetura de informação por INTENÇÃO:</p>
-                <ul className="space-y-3">
-                  <li className="flex gap-3">
-                    <span className="text-[#d9006e] font-bold">PRATICAR:</span>
-                    <span>Concentrado em "Estudar". Recordação Ativa agora roda ReviewSession (flashcards) e ExamAttemptRunner (questões) <span className="text-zinc-100 font-medium">INLINE</span>, sem troca de tela.</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#d9006e] font-bold">GERENCIAR:</span>
-                    <span>Conteúdo movido para dentro da aula (lesson-editor), onde flashcards/questões vivem vinculados ao ID da aula.</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#d9006e] font-bold">MENU:</span>
-                    <span>Rotas avulsas removidas. Navegação encurtada para 6 itens essenciais.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                <div className="p-4 rounded-xl bg-zinc-950/50 border border-zinc-800">
-                  <p className="text-sm font-bold text-green-500 mb-2 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green-500" />
-                    QA VALIDADO
-                  </p>
-                  <ul className="text-xs space-y-2 text-zinc-400">
-                    <li>• Ciclo SM-2 completo gravando no banco</li>
-                    <li>• Sem links mortos ou rotas órfãs</li>
-                    <li>• Build e Typecheck aprovados</li>
-                  </ul>
-                </div>
-                <div className="p-4 rounded-xl bg-zinc-950/50 border border-zinc-800">
-                  <p className="text-sm font-bold text-amber-500 mb-2 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-500" />
-                    DÍVIDA TÉCNICA
-                  </p>
-                  <ul className="text-xs space-y-2 text-zinc-400">
-                    <li>• Criação avulsa (lesson_id null) na Biblioteca</li>
-                    <li>• Refinar UX de gestão dentro do editor</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-[#d9006e]/5 border border-[#d9006e]/10 text-xs text-zinc-500 italic">
-                <p className="font-semibold text-zinc-400 not-italic mb-1">Ressalva de Processo:</p>
-                Esta fase pulou os gates de aprovação de código. O resultado foi validado via QA, mas o plano (docs/PLANO_FASE_08.md) deve ser seguido rigorosamente nas próximas etapas.
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        <footer className="text-zinc-600 text-xs flex justify-between items-center px-2">
-          <span>DominusApp &bull; Do estudo ao domínio.</span>
-          <span className="font-mono opacity-50">2026.08.12</span>
-        </footer>
-      </div>
-    </div>
-  ),
+  component: LandingPage,
 });
+
+function LandingPage() {
+  return (
+    <div className="flex flex-col min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
+      {/* Hero Section */}
+      <header className="relative overflow-hidden pt-20 pb-16 md:pt-32 md:pb-24 border-b border-border/40">
+        {/* Subtle Magenta Glow */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] -z-10" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-primary/5 rounded-full blur-[100px] -z-10" />
+
+        <div className="container mx-auto px-4 text-center max-w-4xl">
+          <div className="flex items-center justify-center gap-3 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <img 
+              src="/logo-dominus.png" 
+              alt="DominusApp Logo" 
+              className="w-12 h-12 md:w-16 md:h-16 object-contain"
+            />
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
+              Dominus<span className="text-primary">App</span>
+            </h1>
+          </div>
+
+          <h2 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+            Do estudo ao <span className="text-primary">domínio</span>.
+          </h2>
+          
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+            {APP_CONFIG.description}
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+            <Button size="lg" className="h-12 px-8 text-base font-semibold w-full sm:w-auto" asChild>
+              <Link to="/cadastro">
+                Começar agora <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="h-12 px-8 text-base font-semibold w-full sm:w-auto" asChild>
+              <Link to="/login">
+                Já tenho conta
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Features Grid */}
+      <main className="container mx-auto px-4 py-20 md:py-32">
+        <div className="text-center mb-16">
+          <h3 className="text-2xl md:text-4xl font-bold tracking-tight mb-4">
+            Tudo o que você precisa para evoluir
+          </h3>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Uma plataforma completa projetada para transformar o aprendizado passivo em conhecimento consolidado.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <FeatureCard 
+            icon={<BookOpen className="w-6 h-6" />}
+            title="Áreas & Cursos"
+            description="Organize o conhecimento em áreas, cursos, módulos e aulas de forma intuitiva."
+          />
+          <FeatureCard 
+            icon={<Layers className="w-6 h-6" />}
+            title="Flashcards"
+            description="Memorize conteúdos complexos com repetição espaçada baseada no algoritmo SM-2."
+          />
+          <FeatureCard 
+            icon={<ListChecks className="w-6 h-6" />}
+            title="Questões & Simulados"
+            description="Teste seu nível de conhecimento com bancos de questões e exames simulados."
+          />
+          <FeatureCard 
+            icon={<Zap className="w-6 h-6" />}
+            title="Revisão Ativa"
+            description="Pratique o que está devido hoje em um único fluxo de recordação ativa."
+          />
+          <FeatureCard 
+            icon={<Calendar className="w-6 h-6" />}
+            title="Planejamento"
+            description="Agenda de estudos com calendário integrado e metas diárias personalizadas."
+          />
+          <div className="p-8 rounded-3xl border border-primary/20 bg-primary/5 flex flex-col justify-center items-center text-center">
+            <p className="text-sm font-bold text-primary uppercase tracking-widest mb-2">Em breve</p>
+            <h4 className="text-xl font-bold mb-2">E muito mais</h4>
+            <p className="text-xs text-muted-foreground">Estatísticas avançadas, biblioteca integrada e gestão de tempo.</p>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border/40 py-12">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
+            <img src="/logo-dominus.png" alt="" className="w-6 h-6" />
+            <span className="font-semibold text-sm">DominusApp</span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            DominusApp &bull; Do estudo ao domínio. &bull; {new Date().getFullYear()}
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+  return (
+    <div className="p-8 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors group">
+      <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+        {icon}
+      </div>
+      <h4 className="text-xl font-bold mb-3">{title}</h4>
+      <p className="text-muted-foreground text-sm leading-relaxed">
+        {description}
+      </p>
+    </div>
+  );
+}
