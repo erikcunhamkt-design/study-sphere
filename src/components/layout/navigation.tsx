@@ -155,28 +155,28 @@ export function DesktopSidebar({
   return (
     <aside
       className={cn(
-        "hidden lg:flex flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200",
+        "hidden lg:flex flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 z-30",
         collapsed ? "w-16" : "w-64",
       )}
     >
-      <div className="border-b border-sidebar-border p-4">
+      <div className="p-4 mb-2">
         <AppBrand isCollapsed={collapsed} />
       </div>
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="flex-1 overflow-y-auto px-3 scrollbar-none">
         <SidebarNav collapsed={collapsed} />
       </div>
-      <div className="p-3 border-t border-sidebar-border space-y-1">
+      <div className="mt-auto p-3 border-t border-sidebar-border space-y-1">
         <SidebarFooter collapsed={collapsed} settingsActive={path === "/app/configuracoes"} />
         <button
           type="button"
           onClick={onToggle}
           className={cn(
-            "mt-2 flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent",
+            "mt-2 flex w-full items-center gap-2 rounded-md px-3 py-2 text-[10px] font-bold tracking-widest text-muted-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent uppercase transition-colors",
             collapsed && "justify-center px-0",
           )}
           aria-label={collapsed ? "Expandir sidebar" : "Recolher sidebar"}
         >
-          <Menu className="h-4 w-4" aria-hidden />
+          <Menu className="h-3 w-3" aria-hidden />
           {!collapsed && <span>Recolher</span>}
         </button>
       </div>
@@ -255,15 +255,15 @@ export function MobileNav() {
         className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]"
       >
         <ul className="grid grid-cols-5">
-          {mobileItems.map((item) => {
-            const active = path === item.to;
+          {mobileItems.slice(0, 4).map((item) => {
+            const active = path === item.to || (item.to.includes('?') && path + useRouterState({ select: s => s.location.search }) === item.to);
             return (
               <li key={item.to}>
                 <Link
                   to={item.to}
                   className={cn(
                     "flex flex-col items-center gap-1 py-2 text-[11px]",
-                    active ? "text-primary" : "text-muted-foreground",
+                    active ? "text-primary font-medium" : "text-muted-foreground",
                   )}
                 >
                   <item.icon aria-hidden className="h-5 w-5" />
@@ -377,10 +377,8 @@ function getInitials(name: string): string {
 }
 
 export function SidebarStateSync() {
-  // hook consumido por app.tsx
   return null;
 }
 
-// Expor helpers ao layout
 export { usePreferences, useUpdatePreferences };
 export { Button };
