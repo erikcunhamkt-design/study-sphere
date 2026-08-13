@@ -181,6 +181,11 @@ function QuickCreate() {
               <ListChecks className="mr-2 h-4 w-4" aria-hidden /> Nova questão
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/app/biblioteca" search={{ tab: "decks" }}>
+              <Layers className="mr-2 h-4 w-4" aria-hidden /> Novo baralho
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setMaterialFormOpen(true)}>
             <ExternalLink className="mr-2 h-4 w-4" aria-hidden /> Novo material
           </DropdownMenuItem>

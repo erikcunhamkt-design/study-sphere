@@ -19,6 +19,11 @@ import { FlashcardList } from "@/features/flashcards/flashcard-list";
 import { FlashcardFormDialog } from "@/features/flashcards/flashcard-form-dialog";
 import { useFlashcards } from "@/features/flashcards/hooks";
 
+import { DeckList } from "@/features/decks/deck-list";
+import { DeckFormDialog } from "@/features/decks/deck-form-dialog";
+import { useDecks } from "@/features/decks/hooks";
+import type { DeckRow } from "@/features/decks/types";
+
 import { QuestionList } from "@/features/questions/question-list";
 import { QuestionFormDialog } from "@/features/questions/question-form-dialog";
 import { ExamList } from "@/features/questions/exam-list";
@@ -30,7 +35,7 @@ import { useStudyMaterials } from "@/features/study-materials/hooks";
 import type { StudyMaterialRow } from "@/features/study-materials/types";
 
 const librarySearchSchema = z.object({
-  tab: z.enum(["flashcards", "questions", "exams", "materials"]).optional().default("flashcards"),
+  tab: z.enum(["flashcards", "decks", "questions", "exams", "materials"]).optional().default("flashcards"),
 });
 
 export const Route = createFileRoute("/app/biblioteca")({
@@ -44,12 +49,15 @@ function LibraryPage() {
   const [search, setSearch] = useState("");
 
   const [flashcardFormOpen, setFlashcardFormOpen] = useState(false);
+  const [deckFormOpen, setDeckFormOpen] = useState(false);
+  const [editingDeck, setEditingDeck] = useState<DeckRow | null>(null);
   const [questionFormOpen, setQuestionFormOpen] = useState(false);
   const [examFormOpen, setExamFormOpen] = useState(false);
   const [materialFormOpen, setMaterialFormOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<StudyMaterialRow | null>(null);
 
   const { data: flashcards = [] } = useFlashcards();
+  const { data: decks = [] } = useDecks();
   const { data: questions = [] } = useQuestions();
   const { data: exams = [] } = useExams();
   const { data: materials = [] } = useStudyMaterials();
@@ -82,6 +90,10 @@ function LibraryPage() {
   const filteredMaterials = unlinkedMaterials.filter((m) =>
     m.title.toLowerCase().includes(search.toLowerCase()) ||
     m.url.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const filteredDecks = decks.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -121,6 +133,15 @@ function LibraryPage() {
               </span>
             </TabsTrigger>
             <TabsTrigger 
+              value="decks"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
+            >
+              <Layers className="mr-2 h-4 w-4" /> Baralhos
+              <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                {decks.length}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger 
               value="questions"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
@@ -155,6 +176,11 @@ function LibraryPage() {
                 <Plus className="h-4 w-4" /> Novo flashcard
               </Button>
             )}
+            {tab === "decks" && (
+              <Button onClick={() => setDeckFormOpen(true)} size="sm" className="gap-2">
+                <Plus className="h-4 w-4" /> Novo baralho
+              </Button>
+            )}
             {tab === "questions" && (
               <Button onClick={() => setQuestionFormOpen(true)} size="sm" className="gap-2">
                 <Plus className="h-4 w-4" /> Nova questão
@@ -181,6 +207,18 @@ function LibraryPage() {
               <Layers className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
               <p className="text-muted-foreground">Nenhum flashcard avulso encontrado.</p>
               <Button variant="link" onClick={() => setFlashcardFormOpen(true)}>Criar primeiro flashcard</Button>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="decks" className="pt-6">
+          {filteredDecks.length > 0 ? (
+            <DeckList decks={filteredDecks} onEdit={(d) => setEditingDeck(d)} />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
+              <Layers className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
+              <p className="text-muted-foreground">Nenhum baralho encontrado.</p>
+              <Button variant="link" onClick={() => setDeckFormOpen(true)}>Criar primeiro baralho</Button>
             </div>
           )}
         </TabsContent>
@@ -240,6 +278,14 @@ function LibraryPage() {
           front: "",
           frontContent: null
         }}
+      />
+      <DeckFormDialog 
+        open={deckFormOpen || !!editingDeck} 
+        onOpenChange={(open) => {
+          setDeckFormOpen(open);
+          if (!open) setEditingDeck(null);
+        }}
+        deck={editingDeck}
       />
       <QuestionFormDialog 
         open={questionFormOpen} 
