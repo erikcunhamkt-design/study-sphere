@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { APP_CONFIG } from "@/lib/app-config";
 import { 
   BookOpen, 
   Layers, 
   ListChecks, 
   Zap, 
   Calendar, 
-  ArrowRight 
+  ArrowRight,
+  ShieldAlert,
+  Brain,
+  History,
+  Target
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -28,90 +31,136 @@ function LandingPage() {
             <img 
               src="/logo-dominus.png" 
               alt="DominusApp Logo" 
-              className="w-12 h-12 md:w-16 md:h-16 object-contain"
+              className="w-10 h-10 md:w-12 md:h-12 object-contain"
             />
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
+            <span className="text-xl md:text-2xl font-bold tracking-tight">
               Dominus<span className="text-primary">App</span>
-            </h1>
+            </span>
           </div>
 
-          <h2 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-            Do estudo ao <span className="text-primary">domínio</span>.
-          </h2>
+          <p className="text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-muted-foreground mb-4 animate-in fade-in duration-1000">
+            A VERDADE QUE NINGUÉM TE CONTOU SOBRE ESTUDAR
+          </p>
           
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-            {APP_CONFIG.description}
+          <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+            Você não tem problema de esforço. Você tem um método que te faz <span className="text-primary">esquecer</span> tudo.
+          </h1>
+          
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed">
+            Horas estudando pra quê? Se em uma semana sumiu, você não aprendeu — você se distraiu com sensação de produtividade. O DominusApp existe pra acabar com isso: você aprende de verdade, lembra na hora que importa, e <span className="text-primary">domina</span> o conteúdo. Sem enrolação.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-            <Button size="lg" className="h-12 px-8 text-base font-semibold w-full sm:w-auto" asChild>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 mb-6">
+            <Button size="lg" className="h-14 px-10 text-base font-bold w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg shadow-primary/20" asChild>
               <Link to="/cadastro">
-                Começar agora <ArrowRight className="ml-2 w-4 h-4" />
+                Quero dominar agora <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="h-12 px-8 text-base font-semibold w-full sm:w-auto" asChild>
+            <Button size="lg" variant="outline" className="h-14 px-10 text-base font-bold w-full sm:w-auto rounded-full border-border/60 hover:bg-accent" asChild>
               <Link to="/login">
                 Já tenho conta
               </Link>
             </Button>
           </div>
+          
+          <p className="text-xs text-muted-foreground/60 italic animate-in fade-in duration-1000 delay-500">
+            Grátis pra começar. Enquanto você pensa, alguém já começou.
+          </p>
         </div>
       </header>
 
-      {/* Features Grid */}
-      <main className="container mx-auto px-4 py-20 md:py-32">
-        <div className="text-center mb-16">
-          <h3 className="text-2xl md:text-4xl font-bold tracking-tight mb-4">
-            Tudo o que você precisa para evoluir
+      {/* "A DOR" Section */}
+      <section className="py-24 bg-card/30 border-b border-border/40">
+        <div className="container mx-auto px-4 max-w-3xl text-center">
+          <h3 className="text-3xl md:text-5xl font-bold mb-8 tracking-tight">
+            Reler, sublinhar, resumir. E <span className="text-primary">esquecer</span> mesmo assim.
           </h3>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Uma plataforma completa projetada para transformar o aprendizado passivo em conhecimento consolidado.
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+            Chega de se enganar. Grifar página inteira não é estudar — é decorar a cor amarela. 
+            Reler dez vezes não fixa nada — só te dá a ilusão de que sabe, até a prova provar que não. 
+            Você não está sem tempo. Você está sem <span className="text-primary">sistema</span>. E cada dia sem um é conteúdo escorrendo pelo ralo.
+          </p>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <main className="container mx-auto px-4 py-24 md:py-32">
+        <div className="text-center mb-20 max-w-3xl mx-auto">
+          <h3 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
+            Isso não é mais um app de anotações. É um <span className="text-primary">sistema</span> pra você dominar.
+          </h3>
+          <p className="text-lg text-muted-foreground">
+            Cada recurso ataca uma parte do problema. Nenhum está aqui pra enfeitar.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <FeatureCard 
-            icon={<BookOpen className="w-6 h-6" />}
-            title="Áreas & Cursos"
-            description="Organize o conhecimento em áreas, cursos, módulos e aulas de forma intuitiva."
+            icon={<Brain className="w-8 h-8" />}
+            title="Esquecer deixa de ser uma opção"
+            description="O app sabe a hora exata de te cobrar cada conteúdo — bem antes do seu cérebro apagar. Você revisa menos, lembra mais, e para de reaprender o que já viu."
           />
           <FeatureCard 
-            icon={<Layers className="w-6 h-6" />}
-            title="Flashcards"
-            description="Memorize conteúdos complexos com repetição espaçada baseada no algoritmo SM-2."
+            icon={<Zap className="w-8 h-8" />}
+            title="Você nunca mais trava sem saber por onde começar"
+            description="Abriu o app? A fila do dia já está pronta. O que está devido, na sua frente, pronto pra praticar. Zero desculpa, zero paralisia."
           />
           <FeatureCard 
-            icon={<ListChecks className="w-6 h-6" />}
-            title="Questões & Simulados"
-            description="Teste seu nível de conhecimento com bancos de questões e exames simulados."
+            icon={<ShieldAlert className="w-8 h-8" />}
+            title="Descubra o que você NÃO sabe — antes da prova descobrir por você"
+            description="Reler afaga o ego. Responder expõe a verdade. Questões e simulados que cavam seus buracos enquanto ainda dá tempo de tapar."
           />
           <FeatureCard 
-            icon={<Zap className="w-6 h-6" />}
-            title="Revisão Ativa"
-            description="Pratique o que está devido hoje em um único fluxo de recordação ativa."
+            icon={<BookOpen className="w-8 h-8" />}
+            title="Fim do caos de PDF perdido e caderno largado"
+            description="Áreas, cursos, módulos, aulas — cada coisa no lugar, do jeito que o assunto se monta na sua cabeça. Ordem no lugar da bagunça."
           />
           <FeatureCard 
-            icon={<Calendar className="w-6 h-6" />}
-            title="Planejamento"
-            description="Agenda de estudos com calendário integrado e metas diárias personalizadas."
+            icon={<Target className="w-8 h-8" />}
+            title="Plano de verdade, não promessa de ano novo"
+            description="Calendário, metas por dia, e o retrato honesto do que você fez e do que fugiu. Disciplina vira sistema — e sistema não depende de motivação."
           />
-          <div className="p-8 rounded-3xl border border-primary/20 bg-primary/5 flex flex-col justify-center items-center text-center">
-            <p className="text-sm font-bold text-primary uppercase tracking-widest mb-2">Em breve</p>
-            <h4 className="text-xl font-bold mb-2">E muito mais</h4>
-            <p className="text-xs text-muted-foreground">Estatísticas avançadas, biblioteca integrada e gestão de tempo.</p>
+          <div className="p-10 rounded-[2.5rem] border border-primary/30 bg-primary/5 flex flex-col justify-center items-center text-center relative overflow-hidden group">
+             <div className="absolute top-0 right-0 p-4">
+               <span className="text-[10px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-widest">Full Power</span>
+             </div>
+             <Zap className="w-10 h-10 text-primary mb-6 animate-pulse" />
+             <h4 className="text-2xl font-bold mb-4">Foco no Domínio</h4>
+             <p className="text-sm text-muted-foreground leading-relaxed">
+               Toda a arquitetura do DominusApp foi desenhada para uma única coisa: que você nunca mais sinta que estudou em vão.
+             </p>
           </div>
         </div>
       </main>
 
+      {/* CTA Final */}
+      <section className="py-24 bg-card/50 border-y border-border/40 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/5 blur-[120px] -z-10" />
+        <div className="container mx-auto px-4 max-w-4xl text-center">
+          <h3 className="text-3xl md:text-5xl font-bold mb-8 tracking-tight">
+            Daqui a 3 meses você vai ter <span className="text-primary">dominado</span> — ou vai estar recomeçando de novo.
+          </h3>
+          <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
+            A diferença não é talento nem tempo livre. É ter um sistema que faz cada hora contar, ou não ter. 
+            Você já sabe onde o "vou começar segunda" te levou até hoje. Muda o jogo <span className="text-primary">agora</span> — depois é só desculpa.
+          </p>
+          <Button size="lg" className="h-16 px-12 text-lg font-bold bg-primary hover:bg-primary/90 text-white rounded-full shadow-xl shadow-primary/20" asChild>
+            <Link to="/cadastro">
+              Quero dominar agora <ArrowRight className="ml-2 w-6 h-6" />
+            </Link>
+          </Button>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="border-t border-border/40 py-12">
+      <footer className="py-16 border-t border-border/10">
         <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-            <img src="/logo-dominus.png" alt="" className="w-6 h-6" />
-            <span className="font-semibold text-sm">DominusApp</span>
+          <div className="flex items-center justify-center gap-2 mb-6 opacity-60">
+            <img src="/logo-dominus.png" alt="" className="w-5 h-5 grayscale" />
+            <span className="font-bold text-sm tracking-tight">Dominus<span className="text-primary">App</span></span>
           </div>
-          <p className="text-sm text-muted-foreground">
-            DominusApp &bull; Do estudo ao domínio. &bull; {new Date().getFullYear()}
+          <p className="text-xs text-muted-foreground/50 tracking-wide">
+            DominusApp &bull; Do estudo ao domínio. &bull; 2026
           </p>
         </div>
       </footer>
@@ -121,12 +170,12 @@ function LandingPage() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="p-8 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors group">
-      <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+    <div className="p-10 rounded-[2.5rem] border border-border/40 bg-card/40 backdrop-blur-md hover:border-primary/40 transition-all duration-500 group hover:translate-y-[-4px] hover:shadow-2xl hover:shadow-primary/5">
+      <div className="w-16 h-16 rounded-3xl bg-primary/10 text-primary flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
         {icon}
       </div>
-      <h4 className="text-xl font-bold mb-3">{title}</h4>
-      <p className="text-muted-foreground text-sm leading-relaxed">
+      <h4 className="text-2xl font-bold mb-4 tracking-tight">{title}</h4>
+      <p className="text-muted-foreground text-base leading-relaxed">
         {description}
       </p>
     </div>
