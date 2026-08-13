@@ -24,7 +24,7 @@ import { moveId } from "@/features/studies/components/reorder-buttons";
 import type { ArchiveFilter, StudyArea, StudyAreaWithCounts } from "@/features/studies/types";
 import { filterByArchiveState, searchStudyAreas } from "@/features/studies/utils";
 
-export const Route = createFileRoute("/app/estudos/")({
+export const Route = createFileRoute("/app/meus-estudos/")({
   component: EstudosPage,
 });
 

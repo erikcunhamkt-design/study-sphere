@@ -21,7 +21,7 @@ import { Route as AppEstudarRouteImport } from './routes/app.estudar'
 import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
-import { Route as AppEstudosIndexRouteImport } from './routes/app.estudos.index'
+import { Route as AppMeusEstudosIndexRouteImport } from './routes/app.meus-estudos.index'
 import { Route as AppLabEditorRouteImport } from './routes/app.lab.editor'
 import { Route as AppEstudosAreaIdIndexRouteImport } from './routes/app.estudos.$areaId.index'
 import { Route as AppBibliotecaBaralhoDeckIdRouteImport } from './routes/app.biblioteca.baralho.$deckId'
@@ -89,9 +89,9 @@ const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
   path: '/biblioteca',
   getParentRoute: () => AppRoute,
 } as any)
-const AppEstudosIndexRoute = AppEstudosIndexRouteImport.update({
-  id: '/estudos/',
-  path: '/estudos/',
+const AppMeusEstudosIndexRoute = AppMeusEstudosIndexRouteImport.update({
+  id: '/meus-estudos/',
+  path: '/meus-estudos/',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLabEditorRoute = AppLabEditorRouteImport.update({
@@ -143,7 +143,7 @@ export interface FileRoutesByFullPath {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
-  '/app/estudos/': typeof AppEstudosIndexRoute
+  '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
   '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
   '/app/estudos/$areaId/cursos/$courseId/': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
@@ -163,7 +163,7 @@ export interface FileRoutesByTo {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
-  '/app/estudos': typeof AppEstudosIndexRoute
+  '/app/meus-estudos': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
   '/app/estudos/$areaId': typeof AppEstudosAreaIdIndexRoute
   '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
@@ -185,7 +185,7 @@ export interface FileRoutesById {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
-  '/app/estudos/': typeof AppEstudosIndexRoute
+  '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
   '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
   '/app/estudos/$areaId/cursos/$courseId/': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
@@ -208,7 +208,7 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/'
     | '/app/lab/editor'
-    | '/app/estudos/'
+    | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
     | '/app/estudos/$areaId/'
     | '/app/estudos/$areaId/cursos/$courseId/'
@@ -228,7 +228,7 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app'
     | '/app/lab/editor'
-    | '/app/estudos'
+    | '/app/meus-estudos'
     | '/app/biblioteca/baralho/$deckId'
     | '/app/estudos/$areaId'
     | '/app/estudos/$areaId/cursos/$courseId'
@@ -249,7 +249,7 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/'
     | '/app/lab/editor'
-    | '/app/estudos/'
+    | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
     | '/app/estudos/$areaId/'
     | '/app/estudos/$areaId/cursos/$courseId/'
@@ -352,11 +352,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBibliotecaRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/estudos/': {
-      id: '/app/estudos/'
-      path: '/estudos'
-      fullPath: '/app/estudos/'
-      preLoaderRoute: typeof AppEstudosIndexRouteImport
+    '/app/meus-estudos/': {
+      id: '/app/meus-estudos/'
+      path: '/meus-estudos'
+      fullPath: '/app/meus-estudos/'
+      preLoaderRoute: typeof AppMeusEstudosIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/lab/editor': {
@@ -424,7 +424,7 @@ interface AppRouteChildren {
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLabEditorRoute: typeof AppLabEditorRoute
-  AppEstudosIndexRoute: typeof AppEstudosIndexRoute
+  AppMeusEstudosIndexRoute: typeof AppMeusEstudosIndexRoute
   AppEstudosAreaIdIndexRoute: typeof AppEstudosAreaIdIndexRoute
   AppEstudosAreaIdCursosCourseIdIndexRoute: typeof AppEstudosAreaIdCursosCourseIdIndexRoute
   AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -439,7 +439,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPlanejamentoRoute: AppPlanejamentoRoute,
   AppIndexRoute: AppIndexRoute,
   AppLabEditorRoute: AppLabEditorRoute,
-  AppEstudosIndexRoute: AppEstudosIndexRoute,
+  AppMeusEstudosIndexRoute: AppMeusEstudosIndexRoute,
   AppEstudosAreaIdIndexRoute: AppEstudosAreaIdIndexRoute,
   AppEstudosAreaIdCursosCourseIdIndexRoute:
     AppEstudosAreaIdCursosCourseIdIndexRoute,
