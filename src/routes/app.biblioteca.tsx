@@ -19,6 +19,11 @@ import { FlashcardList } from "@/features/flashcards/flashcard-list";
 import { FlashcardFormDialog } from "@/features/flashcards/flashcard-form-dialog";
 import { useFlashcards } from "@/features/flashcards/hooks";
 
+import { DeckList } from "@/features/decks/deck-list";
+import { DeckFormDialog } from "@/features/decks/deck-form-dialog";
+import { useDecks } from "@/features/decks/hooks";
+import type { DeckRow } from "@/features/decks/types";
+
 import { QuestionList } from "@/features/questions/question-list";
 import { QuestionFormDialog } from "@/features/questions/question-form-dialog";
 import { ExamList } from "@/features/questions/exam-list";
