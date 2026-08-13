@@ -102,3 +102,17 @@ export function useSubmitFlashcardReview() {
     },
   });
 }
+
+export function useSetFlashcardsDeck() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const invalidateLists = useInvalidateFlashcardLists();
+  return useMutation({
+    mutationFn: ({ flashcardIds, deckId }: { flashcardIds: string[]; deckId: string | null }) =>
+      api.setFlashcardsDeck(flashcardIds, deckId),
+    onSuccess: () => {
+      invalidateLists();
+      void qc.invalidateQueries({ queryKey: ["decks", user?.id] });
+    },
+  });
+}
