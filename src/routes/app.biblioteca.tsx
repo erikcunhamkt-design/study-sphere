@@ -34,7 +34,7 @@ import { MaterialFormDialog } from "@/features/study-materials/material-form-dia
 import { useStudyMaterials } from "@/features/study-materials/hooks";
 import type { StudyMaterialRow } from "@/features/study-materials/types";
 
-const librarySearchSchema = z.object({
+export const librarySearchSchema = z.object({
   tab: z.enum(["flashcards", "decks", "questions", "exams", "materials"]).optional().default("flashcards"),
 });
 

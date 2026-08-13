@@ -95,6 +95,17 @@ export async function setFlashcardArchived(
   if (error) throw error;
 }
 
+export async function setFlashcardsDeck(
+  flashcardIds: string[],
+  deckId: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from("flashcards")
+    .update({ deck_id: deckId })
+    .in("id", flashcardIds);
+  if (error) throw error;
+}
+
 export async function deleteFlashcard(flashcardId: string): Promise<void> {
   const { error } = await supabase.from("flashcards").delete().eq("id", flashcardId);
   if (error) throw error;
