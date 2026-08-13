@@ -36,6 +36,7 @@ export function PomodoroSession({ resumingSession, onDone, plannedId }: Pomodoro
       const created = await createSession.mutateAsync({
         method: "pomodoro",
         lessonId,
+        isFreeSession: !lessonId,
         details: initialDetailsForMethod("pomodoro"),
       });
       setSession(created);

@@ -53,6 +53,7 @@ export function BlurtingSession({ resumingSession, onDone, plannedId }: Blurting
       const created = await createSession.mutateAsync({
         method: "blurting",
         lessonId,
+        isFreeSession: !lessonId,
         details: initialDetailsForMethod("blurting"),
       });
       setSession(created);

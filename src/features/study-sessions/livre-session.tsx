@@ -53,6 +53,7 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
       const created = await createSession.mutateAsync({
         method: "livre",
         lessonId,
+        isFreeSession: !lessonId,
         details: initialDetailsForMethod("livre"),
       });
       setSession(created);
