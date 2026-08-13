@@ -30,7 +30,7 @@ import { useStudyMaterials } from "@/features/study-materials/hooks";
 import type { StudyMaterialRow } from "@/features/study-materials/types";
 
 const librarySearchSchema = z.object({
-  tab: z.enum(["flashcards", "questions", "exams", "materials"]).optional().default("flashcards"),
+  tab: z.enum(["flashcards", "decks", "questions", "exams", "materials"]).optional().default("flashcards"),
 });
 
 export const Route = createFileRoute("/app/biblioteca")({
