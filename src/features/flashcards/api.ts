@@ -4,7 +4,7 @@ import type { FlashcardContent, FlashcardRating } from "./schema";
 import type { FlashcardReviewRow, FlashcardRow, SubmitFlashcardReviewResult } from "./types";
 
 const FLASHCARD_COLUMNS =
-  "id, user_id, lesson_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, created_at, updated_at";
+  "id, user_id, lesson_id, deck_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, created_at, updated_at";
 
 export async function fetchFlashcards(userId: string): Promise<FlashcardRow[]> {
   const { data, error } = await supabase
@@ -47,6 +47,7 @@ export async function createFlashcard(
     .insert({
       user_id: userId,
       lesson_id: input.lessonId,
+      deck_id: input.deckId,
       source_block_id: input.sourceBlockId,
       front: input.front as unknown as Json,
       back: input.back as unknown as Json,
@@ -59,6 +60,7 @@ export async function createFlashcard(
 
 export interface UpdateFlashcardContentInput {
   lessonId: string | null;
+  deckId: string | null;
   front: FlashcardContent;
   back: FlashcardContent;
 }
@@ -71,6 +73,7 @@ export async function updateFlashcardContent(
     .from("flashcards")
     .update({
       lesson_id: input.lessonId,
+      deck_id: input.deckId,
       front: input.front as unknown as Json,
       back: input.back as unknown as Json,
     })
