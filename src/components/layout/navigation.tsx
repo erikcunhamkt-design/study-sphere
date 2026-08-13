@@ -51,7 +51,7 @@ export const NAV_GROUPS = [
     label: "APRENDER",
     items: [
       { to: "/app/estudar", label: "Estudar", icon: Play, mobile: true },
-      { to: "/app/estudar?view=hub", label: "Revisar", icon: RefreshCcw, mobile: true },
+      { to: "/app/revisar", label: "Revisar", icon: RefreshCcw, mobile: true },
     ],
   },
   {
@@ -106,7 +106,7 @@ export function SidebarNav({ collapsed }: { collapsed: boolean }) {
               </h3>
             )}
             {group.items.map((item) => {
-              const active = path === item.to || (item.to.includes('?') && path + useRouterState({ select: s => s.location.search }) === item.to);
+              const active = path === item.to;
               const link = (
                 <Link
                   to={item.to}
@@ -256,7 +256,7 @@ export function MobileNav() {
       >
         <ul className="grid grid-cols-5">
           {mobileItems.slice(0, 4).map((item) => {
-            const active = path === item.to || (item.to.includes('?') && path + useRouterState({ select: s => s.location.search }) === item.to);
+            const active = path === item.to;
             return (
               <li key={item.to}>
                 <Link
