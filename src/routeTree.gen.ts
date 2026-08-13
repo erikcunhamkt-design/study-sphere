@@ -16,6 +16,7 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppRevisarRouteImport } from './routes/app.revisar'
 import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
 import { Route as AppEstudarRouteImport } from './routes/app.estudar'
 import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
@@ -62,6 +63,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRevisarRoute = AppRevisarRouteImport.update({
+  id: '/revisar',
+  path: '/revisar',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/revisar': typeof AppRevisarRoute
   '/app': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos': typeof AppMeusEstudosIndexRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/app/desempenho'
     | '/app/estudar'
     | '/app/planejamento'
+    | '/app/revisar'
     | '/app/'
     | '/app/lab/editor'
     | '/app/meus-estudos/'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/app/desempenho'
     | '/app/estudar'
     | '/app/planejamento'
+    | '/app/revisar'
     | '/app'
     | '/app/lab/editor'
     | '/app/meus-estudos'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/app/desempenho'
     | '/app/estudar'
     | '/app/planejamento'
+    | '/app/revisar'
     | '/app/'
     | '/app/lab/editor'
     | '/app/meus-estudos/'
@@ -318,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/revisar': {
+      id: '/app/revisar'
+      path: '/revisar'
+      fullPath: '/app/revisar'
+      preLoaderRoute: typeof AppRevisarRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/planejamento': {
@@ -425,6 +444,7 @@ interface AppRouteChildren {
   AppDesempenhoRoute: typeof AppDesempenhoRoute
   AppEstudarRoute: typeof AppEstudarRoute
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
+  AppRevisarRoute: typeof AppRevisarRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLabEditorRoute: typeof AppLabEditorRoute
   AppMeusEstudosIndexRoute: typeof AppMeusEstudosIndexRoute
@@ -440,6 +460,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDesempenhoRoute: AppDesempenhoRoute,
   AppEstudarRoute: AppEstudarRoute,
   AppPlanejamentoRoute: AppPlanejamentoRoute,
+  AppRevisarRoute: AppRevisarRoute,
   AppIndexRoute: AppIndexRoute,
   AppLabEditorRoute: AppLabEditorRoute,
   AppMeusEstudosIndexRoute: AppMeusEstudosIndexRoute,
