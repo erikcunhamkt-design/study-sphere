@@ -279,6 +279,14 @@ function LibraryPage() {
           frontContent: null
         }}
       />
+      <DeckFormDialog 
+        open={deckFormOpen || !!editingDeck} 
+        onOpenChange={(open) => {
+          setDeckFormOpen(open);
+          if (!open) setEditingDeck(null);
+        }}
+        deck={editingDeck}
+      />
       <QuestionFormDialog 
         open={questionFormOpen} 
         onOpenChange={setQuestionFormOpen}
