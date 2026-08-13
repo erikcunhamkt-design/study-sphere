@@ -122,6 +122,47 @@ export type Database = {
           },
         ]
       }
+      decks: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          is_archived: boolean
+          name: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          name: string
+          position?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          name?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exam_attempts: {
         Row: {
           duration_seconds: number | null
@@ -309,6 +350,7 @@ export type Database = {
         Row: {
           back: Json
           created_at: string
+          deck_id: string | null
           due_at: string | null
           ease: number
           front: Json
@@ -327,6 +369,7 @@ export type Database = {
         Insert: {
           back: Json
           created_at?: string
+          deck_id?: string | null
           due_at?: string | null
           ease?: number
           front: Json
@@ -345,6 +388,7 @@ export type Database = {
         Update: {
           back?: Json
           created_at?: string
+          deck_id?: string | null
           due_at?: string | null
           ease?: number
           front?: Json
@@ -361,6 +405,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "flashcards_deck_fkey"
+            columns: ["deck_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id", "user_id"]
+          },
           {
             foreignKeyName: "flashcards_lesson_user_fkey"
             columns: ["lesson_id", "user_id"]
