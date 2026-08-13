@@ -133,6 +133,14 @@ function LibraryPage() {
               </span>
             </TabsTrigger>
             <TabsTrigger 
+              value="decks"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
+            >
+              <Layers className="mr-2 h-4 w-4" /> Baralhos
+              <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                {decks.length}
+              </span>
+            <TabsTrigger 
               value="questions"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
