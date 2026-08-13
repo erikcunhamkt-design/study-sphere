@@ -10,6 +10,7 @@ import {
   Target,
   Layers,
   ListChecks,
+  ExternalLink,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ import { StudyAreaFormDialog } from "@/features/studies/components/study-area-fo
 import { CourseFormDialog } from "@/features/studies/components/course-form-dialog";
 import { CourseModuleFormDialog } from "@/features/studies/components/course-module-form-dialog";
 import { LessonFormDialog } from "@/features/studies/components/lesson-form-dialog";
+import { MaterialFormDialog } from "@/features/study-materials/material-form-dialog";
 
 export function TopBar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -143,6 +145,7 @@ function QuickCreate() {
   const [courseFormOpen, setCourseFormOpen] = useState(false);
   const [moduleFormOpen, setModuleFormOpen] = useState(false);
   const [lessonFormOpen, setLessonFormOpen] = useState(false);
+  const [materialFormOpen, setMaterialFormOpen] = useState(false);
   const params = useParams({ strict: false }) as {
     areaId?: string;
     courseId?: string;
@@ -178,6 +181,9 @@ function QuickCreate() {
               <ListChecks className="mr-2 h-4 w-4" aria-hidden /> Nova questão
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setMaterialFormOpen(true)}>
+            <ExternalLink className="mr-2 h-4 w-4" aria-hidden /> Novo material
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link to="/app/estudar">
@@ -203,6 +209,11 @@ function QuickCreate() {
         onOpenChange={setLessonFormOpen}
         fixedCourseId={hasModuleContext ? currentCourseId : undefined}
         fixedModuleId={hasModuleContext ? currentModuleId : undefined}
+      />
+      <MaterialFormDialog
+        open={materialFormOpen}
+        onOpenChange={setMaterialFormOpen}
+        prefill={{ courseId: currentCourseId }}
       />
     </>
   );
