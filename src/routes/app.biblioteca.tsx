@@ -5,7 +5,8 @@ import {
   Search,
   Layers,
   ListChecks,
-  GraduationCap
+  GraduationCap,
+  ExternalLink
 } from "lucide-react";
 import { z } from "zod";
 
@@ -23,9 +24,13 @@ import { QuestionFormDialog } from "@/features/questions/question-form-dialog";
 import { ExamList } from "@/features/questions/exam-list";
 import { ExamFormDialog } from "@/features/questions/exam-form-dialog";
 import { useQuestions, useExams } from "@/features/questions/hooks";
+import { MaterialList } from "@/features/study-materials/material-list";
+import { MaterialFormDialog } from "@/features/study-materials/material-form-dialog";
+import { useStudyMaterials } from "@/features/study-materials/hooks";
+import type { StudyMaterialRow } from "@/features/study-materials/types";
 
 const librarySearchSchema = z.object({
-  tab: z.enum(["flashcards", "questions", "exams"]).optional().default("flashcards"),
+  tab: z.enum(["flashcards", "questions", "exams", "materials"]).optional().default("flashcards"),
 });
 
 export const Route = createFileRoute("/app/biblioteca")({
@@ -41,10 +46,13 @@ function LibraryPage() {
   const [flashcardFormOpen, setFlashcardFormOpen] = useState(false);
   const [questionFormOpen, setQuestionFormOpen] = useState(false);
   const [examFormOpen, setExamFormOpen] = useState(false);
+  const [materialFormOpen, setMaterialFormOpen] = useState(false);
+  const [editingMaterial, setEditingMaterial] = useState<StudyMaterialRow | null>(null);
 
   const { data: flashcards = [] } = useFlashcards();
   const { data: questions = [] } = useQuestions();
   const { data: exams = [] } = useExams();
+  const { data: materials = [] } = useStudyMaterials();
 
   const unlinkedFlashcards = flashcards.filter(
     (c) => c.lesson_id === null && !c.is_archived
@@ -54,6 +62,9 @@ function LibraryPage() {
   );
   const activeExams = exams.filter(
     (e) => !e.is_archived
+  );
+  const unlinkedMaterials = materials.filter(
+    (m) => m.course_id === null && !m.is_archived
   );
 
   const filteredFlashcards = unlinkedFlashcards.filter((c) => 
@@ -67,6 +78,10 @@ function LibraryPage() {
 
   const filteredExams = activeExams.filter((e) =>
     e.title.toLowerCase().includes(search.toLowerCase())
+  );
+  const filteredMaterials = unlinkedMaterials.filter((m) =>
+    m.title.toLowerCase().includes(search.toLowerCase()) ||
+    m.url.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -123,6 +138,15 @@ function LibraryPage() {
                 {activeExams.length}
               </span>
             </TabsTrigger>
+            <TabsTrigger 
+              value="materials"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
+            >
+              <ExternalLink className="mr-2 h-4 w-4" /> Materiais
+              <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                {unlinkedMaterials.length}
+              </span>
+            </TabsTrigger>
           </TabsList>
 
           <div className="hidden sm:flex items-center gap-2">
@@ -139,6 +163,11 @@ function LibraryPage() {
             {tab === "exams" && (
               <Button onClick={() => setExamFormOpen(true)} size="sm" className="gap-2">
                 <Plus className="h-4 w-4" /> Novo simulado
+              </Button>
+            )}
+            {tab === "materials" && (
+              <Button onClick={() => setMaterialFormOpen(true)} size="sm" className="gap-2">
+                <Plus className="h-4 w-4" /> Novo material
               </Button>
             )}
           </div>
@@ -185,6 +214,21 @@ function LibraryPage() {
             </div>
           )}
         </TabsContent>
+        
+        <TabsContent value="materials" className="pt-6">
+          {filteredMaterials.length > 0 ? (
+            <MaterialList 
+              materials={filteredMaterials} 
+              onEdit={(m) => setEditingMaterial(m)} 
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
+              <ExternalLink className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
+              <p className="text-muted-foreground">Nenhum material avulso encontrado.</p>
+              <Button variant="link" onClick={() => setMaterialFormOpen(true)}>Criar primeiro material</Button>
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
 
       <FlashcardFormDialog 
@@ -205,6 +249,15 @@ function LibraryPage() {
       <ExamFormDialog 
         open={examFormOpen} 
         onOpenChange={setExamFormOpen}
+      />
+      <MaterialFormDialog 
+        open={materialFormOpen || !!editingMaterial} 
+        onOpenChange={(open) => {
+          setMaterialFormOpen(open);
+          if (!open) setEditingMaterial(null);
+        }}
+        material={editingMaterial ?? undefined}
+        prefill={{ courseId: null }}
       />
     </div>
   );
