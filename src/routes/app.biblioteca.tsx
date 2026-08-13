@@ -57,6 +57,7 @@ function LibraryPage() {
   const [editingMaterial, setEditingMaterial] = useState<StudyMaterialRow | null>(null);
 
   const { data: flashcards = [] } = useFlashcards();
+  const { data: decks = [] } = useDecks();
   const { data: questions = [] } = useQuestions();
   const { data: exams = [] } = useExams();
   const { data: materials = [] } = useStudyMaterials();
