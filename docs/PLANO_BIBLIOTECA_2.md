@@ -1,4 +1,4 @@
-# Plano: Biblioteca — Fatia 2: Materiais de Referência
+# Plano: Biblioteca — Fatia 2: Materiais de Referência (Revisado)
 
 ## 1. Visão Geral
 Adicionar a capacidade de gerenciar **Materiais de Referência** (links externos) na Biblioteca. Materiais são exclusivamente referências (URLs), sem armazenamento de arquivos físicos no backend (eliminando custos de storage e complexidade de upload).
@@ -9,7 +9,7 @@ Adicionar a capacidade de gerenciar **Materiais de Referência** (links externos
 ```sql
 CREATE TABLE public.study_materials (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   title text NOT NULL,
   url text NOT NULL,
   type text NOT NULL, -- enum: 'pdf', 'video', 'artigo', 'link', 'livro', 'outro'
@@ -29,18 +29,28 @@ CREATE TABLE public.study_materials (
   CONSTRAINT study_materials_title_check CHECK (btrim(title) <> '' AND char_length(title) <= 255),
   CONSTRAINT study_materials_url_check CHECK (btrim(url) <> '' AND char_length(url) <= 2048),
   CONSTRAINT study_materials_type_check CHECK (type IN ('pdf', 'video', 'artigo', 'link', 'livro', 'outro')),
-  CONSTRAINT study_materials_note_check CHECK (char_length(note) <= 2000)
+  CONSTRAINT study_materials_note_check CHECK (note IS NULL OR char_length(note) <= 2000)
 );
+
+-- Índices
+CREATE INDEX study_materials_user_id_idx ON public.study_materials (user_id);
+CREATE INDEX study_materials_user_archived_idx ON public.study_materials (user_id, is_archived);
+CREATE INDEX study_materials_course_idx ON public.study_materials (user_id, course_id);
 
 -- RLS & Permissões
 ALTER TABLE public.study_materials ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can manage their own study materials"
-  ON public.study_materials
-  FOR ALL
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "study_materials_select_own" ON public.study_materials
+  FOR SELECT TO authenticated USING (auth.uid() = user_id);
+
+CREATE POLICY "study_materials_insert_own" ON public.study_materials
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "study_materials_update_own" ON public.study_materials
+  FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "study_materials_delete_own" ON public.study_materials
+  FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.study_materials TO authenticated;
 GRANT ALL ON public.study_materials TO service_role;
@@ -59,7 +69,7 @@ Diferente de Flashcards/Questões que muitas vezes perdem o sentido sem o contex
 
 ### Aba na Biblioteca
 - Adição da aba **"Materiais"** em `/app/biblioteca`.
-- A aba exibe a lista de materiais filtrados por `lesson_id IS NULL` (avulsos) ou todos (se a visão for global).
+- A aba exibe a lista de materiais do usuário. A listagem principal da biblioteca mostra materiais "avulsos" (`course_id IS NULL`) ou todos, dependendo do filtro selecionado.
 - **Cards de Material**: Título, ícone representativo do tipo, indicação do curso vinculado (se houver), e ações (Editar, Arquivar, Abrir Link).
 
 ### Componentes a Criar/Modificar
