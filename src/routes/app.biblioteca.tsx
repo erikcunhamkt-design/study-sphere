@@ -176,6 +176,11 @@ function LibraryPage() {
                 <Plus className="h-4 w-4" /> Novo flashcard
               </Button>
             )}
+            {tab === "decks" && (
+              <Button onClick={() => setDeckFormOpen(true)} size="sm" className="gap-2">
+                <Plus className="h-4 w-4" /> Novo baralho
+              </Button>
+            )}
             {tab === "questions" && (
               <Button onClick={() => setQuestionFormOpen(true)} size="sm" className="gap-2">
                 <Plus className="h-4 w-4" /> Nova questão
