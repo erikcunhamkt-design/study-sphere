@@ -60,7 +60,7 @@ export function useDashboardState() {
         let displayTitle = lesson?.title || course?.name || (session as any).planned_title;
         
         if (!displayTitle) {
-          if ((session as any).is_free_session) {
+          if (session.is_free_session) {
             displayTitle = "Sessão Livre";
           } else {
             // Último caso: se chegamos aqui, algo está errado, mas usamos o fallback seguro
@@ -81,7 +81,7 @@ export function useDashboardState() {
             displayTitle,
             displayContext,
             displaySecondary,
-            isFree: (session as any).is_free_session && !session.lesson_id
+            isFree: session.is_free_session && !session.lesson_id
           },
         };
       }
