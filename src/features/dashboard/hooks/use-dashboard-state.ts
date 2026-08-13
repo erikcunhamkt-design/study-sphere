@@ -33,11 +33,19 @@ export function useDashboardState() {
       // Filtrar sessões válidas para a Home
       // Válida = (Tem aula) OU (É sessão livre intencional)
       const validSessions = inProgressSessions.filter(s => {
+        // Ignorar sessões finalizadas (redundância de segurança)
+        if (s.ended_at) return false;
+
+        // Abandono por tempo (ex: 4 horas de inatividade)
+        const lastUpdate = new Date(s.updated_at).getTime();
+        const fourHours = 4 * 60 * 60 * 1000;
+        if (Date.now() - lastUpdate > fourHours) return false;
+
         // Sessão de conteúdo real
         if (s.lesson_id) return true;
         
         // Sessão livre intencional
-        if ((s as any).is_free_session) return true;
+        if (s.is_free_session) return true;
 
         return false;
       });
