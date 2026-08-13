@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Layers, ListChecks, Play, Sparkles, Target } from "lucide-react";
 import { useMemo } from "react";
 import { useDashboardState } from "@/features/dashboard/hooks/use-dashboard-state";
@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { resolveTimezone, startOfDayIso } from "@/lib/timezone";
 import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
 import { useStudySessionSecondsSince } from "@/features/study-sessions/hooks";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
@@ -25,7 +26,7 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
   const { data: prefs } = usePreferences();
-  const { priority, data, isLoading, dueFlashcards, hasActivity, courses } = useDashboardState();
+  const { priority, data, isLoading, dueFlashcards, hasActivity } = useDashboardState();
   
   const sinceIso = useMemo(() => startOfDayIso(profile?.timezone), [profile?.timezone]);
   const { data: todaySeconds } = useStudySessionSecondsSince(sinceIso);
@@ -39,7 +40,7 @@ function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-10">
+      <div className="max-w-4xl mx-auto space-y-10 px-4 md:px-0">
         <div className="space-y-2">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-5 w-48" />
@@ -54,7 +55,7 @@ function DashboardPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12 pb-20">
+    <div className="max-w-4xl mx-auto space-y-12 pb-20 px-4 md:px-0">
       {/* Header Contextual */}
       <div className="space-y-2">
         <h1 className="text-4xl font-black tracking-tight text-foreground">{greeting}, {displayName}.</h1>

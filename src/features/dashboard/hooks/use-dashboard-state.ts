@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useDueFlashcards } from "@/features/flashcards/hooks";
-import { useInProgressStudySessions, useStudySessions } from "@/features/study-sessions/hooks";
+import { useInProgressStudySessions, useRecentStudySessions } from "@/features/study-sessions/hooks";
 import { useAllCourses } from "@/features/studies/hooks/use-courses";
 import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
@@ -14,7 +14,7 @@ export function useDashboardState() {
   const { data: allLessons, isLoading: loadingLessons } = useAllLessons();
   const { data: areas, isLoading: loadingAreas } = useStudyAreas();
   const { data: modules, isLoading: loadingModules } = useAllCourseModules();
-  const { data: sessions, isLoading: loadingSessions } = useStudySessions();
+  const { data: recentSessions, isLoading: loadingRecent } = useRecentStudySessions(1);
 
   const isLoading =
     loadingDue ||
@@ -23,7 +23,7 @@ export function useDashboardState() {
     loadingLessons ||
     loadingAreas ||
     loadingModules ||
-    loadingSessions;
+    loadingRecent;
 
   const state = useMemo(() => {
     if (isLoading) return { priority: "loading" as const, data: {} };
@@ -31,7 +31,6 @@ export function useDashboardState() {
     // 1. Prioridade: Revisão Urgente
     if (dueFlashcards && dueFlashcards.length > 0) {
       // Estimativa: 4 min a cada 1 pendente (exemplo heurístico sugerido "8 min para 2")
-      // Se houver dados reais de sessões passadas, poderíamos ser mais precisos.
       const estimatedMinutes = Math.max(dueFlashcards.length * 4, 1);
       
       return {
@@ -84,7 +83,7 @@ export function useDashboardState() {
     return { priority: "maintenance" as const, data: {} };
   }, [isLoading, dueFlashcards, inProgressSessions, courses, allLessons, areas, modules]);
 
-  const hasActivity = (sessions?.length ?? 0) > 0;
+  const hasActivity = (recentSessions?.length ?? 0) > 0;
 
-  return { ...state, isLoading, dueFlashcards, courses, allLessons, modules, hasActivity, sessions };
+  return { ...state, isLoading, dueFlashcards, courses, allLessons, modules, hasActivity };
 }
