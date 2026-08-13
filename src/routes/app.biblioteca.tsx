@@ -92,6 +92,10 @@ function LibraryPage() {
     m.url.toLowerCase().includes(search.toLowerCase())
   );
 
+  const filteredDecks = decks.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
