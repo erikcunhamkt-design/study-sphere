@@ -16,18 +16,19 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppRevisarRouteImport } from './routes/app.revisar'
 import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
 import { Route as AppEstudarRouteImport } from './routes/app.estudar'
 import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
-import { Route as AppEstudosIndexRouteImport } from './routes/app.estudos.index'
+import { Route as AppMeusEstudosIndexRouteImport } from './routes/app.meus-estudos.index'
 import { Route as AppLabEditorRouteImport } from './routes/app.lab.editor'
-import { Route as AppEstudosAreaIdIndexRouteImport } from './routes/app.estudos.$areaId.index'
+import { Route as AppMeusEstudosAreaIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.index'
 import { Route as AppBibliotecaBaralhoDeckIdRouteImport } from './routes/app.biblioteca.baralho.$deckId'
-import { Route as AppEstudosAreaIdCursosCourseIdIndexRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.index'
-import { Route as AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.modulos.$moduleId.index'
-import { Route as AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport } from './routes/app.estudos.$areaId.cursos.$courseId.modulos.$moduleId.aulas.$lessonId'
+import { Route as AppMeusEstudosAreaIdCursosCourseIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.cursos.$courseId.index'
+import { Route as AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.cursos.$courseId.modulos.$moduleId.index'
+import { Route as AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport } from './routes/app.meus-estudos.$areaId.cursos.$courseId.modulos.$moduleId.aulas.$lessonId'
 
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
@@ -64,6 +65,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppRevisarRoute = AppRevisarRouteImport.update({
+  id: '/revisar',
+  path: '/revisar',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
   id: '/planejamento',
   path: '/planejamento',
@@ -89,9 +95,9 @@ const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
   path: '/biblioteca',
   getParentRoute: () => AppRoute,
 } as any)
-const AppEstudosIndexRoute = AppEstudosIndexRouteImport.update({
-  id: '/estudos/',
-  path: '/estudos/',
+const AppMeusEstudosIndexRoute = AppMeusEstudosIndexRouteImport.update({
+  id: '/meus-estudos/',
+  path: '/meus-estudos/',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLabEditorRoute = AppLabEditorRouteImport.update({
@@ -99,35 +105,38 @@ const AppLabEditorRoute = AppLabEditorRouteImport.update({
   path: '/lab/editor',
   getParentRoute: () => AppRoute,
 } as any)
-const AppEstudosAreaIdIndexRoute = AppEstudosAreaIdIndexRouteImport.update({
-  id: '/estudos/$areaId/',
-  path: '/estudos/$areaId/',
-  getParentRoute: () => AppRoute,
-} as any)
+const AppMeusEstudosAreaIdIndexRoute =
+  AppMeusEstudosAreaIdIndexRouteImport.update({
+    id: '/meus-estudos/$areaId/',
+    path: '/meus-estudos/$areaId/',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppBibliotecaBaralhoDeckIdRoute =
   AppBibliotecaBaralhoDeckIdRouteImport.update({
     id: '/baralho/$deckId',
     path: '/baralho/$deckId',
     getParentRoute: () => AppBibliotecaRoute,
   } as any)
-const AppEstudosAreaIdCursosCourseIdIndexRoute =
-  AppEstudosAreaIdCursosCourseIdIndexRouteImport.update({
-    id: '/estudos/$areaId/cursos/$courseId/',
-    path: '/estudos/$areaId/cursos/$courseId/',
+const AppMeusEstudosAreaIdCursosCourseIdIndexRoute =
+  AppMeusEstudosAreaIdCursosCourseIdIndexRouteImport.update({
+    id: '/meus-estudos/$areaId/cursos/$courseId/',
+    path: '/meus-estudos/$areaId/cursos/$courseId/',
     getParentRoute: () => AppRoute,
   } as any)
-const AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute =
-  AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport.update({
-    id: '/estudos/$areaId/cursos/$courseId/modulos/$moduleId/',
-    path: '/estudos/$areaId/cursos/$courseId/modulos/$moduleId/',
+const AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute =
+  AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport.update({
+    id: '/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/',
+    path: '/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/',
     getParentRoute: () => AppRoute,
   } as any)
-const AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute =
-  AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport.update({
-    id: '/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId',
-    path: '/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId',
-    getParentRoute: () => AppRoute,
-  } as any)
+const AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute =
+  AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport.update(
+    {
+      id: '/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId',
+      path: '/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId',
+      getParentRoute: () => AppRoute,
+    } as any,
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -141,14 +150,15 @@ export interface FileRoutesByFullPath {
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
-  '/app/estudos/': typeof AppEstudosIndexRoute
+  '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
-  '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
+  '/app/meus-estudos/$areaId/': typeof AppMeusEstudosAreaIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -161,14 +171,15 @@ export interface FileRoutesByTo {
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/revisar': typeof AppRevisarRoute
   '/app': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
-  '/app/estudos': typeof AppEstudosIndexRoute
+  '/app/meus-estudos': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
-  '/app/estudos/$areaId': typeof AppEstudosAreaIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
+  '/app/meus-estudos/$areaId': typeof AppMeusEstudosAreaIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -183,14 +194,15 @@ export interface FileRoutesById {
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
+  '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
   '/app/lab/editor': typeof AppLabEditorRoute
-  '/app/estudos/': typeof AppEstudosIndexRoute
+  '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
-  '/app/estudos/$areaId/': typeof AppEstudosAreaIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/': typeof AppEstudosAreaIdCursosCourseIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
-  '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
+  '/app/meus-estudos/$areaId/': typeof AppMeusEstudosAreaIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
+  '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -206,14 +218,15 @@ export interface FileRouteTypes {
     | '/app/desempenho'
     | '/app/estudar'
     | '/app/planejamento'
+    | '/app/revisar'
     | '/app/'
     | '/app/lab/editor'
-    | '/app/estudos/'
+    | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
-    | '/app/estudos/$areaId/'
-    | '/app/estudos/$areaId/cursos/$courseId/'
-    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
-    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+    | '/app/meus-estudos/$areaId/'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -226,14 +239,15 @@ export interface FileRouteTypes {
     | '/app/desempenho'
     | '/app/estudar'
     | '/app/planejamento'
+    | '/app/revisar'
     | '/app'
     | '/app/lab/editor'
-    | '/app/estudos'
+    | '/app/meus-estudos'
     | '/app/biblioteca/baralho/$deckId'
-    | '/app/estudos/$areaId'
-    | '/app/estudos/$areaId/cursos/$courseId'
-    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId'
-    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+    | '/app/meus-estudos/$areaId'
+    | '/app/meus-estudos/$areaId/cursos/$courseId'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
   id:
     | '__root__'
     | '/'
@@ -247,14 +261,15 @@ export interface FileRouteTypes {
     | '/app/desempenho'
     | '/app/estudar'
     | '/app/planejamento'
+    | '/app/revisar'
     | '/app/'
     | '/app/lab/editor'
-    | '/app/estudos/'
+    | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
-    | '/app/estudos/$areaId/'
-    | '/app/estudos/$areaId/cursos/$courseId/'
-    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
-    | '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+    | '/app/meus-estudos/$areaId/'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
+    | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -317,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/revisar': {
+      id: '/app/revisar'
+      path: '/revisar'
+      fullPath: '/app/revisar'
+      preLoaderRoute: typeof AppRevisarRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/planejamento': {
       id: '/app/planejamento'
       path: '/planejamento'
@@ -352,11 +374,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBibliotecaRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/estudos/': {
-      id: '/app/estudos/'
-      path: '/estudos'
-      fullPath: '/app/estudos/'
-      preLoaderRoute: typeof AppEstudosIndexRouteImport
+    '/app/meus-estudos/': {
+      id: '/app/meus-estudos/'
+      path: '/meus-estudos'
+      fullPath: '/app/meus-estudos/'
+      preLoaderRoute: typeof AppMeusEstudosIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/lab/editor': {
@@ -366,11 +388,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLabEditorRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/estudos/$areaId/': {
-      id: '/app/estudos/$areaId/'
-      path: '/estudos/$areaId'
-      fullPath: '/app/estudos/$areaId/'
-      preLoaderRoute: typeof AppEstudosAreaIdIndexRouteImport
+    '/app/meus-estudos/$areaId/': {
+      id: '/app/meus-estudos/$areaId/'
+      path: '/meus-estudos/$areaId'
+      fullPath: '/app/meus-estudos/$areaId/'
+      preLoaderRoute: typeof AppMeusEstudosAreaIdIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/biblioteca/baralho/$deckId': {
@@ -380,25 +402,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBibliotecaBaralhoDeckIdRouteImport
       parentRoute: typeof AppBibliotecaRoute
     }
-    '/app/estudos/$areaId/cursos/$courseId/': {
-      id: '/app/estudos/$areaId/cursos/$courseId/'
-      path: '/estudos/$areaId/cursos/$courseId'
-      fullPath: '/app/estudos/$areaId/cursos/$courseId/'
-      preLoaderRoute: typeof AppEstudosAreaIdCursosCourseIdIndexRouteImport
+    '/app/meus-estudos/$areaId/cursos/$courseId/': {
+      id: '/app/meus-estudos/$areaId/cursos/$courseId/'
+      path: '/meus-estudos/$areaId/cursos/$courseId'
+      fullPath: '/app/meus-estudos/$areaId/cursos/$courseId/'
+      preLoaderRoute: typeof AppMeusEstudosAreaIdCursosCourseIdIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/': {
-      id: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
-      path: '/estudos/$areaId/cursos/$courseId/modulos/$moduleId'
-      fullPath: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
-      preLoaderRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport
+    '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/': {
+      id: '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
+      path: '/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId'
+      fullPath: '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
+      preLoaderRoute: typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': {
-      id: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
-      path: '/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
-      fullPath: '/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
-      preLoaderRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport
+    '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId': {
+      id: '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+      path: '/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+      fullPath: '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId'
+      preLoaderRoute: typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -422,13 +444,14 @@ interface AppRouteChildren {
   AppDesempenhoRoute: typeof AppDesempenhoRoute
   AppEstudarRoute: typeof AppEstudarRoute
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
+  AppRevisarRoute: typeof AppRevisarRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLabEditorRoute: typeof AppLabEditorRoute
-  AppEstudosIndexRoute: typeof AppEstudosIndexRoute
-  AppEstudosAreaIdIndexRoute: typeof AppEstudosAreaIdIndexRoute
-  AppEstudosAreaIdCursosCourseIdIndexRoute: typeof AppEstudosAreaIdCursosCourseIdIndexRoute
-  AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
-  AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute: typeof AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
+  AppMeusEstudosIndexRoute: typeof AppMeusEstudosIndexRoute
+  AppMeusEstudosAreaIdIndexRoute: typeof AppMeusEstudosAreaIdIndexRoute
+  AppMeusEstudosAreaIdCursosCourseIdIndexRoute: typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
+  AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute: typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
+  AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute: typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -437,16 +460,17 @@ const AppRouteChildren: AppRouteChildren = {
   AppDesempenhoRoute: AppDesempenhoRoute,
   AppEstudarRoute: AppEstudarRoute,
   AppPlanejamentoRoute: AppPlanejamentoRoute,
+  AppRevisarRoute: AppRevisarRoute,
   AppIndexRoute: AppIndexRoute,
   AppLabEditorRoute: AppLabEditorRoute,
-  AppEstudosIndexRoute: AppEstudosIndexRoute,
-  AppEstudosAreaIdIndexRoute: AppEstudosAreaIdIndexRoute,
-  AppEstudosAreaIdCursosCourseIdIndexRoute:
-    AppEstudosAreaIdCursosCourseIdIndexRoute,
-  AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute:
-    AppEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute,
-  AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute:
-    AppEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute,
+  AppMeusEstudosIndexRoute: AppMeusEstudosIndexRoute,
+  AppMeusEstudosAreaIdIndexRoute: AppMeusEstudosAreaIdIndexRoute,
+  AppMeusEstudosAreaIdCursosCourseIdIndexRoute:
+    AppMeusEstudosAreaIdCursosCourseIdIndexRoute,
+  AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute:
+    AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute,
+  AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute:
+    AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

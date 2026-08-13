@@ -167,7 +167,7 @@ function QuickCreate() {
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>Criar rapidamente</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setAreaFormOpen(true)}>Nova área</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setAreaFormOpen(true)}>Nova área de estudo</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setCourseFormOpen(true)}>Novo curso</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setModuleFormOpen(true)}>Novo módulo</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setLessonFormOpen(true)}>Nova aula</DropdownMenuItem>

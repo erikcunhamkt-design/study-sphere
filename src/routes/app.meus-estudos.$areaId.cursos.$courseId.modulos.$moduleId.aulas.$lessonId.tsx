@@ -48,7 +48,7 @@ import {
 } from "@/features/studies/utils";
 
 export const Route = createFileRoute(
-  "/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId",
+  "/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/aulas/$lessonId",
 )({
   // O caderno da aula (BlockNote) não pode rodar no servidor — mesmo
   // motivo do /app/lab/editor (Fase 03.0): acessa window/document na
@@ -129,7 +129,7 @@ function LessonNotFound({
         <div className="mt-6">
           <Button asChild>
             <Link
-              to="/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId"
+              to="/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId"
               params={{ areaId, courseId, moduleId }}
             >
               Voltar para o módulo
@@ -209,13 +209,13 @@ function LessonContent({
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/app/estudos">Estudos</Link>
+              <Link to="/app/meus-estudos">Estudos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/app/estudos/$areaId" params={{ areaId }}>
+              <Link to="/app/meus-estudos/$areaId" params={{ areaId }}>
                 {area.name}
               </Link>
             </BreadcrumbLink>
@@ -223,7 +223,7 @@ function LessonContent({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/app/estudos/$areaId/cursos/$courseId" params={{ areaId, courseId }}>
+              <Link to="/app/meus-estudos/$areaId/cursos/$courseId" params={{ areaId, courseId }}>
                 {course.name}
               </Link>
             </BreadcrumbLink>
@@ -232,7 +232,7 @@ function LessonContent({
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link
-                to="/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId"
+                to="/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId"
                 params={{ areaId, courseId, moduleId }}
               >
                 {courseModule.name}
@@ -263,7 +263,7 @@ function LessonContent({
           <p className="text-xs text-muted-foreground">
             Curso:{" "}
             <Link
-              to="/app/estudos/$areaId/cursos/$courseId"
+              to="/app/meus-estudos/$areaId/cursos/$courseId"
               params={{ areaId, courseId }}
               className="underline hover:text-foreground"
             >
@@ -271,7 +271,7 @@ function LessonContent({
             </Link>{" "}
             · Módulo:{" "}
             <Link
-              to="/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId"
+              to="/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId"
               params={{ areaId, courseId, moduleId }}
               className="underline hover:text-foreground"
             >
@@ -342,7 +342,7 @@ function LessonContent({
         lesson={lesson}
         onDeleted={() =>
           navigate({
-            to: "/app/estudos/$areaId/cursos/$courseId/modulos/$moduleId",
+            to: "/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId",
             params: { areaId, courseId, moduleId },
           })
         }

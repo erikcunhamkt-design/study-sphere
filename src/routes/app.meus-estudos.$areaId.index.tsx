@@ -61,7 +61,7 @@ import {
   searchCourses,
 } from "@/features/studies/utils";
 
-export const Route = createFileRoute("/app/estudos/$areaId/")({
+export const Route = createFileRoute("/app/meus-estudos/$areaId/")({
   component: StudyAreaDetailPage,
 });
 
@@ -96,7 +96,7 @@ function AreaNotFound() {
         </p>
         <div className="mt-6">
           <Button asChild>
-            <Link to="/app/estudos">Voltar para Estudos</Link>
+            <Link to="/app/meus-estudos">Voltar para Estudos</Link>
           </Button>
         </div>
       </div>
@@ -240,7 +240,7 @@ function AreaContent({
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/app/estudos">Estudos</Link>
+              <Link to="/app/meus-estudos">Estudos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -379,7 +379,7 @@ function AreaContent({
         courseCount={activeCourseCount}
         moduleCount={areaModuleCount}
         lessonCount={areaLessonCount}
-        onDeleted={() => navigate({ to: "/app/estudos" })}
+        onDeleted={() => navigate({ to: "/app/meus-estudos" })}
       />
       <CourseFormDialog
         open={courseFormOpen}

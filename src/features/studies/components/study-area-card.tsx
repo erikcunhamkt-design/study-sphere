@@ -58,7 +58,7 @@ export function StudyAreaCard({
       ) : null}
 
       <Link
-        to="/app/estudos/$areaId"
+        to="/app/meus-estudos/$areaId"
         params={{ areaId: area.id }}
         className="flex min-w-0 flex-1 items-start gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >

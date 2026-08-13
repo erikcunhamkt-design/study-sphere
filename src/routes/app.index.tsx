@@ -88,7 +88,7 @@ function DashboardPage() {
           </p>
           <div className="pt-4 animate-in fade-in slide-in-from-bottom-5 duration-1000 delay-300 fill-mode-both">
             <Button asChild size="lg" className="rounded-full px-8 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95">
-              <Link to="/app/estudos">
+              <Link to="/app/meus-estudos">
                 <BookOpen className="mr-2 h-5 w-5" aria-hidden /> {hero.cta}
               </Link>
             </Button>
@@ -158,7 +158,7 @@ function DashboardPage() {
               }
               action={
                 <Button asChild variant="outline" size="sm">
-                  <Link to="/app/estudos">Abrir Estudos</Link>
+                  <Link to="/app/meus-estudos">Abrir Estudos</Link>
                 </Button>
               }
             />
@@ -171,7 +171,7 @@ function DashboardPage() {
                 return (
                   <Link
                     key={course.id}
-                    to="/app/estudos/$areaId/cursos/$courseId"
+                    to="/app/meus-estudos/$areaId/cursos/$courseId"
                     params={{ areaId: course.study_area_id, courseId: course.id }}
                     className="flex items-center justify-between gap-3 rounded-2xl border border-border/50 bg-surface/40 backdrop-blur-sm px-5 py-4 transition-all hover:border-primary/40 hover:bg-surface/60 hover:shadow-sm group"
                   >

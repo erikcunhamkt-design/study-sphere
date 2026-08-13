@@ -214,7 +214,7 @@ export function validateReorderIds(
 }
 
 /**
- * Um curso só é válido dentro da rota /app/estudos/$areaId/cursos/$courseId
+ * Um curso só é válido dentro da rota /app/meus-estudos/$areaId/cursos/$courseId
  * se ele existir E pertencer à área da própria URL — sem essa segunda
  * checagem, trocar o segmento $areaId na barra de endereço por qualquer
  * outra área (inclusive uma que não seja sua) mostraria um curso de outra
