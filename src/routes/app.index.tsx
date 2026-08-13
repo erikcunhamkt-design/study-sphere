@@ -1,28 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, Clock, Layers, ListChecks, Play, Sparkles, Target } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { BookOpen, Layers, ListChecks, Play, Sparkles, Target } from "lucide-react";
 import { useMemo } from "react";
 import { useDashboardState } from "@/features/dashboard/hooks/use-dashboard-state";
 import { NextStepAction, MiniStatCard } from "@/features/dashboard/components/dashboard-ui";
 
-import { EmptyState, PageHeader, Section } from "@/components/layout/page-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, usePreferences } from "@/hooks/use-preferences";
 import { useAuth } from "@/hooks/use-auth";
 import { resolveTimezone, startOfDayIso } from "@/lib/timezone";
-import { useAllCourses } from "@/features/studies/hooks/use-courses";
-import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
-import { useAllLessons } from "@/features/studies/hooks/use-lessons";
-import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
-import { calculateCourseProgress, COURSE_STATUS_LABELS } from "@/features/studies/utils";
-import { useDueFlashcards } from "@/features/flashcards/hooks";
 import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
-import {
-  useRecentStudySessions,
-  useStudySessionSecondsSince,
-} from "@/features/study-sessions/hooks";
+import { useStudySessionSecondsSince } from "@/features/study-sessions/hooks";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
