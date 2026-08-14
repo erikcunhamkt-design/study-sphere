@@ -133,29 +133,41 @@ function PomodoroRunner({
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-surface p-6 text-center">
-      <div className="flex items-center justify-between text-left">
-        <p className="text-sm text-muted-foreground">
-          Ciclo {state.cycleNumber}/{prefs.pomodoro_cycles} · {state.cyclesCompleted} concluído
-          {state.cyclesCompleted === 1 ? "" : "s"}
-        </p>
-        <Button variant="ghost" size="sm" onClick={onDone}>
-          Sair sem finalizar
-        </Button>
+    <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-12 text-center transition-all">
+      <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
+      
+      <div className="relative z-10 space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+              Ciclo {state.cycleNumber}/{prefs.pomodoro_cycles}
+            </span>
+            <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+              {state.cyclesCompleted} concluídos
+            </span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-primary">
+            Sair sem salvar
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary/60">{PHASE_LABELS[state.phase]}</p>
+          <p className="text-7xl md:text-8xl font-black tabular-nums tracking-tighter text-foreground drop-shadow-sm">
+            {formatSeconds(state.secondsLeftInPhase)}
+          </p>
+        </div>
+
+        <div className="pt-4">
+          <Button
+            onClick={() => void handleFinishNow()}
+            disabled={finishSession.isPending}
+            className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-base shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform active:scale-95"
+          >
+            Finalizar Sessão
+          </Button>
+        </div>
       </div>
-
-      <p className="text-sm font-medium text-primary">{PHASE_LABELS[state.phase]}</p>
-      <p className="text-5xl font-semibold tabular-nums text-foreground">
-        {formatSeconds(state.secondsLeftInPhase)}
-      </p>
-
-      <Button
-        variant="outline"
-        onClick={() => void handleFinishNow()}
-        disabled={finishSession.isPending}
-      >
-        Finalizar agora
-      </Button>
     </div>
   );
 }
