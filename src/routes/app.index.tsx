@@ -80,9 +80,9 @@ function DashboardPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-10 pb-20 px-6 md:px-8 pt-8">
       {/* Header Contextual */}
-      <div className="space-y-1">
+      <div className="space-y-0.5">
         <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">{greeting}, {displayName}.</h1>
-        <p className="text-lg md:text-xl text-muted-foreground/60 font-medium tracking-tight">O que vamos aprender hoje?</p>
+        <p className="text-lg md:text-xl text-muted-foreground/40 font-medium tracking-tight">O que vamos aprender hoje?</p>
       </div>
 
       {/* 1. HERO — AÇÃO PRINCIPAL */}
