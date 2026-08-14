@@ -47,8 +47,8 @@ export function useStudyState() {
           session: activeSession,
           lesson,
           course,
-          title: lesson?.title || "Sessão em andamento",
-          context: course?.name || "Estudo livre"
+          title: lesson?.title || (activeSession.is_free_session ? "Sessão Livre" : "Sessão em andamento"),
+          context: course?.name || (activeSession.is_free_session ? "Estudo Livre" : undefined)
         }
       };
     }
