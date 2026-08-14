@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layers, ListChecks, ChevronLeft, Play, RotateCcw } from "lucide-react";
+import { Layers, ListChecks, ChevronLeft, Play, RotateCcw, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDueFlashcards, useDueFlashcardsByDeck, useFlashcardsByDeck } from "@/features/flashcards/hooks";
 import { ReviewSession } from "@/features/flashcards/review-session";
