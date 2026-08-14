@@ -2,11 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { 
   ArrowRight, 
   Brain, 
-  Calendar, 
   ChevronRight, 
   Clock, 
-  Flame, 
-  Library, 
   Plus, 
   Zap,
   BookOpen
@@ -16,7 +13,6 @@ import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
 import { useStudyState } from "@/features/study-sessions/use-study-state";
 import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
 import type { StudyMethod, StudySessionRow } from "@/features/study-sessions/types";
@@ -27,6 +23,7 @@ import { CornellSession } from "@/features/study-sessions/cornell-session";
 import { LivreSession } from "@/features/study-sessions/livre-session";
 import { RecordacaoAtivaHub } from "@/features/study-sessions/recordacao-ativa-hub";
 import { AddContentDialog } from "@/routes/app.index";
+import { StudyMethodsHub } from "@/features/study-sessions/components/study-methods-hub";
 
 export const Route = createFileRoute("/app/estudar")({
   validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; mode?: "review" | "training" } => {
