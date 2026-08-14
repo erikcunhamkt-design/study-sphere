@@ -305,7 +305,7 @@ function EstudarPage() {
         </div>
         
         <div className="grid grid-cols-1 gap-3">
-          {allCourses.length > 0 ? (
+          {allCourses.filter(c => !c.is_archived).length > 0 ? (
             allCourses.filter(c => !c.is_archived).map((course) => (
               <div 
                 key={course.id}
