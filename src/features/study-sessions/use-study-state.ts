@@ -6,6 +6,8 @@ import { usePlannedStudiesInRange } from "@/features/planned-studies/hooks";
 import { useAllCourses } from "@/features/studies/hooks/use-courses";
 import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
+import { useDueFlashcards } from "@/features/flashcards/hooks";
+import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
 import { calculateCourseProgress } from "@/features/studies/utils";
 
 export function useStudyState() {
@@ -16,12 +18,21 @@ export function useStudyState() {
   const { data: courses, isLoading: loadingCourses } = useAllCourses();
   const { data: allLessons, isLoading: loadingLessons } = useAllLessons();
   const { data: modules, isLoading: loadingModules } = useAllCourseModules();
+  const { data: dueFlashcards, isLoading: loadingDue } = useDueFlashcards();
+  const { data: areas, isLoading: loadingAreas } = useStudyAreas();
   
   // Planejamentos de hoje
   const today = format(new Date(), "yyyy-MM-dd");
   const { data: plannedToday, isLoading: loadingPlanned } = usePlannedStudiesInRange(today, today);
 
-  const isLoading = loadingSessions || loadingCourses || loadingLessons || loadingModules || loadingPlanned;
+  const isLoading = 
+    loadingSessions || 
+    loadingCourses || 
+    loadingLessons || 
+    loadingModules || 
+    loadingPlanned ||
+    loadingDue ||
+    loadingAreas;
 
   const state = useMemo(() => {
     if (isLoading) return { priority: "loading" as const, data: {} };
