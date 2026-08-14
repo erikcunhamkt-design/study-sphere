@@ -303,7 +303,7 @@ function EstudarPage() {
       )}
 
       {/* 3. CONTINUE (CURSOS EM ANDAMENTO) */}
-      {(priority === "continue" || priority === "recommendation" || priority === "resume") && (
+      {(priority === "recommendation" || priority === "resume" || priority === "start") && data.courses && data.courses.length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
@@ -311,7 +311,7 @@ function EstudarPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(priority === "continue" ? data.courses : allCourses.filter(c => c.status === "in_progress")).slice(0, 3).map((course: any) => (
+            {data.courses.filter((c: any) => c.status === "in_progress").slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
@@ -321,9 +321,9 @@ function EstudarPage() {
                   <h4 className="font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{course.name}</h4>
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-wider text-muted-foreground/40">
-                      <span>{course.progress || 0}% concluído</span>
+                      <span>{course.progress?.percent || 0}% concluído</span>
                     </div>
-                    <Progress value={course.progress || 0} className="h-1 bg-surface/40" />
+                    <Progress value={course.progress?.percent || 0} className="h-1 bg-surface/40" />
                   </div>
                 </div>
                 <div className="mt-6 flex items-center justify-between text-primary opacity-0 group-hover:opacity-100 transition-opacity">

@@ -36,7 +36,6 @@ export function useStudyState() {
 
   const state = useMemo(() => {
     // 1. RESUME: Sessão ativa (sempre prioritária)
-    // Filtramos apenas sessões válidas: ou tem lesson_id ou é explicitamente is_free_session
     const activeSession = inProgressSessions?.find(s => !s.ended_at && (!!s.lesson_id || s.is_free_session));
     
     if (activeSession) {
@@ -70,10 +69,9 @@ export function useStudyState() {
       };
     }
 
-    // 3. CONTINUAR: Cursos em andamento
-    // Validamos se o curso tem módulos e lições antes de sugerir continuar
-    const inProgressCourses = (courses ?? [])
-      .filter(c => !c.is_archived && c.status === "in_progress")
+    // 3. START: Cursos disponíveis (em andamento primeiro, depois não iniciados)
+    const availableCourses = (courses ?? [])
+      .filter(c => !c.is_archived)
       .map(c => {
         const courseModules = (modules ?? []).filter(m => m.course_id === c.id);
         const courseLessons = (allLessons ?? []).filter(l => l.course_id === c.id);
@@ -83,42 +81,26 @@ export function useStudyState() {
         };
       })
       .filter(c => c.progress.lessonCount > 0) // Só mostra se tiver conteúdo real
-      .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      .sort((a, b) => {
+        // Ordena: Em andamento primeiro, depois data de atualização
+        if (a.status === 'in_progress' && b.status !== 'in_progress') return -1;
+        if (a.status !== 'in_progress' && b.status === 'in_progress') return 1;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
 
-    if (inProgressCourses.length > 0) {
-      return {
-        priority: "resume" as const,
-        data: {
-          course: inProgressCourses[0],
-          title: inProgressCourses[0].name,
-          courses: inProgressCourses
-        }
-      };
-    }
+    const recommendedCourse = availableCourses[0];
 
-    // 4. START: Cursos disponíveis mas não iniciados
-    const availableCourses = (courses ?? [])
-      .filter(c => !c.is_archived && c.status === "not_started")
-      .map(c => {
-        const courseModules = (modules ?? []).filter(m => m.course_id === c.id);
-        const courseLessons = (allLessons ?? []).filter(l => l.course_id === c.id);
-        return {
-          ...c,
-          progress: calculateCourseProgress(courseModules, courseLessons)
-        };
-      })
-      .filter(c => c.progress.lessonCount > 0); // Só mostra se tiver conteúdo real
-
-    if (availableCourses.length > 0) {
+    if (recommendedCourse) {
       return {
         priority: "start" as const,
         data: {
+          course: recommendedCourse,
           courses: availableCourses
         }
       };
     }
 
-    // 5. ONBOARDING: Sem nada
+    // 4. ONBOARDING: Sem nada
     return { priority: "onboarding" as const, data: {} };
 
   }, [isLoading, inProgressSessions, plannedToday, courses, allLessons, modules]);
