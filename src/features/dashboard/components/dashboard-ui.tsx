@@ -99,7 +99,7 @@ export function DayProgress({ current, goal, reviews }: { current: number; goal:
   const percent = Math.min(Math.round((current / goal) * 100), 100);
   
   return (
-    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 space-y-4 flex flex-col justify-center h-full">
+    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 flex flex-col justify-center">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="space-y-1">
           <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Progresso do Dia</h3>
@@ -116,7 +116,7 @@ export function DayProgress({ current, goal, reviews }: { current: number; goal:
         </div>
       </div>
       
-      <div className="space-y-2">
+      <div className="mt-4 space-y-2">
         <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/20 select-none">
           <span className="flex items-center gap-1.5">
             {percent}% <span className="opacity-50">concluído</span>
@@ -137,16 +137,16 @@ export function SectionHeader({ title }: { title: string }) {
 
 export function MasteryCard({ percent, trend }: { percent?: number; trend?: number }) {
   return (
-    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group h-full flex flex-col justify-center">
+    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Mapa de Domínio</h3>
         <Brain className="h-3.5 w-3.5 text-muted-foreground/10 group-hover:text-primary/20 transition-colors" />
       </div>
       
       {percent === undefined ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="space-y-1">
-            <p className="text-xl font-black tracking-tight text-foreground leading-snug">Seu nível ainda está sendo construído.</p>
+            <p className="text-lg font-black tracking-tight text-foreground leading-snug">Seu nível ainda está sendo construído.</p>
             <p className="text-[11px] text-muted-foreground/40 leading-relaxed font-medium max-w-[90%]">
               O Dominus identificará seus pontos fortes e lacunas conforme você estudar e responder questões.
             </p>
