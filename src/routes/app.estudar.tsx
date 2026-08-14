@@ -319,7 +319,7 @@ function EstudarPage() {
                   <div className="space-y-0.5">
                     <h4 className="font-bold tracking-tight text-foreground">{course.name}</h4>
                     <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-wider">
-                      {course.status === "completed" ? "Finalizado" : course.status === "in_progress" ? "Em andamento" : "Não iniciado"} · {course.progress?.percent || 0}%
+                      {COURSE_STATUS_LABELS[course.status as keyof typeof COURSE_STATUS_LABELS]}
                     </p>
                   </div>
                 </div>
