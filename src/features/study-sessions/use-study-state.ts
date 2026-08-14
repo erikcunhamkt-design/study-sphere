@@ -35,9 +35,7 @@ export function useStudyState() {
     loadingAreas;
 
   const state = useMemo(() => {
-    if (isLoading) return { priority: "loading" as const, data: {} };
-
-    // 1. RESUME: Sessão ativa
+    // 1. RESUME: Sessão ativa (sempre prioritária)
     const activeSession = inProgressSessions?.find(s => !s.ended_at);
     if (activeSession) {
       const lesson = allLessons?.find(l => l.id === activeSession.lesson_id);
@@ -54,6 +52,8 @@ export function useStudyState() {
         }
       };
     }
+
+    if (isLoading) return { priority: "loading" as const, data: {} };
 
     // 2. RECOMMENDATION: Próximo passo planejado (não concluído)
     const nextPlanned = plannedToday?.find(p => p.status === "planned");
