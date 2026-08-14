@@ -167,8 +167,8 @@ export function MasteryCard({ percent, trend }: { percent?: number; trend?: numb
         <div className="flex items-end justify-between">
           <div>
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-black tracking-tighter text-foreground">{percent}%</span>
-              <span className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">Domínio</span>
+              <span className="text-3xl font-black tracking-tighter text-foreground">{percent}%</span>
+              <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Domínio</span>
             </div>
             {trend !== undefined && (
               <div className="mt-2 flex items-center gap-1.5 text-[10px] font-black text-emerald-500 uppercase tracking-tighter">
