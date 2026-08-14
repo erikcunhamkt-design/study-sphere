@@ -41,6 +41,79 @@ export const Route = createFileRoute("/app/")({
   component: DashboardPage,
 });
 
+export function AddContentDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+  const navigate = useNavigate();
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl bg-surface/95 backdrop-blur-xl border-border/40 rounded-[2rem] p-8">
+        <DialogHeader className="space-y-3 mb-8">
+          <DialogTitle className="text-3xl font-black tracking-tight">O que você quer adicionar?</DialogTitle>
+          <DialogDescription className="text-base font-medium text-muted-foreground">
+            Escolha o formato ideal para organizar seu conhecimento.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <AddOptionCard 
+            icon={BookOpen}
+            title="Curso"
+            description="Estruture seu estudo em módulos e aulas."
+            onClick={() => {
+              onOpenChange(false);
+              navigate({ to: "/app/meus-estudos" });
+            }}
+          />
+          <AddOptionCard 
+            icon={FileText}
+            title="PDF"
+            description="Importe materiais e documentos de estudo."
+            onClick={() => {
+              onOpenChange(false);
+              navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
+            }}
+          />
+          <AddOptionCard 
+            icon={Book}
+            title="Livro"
+            description="Cadastre livros e referências bibliográficas."
+            onClick={() => {
+              onOpenChange(false);
+              navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
+            }}
+          />
+          <AddOptionCard 
+            icon={Type}
+            title="Texto"
+            description="Crie e organize suas próprias anotações."
+            onClick={() => {
+              onOpenChange(false);
+              navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
+            }}
+          />
+          <AddOptionCard 
+            icon={LinkIcon}
+            title="Link"
+            description="Salve páginas da web e materiais online."
+            onClick={() => {
+              onOpenChange(false);
+              navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
+            }}
+          />
+          <AddOptionCard 
+            icon={Layers}
+            title="Baralho"
+            description="Conjunto de flashcards para memorização."
+            onClick={() => {
+              onOpenChange(false);
+              navigate({ to: "/app/biblioteca", search: { tab: "decks" } });
+            }}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
