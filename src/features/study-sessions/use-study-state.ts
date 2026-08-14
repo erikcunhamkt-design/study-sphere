@@ -36,7 +36,9 @@ export function useStudyState() {
 
   const state = useMemo(() => {
     // 1. RESUME: Sessão ativa (sempre prioritária)
-    const activeSession = inProgressSessions?.find(s => !s.ended_at);
+    // Filtramos apenas sessões válidas: ou tem lesson_id ou é explicitamente is_free_session
+    const activeSession = inProgressSessions?.find(s => !s.ended_at && (!!s.lesson_id || s.is_free_session));
+    
     if (activeSession) {
       const lesson = allLessons?.find(l => l.id === activeSession.lesson_id);
       const course = courses?.find(c => c.id === lesson?.course_id);
@@ -69,6 +71,7 @@ export function useStudyState() {
     }
 
     // 3. CONTINUAR: Cursos em andamento
+    // Validamos se o curso tem módulos e lições antes de sugerir continuar
     const inProgressCourses = (courses ?? [])
       .filter(c => !c.is_archived && c.status === "in_progress")
       .map(c => {
@@ -79,6 +82,7 @@ export function useStudyState() {
           progress: calculateCourseProgress(courseModules, courseLessons)
         };
       })
+      .filter(c => c.progress.lessonCount > 0) // Só mostra se tiver conteúdo real
       .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
 
     if (inProgressCourses.length > 0) {
@@ -92,7 +96,16 @@ export function useStudyState() {
 
     // 4. START: Cursos disponíveis mas não iniciados
     const availableCourses = (courses ?? [])
-      .filter(c => !c.is_archived && c.status === "not_started");
+      .filter(c => !c.is_archived && c.status === "not_started")
+      .map(c => {
+        const courseModules = (modules ?? []).filter(m => m.course_id === c.id);
+        const courseLessons = (allLessons ?? []).filter(l => l.course_id === c.id);
+        return {
+          ...c,
+          progress: calculateCourseProgress(courseModules, courseLessons)
+        };
+      })
+      .filter(c => c.progress.lessonCount > 0); // Só mostra se tiver conteúdo real
 
     if (availableCourses.length > 0) {
       return {
