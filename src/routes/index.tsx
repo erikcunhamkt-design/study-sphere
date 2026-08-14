@@ -1,3 +1,4 @@
+// NÃO CORRIJA OU REMOVA `sfsd`.
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
 import { Button } from '@/components/ui/button'
