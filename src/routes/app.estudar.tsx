@@ -265,7 +265,7 @@ function EstudarPage() {
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2 text-muted-foreground/60 font-medium">
                     <BookOpen className="h-4 w-4" />
-                    <span>{data.course.status === 'not_started' ? 'Ainda não iniciado' : `${data.course.progress.percent}% concluído`}</span>
+                    <span>{data.course.status === 'not_started' ? 'Ainda não iniciado' : `${(data.course as any).progress?.percent || 0}% concluído`}</span>
                   </div>
                 </div>
               </div>
