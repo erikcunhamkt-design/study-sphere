@@ -205,7 +205,7 @@ function DashboardPage() {
             <AddOptionCard 
               icon={BookOpen}
               title="Curso"
-              description="Organize um curso completo em módulos e aulas estruturadas."
+              description="Estruture seu estudo em módulos e aulas."
               onClick={() => {
                 setAddContentOpen(false);
                 navigate({ to: "/app/meus-estudos" });
@@ -213,8 +213,35 @@ function DashboardPage() {
             />
             <AddOptionCard 
               icon={FileText}
-              title="Material Avulso"
-              description="Adicione PDFs, links ou textos para consulta e revisão rápida."
+              title="PDF"
+              description="Importe materiais e documentos de estudo."
+              onClick={() => {
+                setAddContentOpen(false);
+                navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
+              }}
+            />
+            <AddOptionCard 
+              icon={Book}
+              title="Livro"
+              description="Cadastre livros e referências bibliográficas."
+              onClick={() => {
+                setAddContentOpen(false);
+                navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
+              }}
+            />
+            <AddOptionCard 
+              icon={Type}
+              title="Texto"
+              description="Crie e organize suas próprias anotações."
+              onClick={() => {
+                setAddContentOpen(false);
+                navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
+              }}
+            />
+            <AddOptionCard 
+              icon={LinkIcon}
+              title="Link"
+              description="Salve páginas da web e materiais online."
               onClick={() => {
                 setAddContentOpen(false);
                 navigate({ to: "/app/biblioteca", search: { tab: "materials" } });
@@ -223,19 +250,10 @@ function DashboardPage() {
             <AddOptionCard 
               icon={Layers}
               title="Baralho"
-              description="Crie um novo conjunto de flashcards para memorização ativa."
+              description="Conjunto de flashcards para memorização."
               onClick={() => {
                 setAddContentOpen(false);
                 navigate({ to: "/app/biblioteca", search: { tab: "decks" } });
-              }}
-            />
-            <AddOptionCard 
-              icon={ListChecks}
-              title="Questões"
-              description="Cadastre questões avulsas para praticar temas específicos."
-              onClick={() => {
-                setAddContentOpen(false);
-                navigate({ to: "/app/biblioteca", search: { tab: "questions" } });
               }}
             />
           </div>
