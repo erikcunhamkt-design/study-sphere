@@ -2,11 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { 
   ArrowRight, 
   Brain, 
-  Calendar, 
   ChevronRight, 
   Clock, 
-  Flame, 
-  Library, 
   Plus, 
   Zap,
   BookOpen
@@ -16,7 +13,6 @@ import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
 import { useStudyState } from "@/features/study-sessions/use-study-state";
 import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
 import type { StudyMethod, StudySessionRow } from "@/features/study-sessions/types";
@@ -27,6 +23,7 @@ import { CornellSession } from "@/features/study-sessions/cornell-session";
 import { LivreSession } from "@/features/study-sessions/livre-session";
 import { RecordacaoAtivaHub } from "@/features/study-sessions/recordacao-ativa-hub";
 import { AddContentDialog } from "@/routes/app.index";
+import { StudyMethodsHub } from "@/features/study-sessions/components/study-methods-hub";
 
 export const Route = createFileRoute("/app/estudar")({
   validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; mode?: "review" | "training" } => {
@@ -190,7 +187,16 @@ function EstudarPage() {
                 </div>
               </div>
               <Button 
-                onClick={() => setActiveMethod("livre")} // Fallback para início de sessão
+                onClick={() => {
+                  if (data.planned?.id) {
+                    // Se for planejado, podemos abrir direto ou deixar escolher o método
+                    // Por simplicidade, abrimos o seletor de métodos mas mantendo o plannedId
+                    const element = document.getElementById("metodos-selecao");
+                    element?.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    setActiveMethod("livre");
+                  }
+                }}
                 size="lg" 
                 className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg group-hover:scale-105 transition-transform"
               >
@@ -201,7 +207,17 @@ function EstudarPage() {
         ) : null}
       </section>
 
-      {/* 2. CONTINUE (CURSOS EM ANDAMENTO) */}
+      {/* 2. HUB DE MÉTODOS (O CORAÇÃO DO ESTUDAR) */}
+      <section id="metodos-selecao" className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">O que você vai fazer?</h3>
+          <span className="h-px flex-1 mx-6 bg-border/20" />
+        </div>
+        
+        <StudyMethodsHub onSelectMethod={setActiveMethod} />
+      </section>
+
+      {/* 3. CONTINUE (CURSOS EM ANDAMENTO) */}
       {(priority === "continue" || priority === "recommendation" || priority === "resume") && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
@@ -213,6 +229,11 @@ function EstudarPage() {
             {(priority === "continue" ? data.courses : allCourses.filter(c => c.status === "in_progress")).slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
+                onClick={() => {
+                   // Ao clicar num curso, poderíamos filtrar os métodos ou ir para o curso
+                   // Para o cockpit de ação, vamos focar em abrir o curso na biblioteca ou sugerir iniciar livre
+                   setActiveMethod("livre");
+                }}
                 className="group flex flex-col p-6 rounded-[1.5rem] border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30"
               >
                 <div className="flex-1 space-y-3">
@@ -225,7 +246,7 @@ function EstudarPage() {
                   </div>
                 </div>
                 <div className="mt-6 flex items-center justify-between text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-[10px] font-black uppercase tracking-widest">Continuar</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Estudar agora</span>
                   <ChevronRight className="h-4 w-4" />
                 </div>
               </button>
@@ -234,10 +255,10 @@ function EstudarPage() {
         </section>
       )}
 
-      {/* 3. MEUS ESTUDOS (TODOS OS CURSOS) */}
+      {/* 4. MEUS ESTUDOS (TODOS OS CURSOS) */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Meus Estudos</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Todos os Conteúdos</h3>
           <span className="h-px flex-1 mx-6 bg-border/20" />
         </div>
         
@@ -272,7 +293,7 @@ function EstudarPage() {
                   </div>
                   
                   <Button variant="ghost" size="sm" className="h-9 px-4 rounded-full text-muted-foreground/40 hover:text-primary font-black uppercase text-[10px] tracking-widest">
-                    Ações <ChevronRight className="ml-1 h-3 w-3" />
+                    Gerenciar <ChevronRight className="ml-1 h-3 w-3" />
                   </Button>
                 </div>
               </div>

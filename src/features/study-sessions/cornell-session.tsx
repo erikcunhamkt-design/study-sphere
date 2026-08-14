@@ -83,54 +83,67 @@ export function CornellSession({ resumingSession, onDone, plannedId }: CornellSe
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-surface p-6">
-      <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={onDone}>
-          Sair sem finalizar
+    <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-10 transition-all">
+      <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
+      
+      <div className="relative z-10 space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+              Método Cornell
+            </span>
+            <p className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+              Ação: Anotação estruturada
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-primary">
+            Sair sem salvar
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="md:col-span-1 space-y-4">
+            <Label htmlFor="cornell-pistas" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Pistas</Label>
+            <Textarea
+              id="cornell-pistas"
+              value={pistas}
+              onChange={(e) => setPistas(e.target.value)}
+              className="min-h-[200px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-sm font-medium resize-none p-4"
+              placeholder="Palavras-chave e perguntas..."
+            />
+          </div>
+          <div className="md:col-span-3 space-y-4">
+            <Label htmlFor="cornell-notas" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Notas Principais</Label>
+            <Textarea
+              id="cornell-notas"
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+              className="min-h-[200px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-base font-medium resize-none p-6"
+              placeholder="Anotações durante o estudo..."
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Label htmlFor="cornell-resumo" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Resumo Final</Label>
+          <Textarea
+            id="cornell-resumo"
+            value={resumo}
+            onChange={(e) => setResumo(e.target.value)}
+            className="min-h-[100px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-base font-medium resize-none p-6"
+            placeholder="Resuma o conteúdo em poucas frases..."
+          />
+        </div>
+
+        <Button
+          onClick={() => void handleFinish()}
+          disabled={finishSession.isPending}
+          size="lg"
+          className="w-full h-16 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform active:scale-95"
+        >
+          Concluir Notas
         </Button>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="cornell-notas">Notas</Label>
-        <Textarea
-          id="cornell-notas"
-          value={notas}
-          onChange={(e) => setNotas(e.target.value)}
-          rows={8}
-          maxLength={20000}
-          placeholder="Anotações principais durante o estudo"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="cornell-pistas">Pistas</Label>
-        <Textarea
-          id="cornell-pistas"
-          value={pistas}
-          onChange={(e) => setPistas(e.target.value)}
-          rows={4}
-          maxLength={20000}
-          placeholder="Palavras-chave e perguntas para revisar depois"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="cornell-resumo">Resumo</Label>
-        <Textarea
-          id="cornell-resumo"
-          value={resumo}
-          onChange={(e) => setResumo(e.target.value)}
-          rows={4}
-          maxLength={20000}
-          placeholder="Resuma o conteúdo em poucas frases"
-        />
-      </div>
-
-      <Button
-        onClick={() => void handleFinish()}
-        disabled={finishSession.isPending}
-        className="w-full"
-      >
-        Concluir
-      </Button>
     </div>
   );
 }

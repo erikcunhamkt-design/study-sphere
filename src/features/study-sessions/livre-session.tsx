@@ -99,32 +99,45 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-surface p-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium tabular-nums text-foreground">
-          {formatSeconds(elapsed)} decorridos
-        </p>
-        <Button variant="ghost" size="sm" onClick={onDone}>
-          Sair sem finalizar
+    <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-10 transition-all">
+      <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
+      
+      <div className="relative z-10 space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+              Estudo Livre
+            </span>
+            <p className="text-[10px] font-bold tabular-nums text-muted-foreground/40 uppercase tracking-widest">
+              {formatSeconds(elapsed)} decorridos
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-primary">
+            Sair sem salvar
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Nota da Sessão (opcional)</Label>
+          <Textarea
+            id="livre-nota"
+            value={nota}
+            onChange={(e) => setNota(e.target.value)}
+            placeholder="O que você está estudando agora?"
+            className="min-h-[160px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-base font-medium resize-none p-6"
+            maxLength={20000}
+          />
+        </div>
+
+        <Button
+          onClick={() => void handleFinish()}
+          disabled={finishSession.isPending || !session}
+          size="lg"
+          className="w-full h-16 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform active:scale-95"
+        >
+          Concluir Estudo
         </Button>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="livre-nota">Nota (opcional)</Label>
-        <Textarea
-          id="livre-nota"
-          value={nota}
-          onChange={(e) => setNota(e.target.value)}
-          rows={4}
-          maxLength={20000}
-        />
-      </div>
-      <Button
-        onClick={() => void handleFinish()}
-        disabled={finishSession.isPending || !session}
-        className="w-full"
-      >
-        Concluir
-      </Button>
     </div>
   );
 }

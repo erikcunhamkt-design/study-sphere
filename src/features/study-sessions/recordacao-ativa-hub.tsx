@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layers, ListChecks, ChevronLeft, Play, RotateCcw } from "lucide-react";
+import { Layers, ListChecks, ChevronLeft, Play, RotateCcw, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDueFlashcards, useDueFlashcardsByDeck, useFlashcardsByDeck } from "@/features/flashcards/hooks";
 import { ReviewSession } from "@/features/flashcards/review-session";
@@ -222,66 +222,80 @@ export function RecordacaoAtivaHub({
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-surface p-6">
-      <p className="text-sm text-muted-foreground">
-        Recordação ativa é testar sua memória em vez de reler — revise seus flashcards devidos ou
-        pratique questões do seu banco.
-      </p>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <button
-          onClick={() => {
-            setSelectedDeckId(undefined);
-            setView("flashcards");
-          }}
-          disabled={loadingFlashcards || !globalDueFlashcards?.length}
-          className="flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 transition-colors hover:border-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
-            <Layers className="h-4 w-4" aria-hidden />
-          </span>
-          <div className="text-left">
-            <span className="block text-sm font-medium text-foreground">Revisar geral</span>
-            <span className="text-xs text-muted-foreground">
-              {loadingFlashcards ? "Carregando..." : `${globalDueFlashcards?.length ?? 0} devidos`}
-            </span>
-          </div>
-        </button>
+    <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-10 transition-all">
+      <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
+      
+      <div className="relative z-10 space-y-8 text-center">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-2">
+          <Brain className="h-8 w-8 fill-primary/20" />
+        </div>
 
-        <button
-          onClick={() => setView("deck_selection")}
-          className="flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 transition-colors hover:border-primary/40"
-        >
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
-            <Layers className="h-4 w-4" aria-hidden />
-          </span>
-          <div className="text-left">
-            <span className="block text-sm font-medium text-foreground">Por baralho</span>
-            <span className="text-xs text-muted-foreground">
-              Escolha um acervo
-            </span>
-          </div>
-        </button>
+        <div className="space-y-2">
+          <h3 className="text-2xl font-black tracking-tighter">Recordação Ativa</h3>
+          <p className="text-sm text-muted-foreground/60 max-w-sm mx-auto font-medium">
+            Testar sua memória é mais eficiente que reler. Escolha como quer praticar hoje.
+          </p>
+        </div>
 
-        <button
-          onClick={() => setView("questions_list")}
-          className="flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 transition-colors hover:border-primary/40"
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <button
+            onClick={() => {
+              setSelectedDeckId(undefined);
+              setView("flashcards");
+            }}
+            disabled={loadingFlashcards || !globalDueFlashcards?.length}
+            className="group flex flex-col p-6 rounded-2xl border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors mb-4">
+              <Layers className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <span className="block text-sm font-bold text-foreground group-hover:text-primary transition-colors">Revisar geral</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                {loadingFlashcards ? "Carregando..." : `${globalDueFlashcards?.length ?? 0} devidos`}
+              </span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setView("deck_selection")}
+            className="group flex flex-col p-6 rounded-2xl border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors mb-4">
+              <Layers className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <span className="block text-sm font-bold text-foreground group-hover:text-primary transition-colors">Por baralho</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Escolher acervo
+              </span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setView("questions_list")}
+            className="group flex flex-col p-6 rounded-2xl border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors mb-4">
+              <ListChecks className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <span className="block text-sm font-bold text-foreground group-hover:text-primary transition-colors">Simulados</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Praticar questões
+              </span>
+            </div>
+          </button>
+        </div>
+
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 hover:text-primary"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
-            <ListChecks className="h-4 w-4" aria-hidden />
-          </span>
-          <div className="text-left">
-            <span className="block text-sm font-medium text-foreground">Praticar questões</span>
-            <span className="text-xs text-muted-foreground">Simulados</span>
-          </div>
-        </button>
+          Voltar ao Hub de Métodos
+        </Button>
       </div>
-      <button
-        type="button"
-        onClick={onBack}
-        className="text-sm text-muted-foreground underline-offset-2 hover:underline"
-      >
-        Voltar
-      </button>
     </div>
   );
 }
