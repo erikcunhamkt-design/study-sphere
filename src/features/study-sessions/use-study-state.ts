@@ -87,8 +87,10 @@ export function useStudyState() {
 
     if (inProgressCourses.length > 0) {
       return {
-        priority: "continue" as const,
+        priority: "resume" as const,
         data: {
+          course: inProgressCourses[0],
+          title: inProgressCourses[0].name,
           courses: inProgressCourses
         }
       };
