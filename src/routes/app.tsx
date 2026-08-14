@@ -27,14 +27,14 @@ function AppShell() {
   }, []);
 
   return (
-    <div className="min-h-dvh flex bg-background text-foreground">
+    <div className="flex h-dvh bg-background text-foreground overflow-hidden">
       <DesktopSidebar
         collapsed={collapsed}
         onToggle={() => updatePrefs.mutate({ sidebar_collapsed: !collapsed })}
       />
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 min-w-0 px-4 md:px-6 py-6 pb-24 lg:pb-6">
+        <main className="flex-1 min-w-0 overflow-y-auto px-4 md:px-6 py-6 pb-24 lg:pb-6 scroll-smooth">
           <div className="mx-auto w-full max-w-6xl">
             <Outlet />
           </div>
