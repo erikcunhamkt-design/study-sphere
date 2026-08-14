@@ -64,17 +64,25 @@ function EstudarPage() {
 
   const { priority, data, isLoading, allCourses } = useStudyState();
 
-  // Se já começou com um planejado, vamos preencher o selectedContent
+  // Se já começou com um planejado ou recomendação, vamos preencher o selectedContent
   useEffect(() => {
     if (priority === "recommendation" && data.planned && !selectedContent) {
       setSelectedContent({
-        id: data.planned.id,
+        id: data.planned.course_id || data.planned.id,
         name: data.planned.title,
-        status: 'in_progress', // Planejado geralmente implica que algo está em andamento ou pronto
-        type: 'course' // Por simplicidade agora
+        status: 'not_started',
+        type: 'course'
+      });
+    } else if ((priority === "resume" || priority === "start") && data.course && !selectedContent) {
+      // Para cursos em andamento ou não iniciados que o Dominus sugere
+      setSelectedContent({
+        id: data.course.id,
+        name: data.course.name,
+        status: data.course.status,
+        type: 'course'
       });
     }
-  }, [priority, data.planned]);
+  }, [priority, data.planned, data.course]);
   
   function backToHub() {
     setActiveMethod(null);
@@ -165,7 +173,7 @@ function EstudarPage() {
                </Button>
              </div>
           </div>
-        ) : priority === "resume" ? (
+        ) : priority === "resume" && data.session ? (
           <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-10 transition-all hover:bg-surface/40">
             <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
@@ -222,11 +230,11 @@ function EstudarPage() {
               </div>
               <Button 
                 onClick={() => {
-                  if (data.planned?.id) {
+                  if (data.planned?.course_id || data.planned?.id) {
                     handleContentSelect({
-                      id: data.planned.id,
+                      id: data.planned.course_id || data.planned.id,
                       name: data.planned.title,
-                      status: 'in_progress'
+                      status: 'not_started'
                     });
                   } else {
                     setActiveMethod("livre");
@@ -236,6 +244,37 @@ function EstudarPage() {
                 className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg group-hover:scale-105 transition-transform"
               >
                 Começar →
+              </Button>
+            </div>
+          </div>
+        ) : (priority === "resume" || priority === "start") && data.course ? (
+          <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 transition-all hover:border-primary/20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+                    <Zap className="h-3 w-3" /> SEU PRÓXIMO PASSO
+                  </span>
+                  <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+                    {data.course.status === 'not_started' ? 'Começar Estudo' : 'Continuar Aprendizado'}
+                  </span>
+                </div>
+                <h2 className="text-3xl font-black tracking-tighter leading-tight max-w-xl">
+                  {data.course.status === 'not_started' ? `Começar ${data.course.name}` : `Continuar ${data.course.name}`}
+                </h2>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2 text-muted-foreground/60 font-medium">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{data.course.status === 'not_started' ? 'Ainda não iniciado' : `${(data.course as any).progress?.percent || 0}% concluído`}</span>
+                  </div>
+                </div>
+              </div>
+              <Button 
+                onClick={() => handleContentSelect(data.course)}
+                size="lg" 
+                className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg group-hover:scale-105 transition-transform shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)]"
+              >
+                {data.course.status === 'not_started' ? 'Começar estudo →' : 'Continuar estudo →'}
               </Button>
             </div>
           </div>
@@ -264,7 +303,7 @@ function EstudarPage() {
       )}
 
       {/* 3. CONTINUE (CURSOS EM ANDAMENTO) */}
-      {(priority === "continue" || priority === "recommendation" || priority === "resume") && (
+      {(priority === "recommendation" || priority === "resume" || priority === "start") && data.courses && data.courses.length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
@@ -272,7 +311,7 @@ function EstudarPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(priority === "continue" ? data.courses : allCourses.filter(c => c.status === "in_progress")).slice(0, 3).map((course: any) => (
+            {data.courses.filter((c: any) => c.status === "in_progress").slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
@@ -282,9 +321,9 @@ function EstudarPage() {
                   <h4 className="font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{course.name}</h4>
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-wider text-muted-foreground/40">
-                      <span>{course.progress || 0}% concluído</span>
+                      <span>{course.progress?.percent || 0}% concluído</span>
                     </div>
-                    <Progress value={course.progress || 0} className="h-1 bg-surface/40" />
+                    <Progress value={course.progress?.percent || 0} className="h-1 bg-surface/40" />
                   </div>
                 </div>
                 <div className="mt-6 flex items-center justify-between text-primary opacity-0 group-hover:opacity-100 transition-opacity">
@@ -336,7 +375,7 @@ function EstudarPage() {
                   </div>
                   
                   <Button variant="ghost" size="sm" className="h-9 px-4 rounded-full text-muted-foreground/40 group-hover:text-primary font-black uppercase text-[10px] tracking-widest transition-colors">
-                    Continuar →
+                    {course.status === 'not_started' ? 'Começar →' : 'Continuar →'}
                   </Button>
                 </div>
               </div>
