@@ -80,16 +80,16 @@ function DashboardPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-10 pb-20 px-6 md:px-8 pt-8">
       {/* Header Contextual */}
-      <div className="space-y-2">
-        <h1 className="text-4xl font-black tracking-tight text-foreground">{greeting}, {displayName}.</h1>
-        <p className="text-xl text-muted-foreground font-medium tracking-tight">O que vamos aprender hoje?</p>
+      <div className="space-y-1">
+        <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">{greeting}, {displayName}.</h1>
+        <p className="text-lg md:text-xl text-muted-foreground/60 font-medium tracking-tight">O que vamos aprender hoje?</p>
       </div>
 
       {/* 1. HERO — AÇÃO PRINCIPAL */}
       <div className="w-full">
         {priority === "resume" && (
           <NextStepAction
-            title="Retomar"
+            title="RETOMAR"
             subtitle={data.displayTitle}
             context={data.displayContext}
             description={
@@ -120,7 +120,7 @@ function DashboardPage() {
 
         {priority === "review" && (
           <NextStepAction
-            title="Sua próxima ação"
+            title="SUA PRÓXIMA AÇÃO"
             subtitle="Revisar agora"
             description={`Você tem ${reviewsCount} ${reviewsCount === 1 ? 'revisão pendente' : 'revisões pendentes'}. Recupere esses conceitos antes de avançar.`}
             ctaText="Começar revisão"
@@ -132,7 +132,7 @@ function DashboardPage() {
 
         {priority === "recommendation" && (
           <NextStepAction
-            title="Próxima recomendação"
+            title="PRÓXIMA RECOMENDAÇÃO"
             subtitle={`Continuar ${data.course.name}`}
             description={`Você já concluiu ${data.progress.percent}% deste curso. Vamos para a próxima etapa?`}
             ctaText="Estudar agora"
@@ -144,7 +144,7 @@ function DashboardPage() {
 
         {priority === "start_study" && (
           <NextStepAction
-            title="Próximo passo"
+            title="PRÓXIMO PASSO"
             subtitle="Escolha seu primeiro estudo"
             description="Você já possui conteúdo disponível. Escolha por onde começar."
             ctaText="Começar estudo"
@@ -156,7 +156,7 @@ function DashboardPage() {
         
         {priority === "onboarding" && (
           <NextStepAction
-            title="Comece sua jornada"
+            title="COMECE SUA JORNADA"
             subtitle="Comece seu primeiro estudo"
             description="Adicione um conteúdo e dê início à sua primeira sessão."
             ctaText="Adicionar conteúdo"
@@ -167,7 +167,7 @@ function DashboardPage() {
 
         {priority === "maintenance" && (
           <NextStepAction
-            title="Tudo em dia"
+            title="TUDO EM DIA"
             subtitle="Continue avançando"
             description="Nenhuma revisão pendente. Escolha seu próximo passo de aprendizagem."
             ctaText="Continuar estudando"
