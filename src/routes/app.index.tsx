@@ -9,8 +9,7 @@ import {
   FileText,
   Book,
   Link as LinkIcon,
-  PlusCircle,
-  X
+  Type
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDashboardState } from "@/features/dashboard/hooks/use-dashboard-state";
