@@ -8,7 +8,7 @@ import {
   Zap,
   BookOpen
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { PageHeader } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { LivreSession } from "@/features/study-sessions/livre-session";
 import { RecordacaoAtivaHub } from "@/features/study-sessions/recordacao-ativa-hub";
 import { AddContentDialog } from "@/routes/app.index";
 import { StudyMethodsHub } from "@/features/study-sessions/components/study-methods-hub";
+import { COURSE_STATUS_LABELS } from "@/features/studies/utils";
 
 export const Route = createFileRoute("/app/estudar")({
   validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; mode?: "review" | "training" } => {
@@ -53,9 +54,28 @@ function EstudarPage() {
   const [activeMethod, setActiveMethod] = useState<StudyMethod | null>(initialMethod ?? null);
   const [resumingSession, setResumingSession] = useState<StudySessionRow | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  
+  const [selectedContent, setSelectedContent] = useState<{
+    id: string;
+    name: string;
+    status: string;
+    type: 'course' | 'lesson';
+  } | null>(null);
+  const methodsHubRef = useRef<HTMLDivElement>(null);
+
   const { priority, data, isLoading, allCourses } = useStudyState();
 
+  // Se já começou com um planejado, vamos preencher o selectedContent
+  useEffect(() => {
+    if (priority === "recommendation" && data.planned && !selectedContent) {
+      setSelectedContent({
+        id: data.planned.id,
+        name: data.planned.title,
+        status: 'in_progress', // Planejado geralmente implica que algo está em andamento ou pronto
+        type: 'course' // Por simplicidade agora
+      });
+    }
+  }, [priority, data.planned]);
+  
   function backToHub() {
     setActiveMethod(null);
     setResumingSession(null);
@@ -64,6 +84,20 @@ function EstudarPage() {
   function handleResume(session: StudySessionRow) {
     setResumingSession(session);
     setActiveMethod(session.method);
+  }
+
+  function handleContentSelect(content: any) {
+    setSelectedContent({
+      id: content.id,
+      name: content.name || content.title,
+      status: content.status || 'not_started',
+      type: content.title ? 'lesson' : 'course'
+    });
+    
+    // Scroll suave para o hub de métodos após selecionar conteúdo
+    setTimeout(() => {
+      methodsHubRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 
   // Renderização da Sessão Ativa
@@ -172,9 +206,9 @@ function EstudarPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
-                    <Brain className="h-3 w-3" /> PRÓXIMO PASSO
+                    <Brain className="h-3 w-3" /> SUA PRÓXIMA AÇÃO
                   </span>
-                  <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">Planejado para hoje</span>
+                  <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">Recomendação Dominus</span>
                 </div>
                 <h2 className="text-3xl font-black tracking-tighter leading-tight max-w-xl">
                   {data.title}
@@ -189,10 +223,11 @@ function EstudarPage() {
               <Button 
                 onClick={() => {
                   if (data.planned?.id) {
-                    // Se for planejado, podemos abrir direto ou deixar escolher o método
-                    // Por simplicidade, abrimos o seletor de métodos mas mantendo o plannedId
-                    const element = document.getElementById("metodos-selecao");
-                    element?.scrollIntoView({ behavior: 'smooth' });
+                    handleContentSelect({
+                      id: data.planned.id,
+                      name: data.planned.title,
+                      status: 'in_progress'
+                    });
                   } else {
                     setActiveMethod("livre");
                   }
@@ -200,28 +235,39 @@ function EstudarPage() {
                 size="lg" 
                 className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg group-hover:scale-105 transition-transform"
               >
-                Começar <ArrowRight className="ml-2 h-6 w-6" />
+                Começar →
               </Button>
             </div>
           </div>
         ) : null}
       </section>
 
-      {/* 2. HUB DE MÉTODOS (O CORAÇÃO DO ESTUDAR) */}
-      <section id="metodos-selecao" className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">O que você vai fazer?</h3>
-          <span className="h-px flex-1 mx-6 bg-border/20" />
-        </div>
-        
-        <StudyMethodsHub onSelectMethod={setActiveMethod} />
-      </section>
+      {/* 2. COMO ESTUDAR (CONTEXTUAL) */}
+      {selectedContent && (
+        <section ref={methodsHubRef} id="metodos-selecao" className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Como você quer estudar?</h3>
+            <div className="flex items-center gap-3">
+               <div className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(217,0,110,0.5)]" />
+               <p className="text-xl font-black tracking-tight">{selectedContent.name}</p>
+            </div>
+          </div>
+          
+          <StudyMethodsHub onSelectMethod={setActiveMethod} selectedContent={selectedContent} />
+
+          <div className="flex justify-center pt-8">
+            <Button variant="ghost" onClick={() => setSelectedContent(null)} className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 hover:text-foreground">
+              Escolher outro conteúdo
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* 3. CONTINUE (CURSOS EM ANDAMENTO) */}
       {(priority === "continue" || priority === "recommendation" || priority === "resume") && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue Estudando</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
             <span className="h-px flex-1 mx-6 bg-border/20" />
           </div>
           
@@ -229,11 +275,7 @@ function EstudarPage() {
             {(priority === "continue" ? data.courses : allCourses.filter(c => c.status === "in_progress")).slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
-                onClick={() => {
-                   // Ao clicar num curso, poderíamos filtrar os métodos ou ir para o curso
-                   // Para o cockpit de ação, vamos focar em abrir o curso na biblioteca ou sugerir iniciar livre
-                   setActiveMethod("livre");
-                }}
+                onClick={() => handleContentSelect(course)}
                 className="group flex flex-col p-6 rounded-[1.5rem] border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30"
               >
                 <div className="flex-1 space-y-3">
@@ -258,7 +300,7 @@ function EstudarPage() {
       {/* 4. MEUS ESTUDOS (TODOS OS CURSOS) */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Todos os Conteúdos</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Meus Estudos</h3>
           <span className="h-px flex-1 mx-6 bg-border/20" />
         </div>
         
@@ -267,7 +309,8 @@ function EstudarPage() {
             allCourses.filter(c => !c.is_archived).map((course) => (
               <div 
                 key={course.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border border-border/40 bg-surface/10 hover:bg-surface/20 transition-colors group"
+                onClick={() => handleContentSelect(course)}
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border border-border/40 bg-surface/10 hover:bg-surface/20 transition-all group text-left cursor-pointer active:scale-[0.99]"
               >
                 <div className="flex items-center gap-4">
                   <div className="h-10 w-10 rounded-xl bg-surface/40 flex items-center justify-center text-muted-foreground/40 group-hover:bg-primary/10 group-hover:text-primary transition-all">
@@ -276,7 +319,7 @@ function EstudarPage() {
                   <div className="space-y-0.5">
                     <h4 className="font-bold tracking-tight text-foreground">{course.name}</h4>
                     <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-wider">
-                      {course.status === "completed" ? "Finalizado" : course.status === "in_progress" ? "Em andamento" : "Não iniciado"}
+                      {course.status === "completed" ? "Finalizado" : course.status === "in_progress" ? "Em andamento" : "Não iniciado"} · {course.progress?.percent || 0}%
                     </p>
                   </div>
                 </div>
@@ -292,15 +335,28 @@ function EstudarPage() {
                     </div>
                   </div>
                   
-                  <Button variant="ghost" size="sm" className="h-9 px-4 rounded-full text-muted-foreground/40 hover:text-primary font-black uppercase text-[10px] tracking-widest">
-                    Gerenciar <ChevronRight className="ml-1 h-3 w-3" />
+                  <Button variant="ghost" size="sm" className="h-9 px-4 rounded-full text-muted-foreground/40 group-hover:text-primary font-black uppercase text-[10px] tracking-widest transition-colors">
+                    Continuar →
                   </Button>
                 </div>
               </div>
             ))
           ) : (
-            <div className="py-12 text-center rounded-2xl border border-dashed border-border/40 bg-surface/5">
-              <p className="text-sm text-muted-foreground font-medium">Nenhum curso disponível.</p>
+            <div className="py-20 text-center rounded-[2rem] border border-dashed border-border/40 bg-surface/5 space-y-4">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-surface/10 flex items-center justify-center text-muted-foreground/20">
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-lg font-bold text-foreground">Adicione seu primeiro conteúdo</p>
+                <p className="text-sm text-muted-foreground/60 max-w-xs mx-auto">O Dominus precisa de algo para estudar com você.</p>
+              </div>
+              <Button 
+                onClick={() => setIsAddDialogOpen(true)}
+                variant="outline"
+                className="rounded-full border-primary/20 text-primary hover:bg-primary/10"
+              >
+                Adicionar conteúdo <Plus className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           )}
         </div>
