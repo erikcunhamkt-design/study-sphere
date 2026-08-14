@@ -99,31 +99,28 @@ export function DayProgress({ current, goal, reviews }: { current: number; goal:
   const percent = Math.min(Math.round((current / goal) * 100), 100);
   
   return (
-    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-8 space-y-8 flex flex-col justify-between h-full">
-      <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-        <div className="space-y-3">
+    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 space-y-4 flex flex-col justify-center h-full">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="space-y-1">
           <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Progresso do Dia</h3>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black tracking-tighter text-foreground">{current} / {goal}</span>
-              <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">min</span>
-            </div>
-            <p className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.2em]">Meta diária</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-black tracking-tighter text-foreground">{current} / {goal}</span>
+            <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">min</span>
           </div>
         </div>
-        <div className="text-left sm:text-right space-y-3">
+        <div className="text-left sm:text-right space-y-1">
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Revisões</p>
-          <div className="flex flex-col items-start sm:items-end">
-            <p className={cn("text-xl font-black tracking-tight", reviews > 0 ? "text-primary/90" : "text-emerald-500/60")}>
-              {reviews > 0 ? `${reviews} ${reviews === 1 ? 'revisão' : 'revisões'}` : "Tudo em dia"}
-            </p>
-          </div>
+          <p className={cn("text-xl font-black tracking-tight", reviews > 0 ? "text-primary/90" : "text-emerald-500/60")}>
+            {reviews > 0 ? `${reviews} ${reviews === 1 ? 'revisão' : 'revisões'}` : "Tudo em dia"}
+          </p>
         </div>
       </div>
       
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/20 select-none">
-          <span>{percent}% concluído</span>
+          <span className="flex items-center gap-1.5">
+            {percent}% <span className="opacity-50">concluído</span>
+          </span>
           {percent >= 100 && <span className="text-emerald-500/40">Meta atingida</span>}
         </div>
         <Progress value={percent} className="h-1 bg-surface/40 rounded-full" />
