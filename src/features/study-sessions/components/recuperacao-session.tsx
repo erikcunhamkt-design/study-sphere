@@ -128,12 +128,13 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
         sessionId: session.id,
         questionId: currentQuestion.id,
         response: response.trim(),
-        result,
+        result: result as RecallResult,
         resultSource: "self_assessment",
         confidence: confidenceValue,
         responseTimeMs: durationMs,
         publishedVersion: lessonDoc?.published_version ?? null
       });
+
 
       const newAttempt = {
         questionId: currentQuestion.id,
