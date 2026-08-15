@@ -21,10 +21,10 @@ interface LessonContentViewerProps {
 /**
  * Filtra placeholders de QA e blocos vazios do conteúdo real.
  */
-function getRealContent(doc: LessonDocument | undefined) {
-  if (!doc?.content || !Array.isArray(doc.content)) return [];
+function getRealContent(content: LessonDocument | undefined) {
+  if (!content || !Array.isArray(content)) return [];
 
-  return doc.content.filter((block: any) => {
+  return content.filter((block: any) => {
     // 1. Remover parágrafos vazios ou apenas com espaços
     if (block.type === "paragraph" && (!block.content || block.content.length === 0)) {
       return false;
@@ -36,7 +36,8 @@ function getRealContent(doc: LessonDocument | undefined) {
     // 2. Remover placeholders de QA clássicos ("Conteúdo de [tipo]")
     // Estes IDs "qa33-*" são gerados pelo seed de QA.
     if (block.id?.startsWith("qa33-")) {
-      const text = block.content?.[0]?.text || "";
+      const contentArray = block.content;
+      const text = Array.isArray(contentArray) ? contentArray[0]?.text || "" : "";
       if (text.toLowerCase().includes("conteúdo de")) return false;
       if (text.toLowerCase().includes("qa fase")) return false;
       if (block.type === "image" && !block.props?.url) return false;
@@ -50,7 +51,7 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
   const { resolvedTheme } = useTheme();
   const { data: doc, isLoading, isError } = useLessonDocument(lessonId);
 
-  const realContent = useMemo(() => getRealContent(doc), [doc]);
+  const realContent = useMemo(() => getRealContent(doc?.content), [doc?.content]);
   const hasContent = realContent.length > 0;
 
   useEffect(() => {
@@ -107,13 +108,12 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
         <div className="flex flex-col gap-3 w-full max-w-[240px]">
           {canEdit ? (
             <Button asChild className="h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px]">
-              <Link to="/app/biblioteca" search={{}}>
+              <Link to="/app/biblioteca">
                 <Edit className="h-3 w-3 mr-2" />
                 Editar conteúdo →
               </Link>
             </Button>
           ) : (
-
             <Button variant="outline" onClick={() => window.history.back()} className="h-12 rounded-2xl border-border/40 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
               <ArrowLeft className="h-3 w-3 mr-2" />
               Voltar →
@@ -137,4 +137,3 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
     </div>
   );
 }
-
