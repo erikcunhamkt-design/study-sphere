@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-preferences";
 import { mapToHumanState, checkMetacognitiveMismatch } from "../utils/memory-interpretation";
 import type { RecallResult } from "@/features/study-sessions/types";
 import { startOfDayIso } from "@/lib/timezone";
 
 export function usePerformanceDashboard() {
   const { user } = useAuth();
+  const { data: profile } = useProfile();
 
   return useQuery({
     enabled: !!user,
@@ -94,14 +96,16 @@ export function usePerformanceDashboard() {
         .slice(0, 5);
 
       // Future Reviews Breakdown
-      const today = startOfDayIso(now);
+      const tz = profile?.timezone;
+      const today = startOfDayIso(tz, now);
+      
       const tomorrowDate = new Date(now);
       tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-      const tomorrow = startOfDayIso(tomorrowDate);
+      const tomorrow = startOfDayIso(tz, tomorrowDate);
       
       const next7DaysLimit = new Date(now);
       next7DaysLimit.setDate(next7DaysLimit.getDate() + 7);
-      const next7Days = startOfDayIso(next7DaysLimit);
+      const next7Days = startOfDayIso(tz, next7DaysLimit);
 
       const futureReviews = {
         today: interpretedConcepts.filter(c => c.due && c.due <= today).length,
