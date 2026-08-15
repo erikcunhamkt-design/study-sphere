@@ -269,10 +269,10 @@ function DashboardPage() {
       {/* 2. SEU DIA & 3. SEU DOMÍNIO */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
         <div className="md:col-span-3">
-          <DayProgress current={studyMinutes} goal={studyGoal} reviews={reviewsCount} />
+          <DayProgress current={studyMinutes} goal={studyGoal} reviews={reviewsCount} state={reviewSemantic} />
         </div>
         <div className="md:col-span-2">
-          <MasteryCard />
+          <MasteryCard state={reviewSemantic} />
         </div>
       </div>
 
