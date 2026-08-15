@@ -178,7 +178,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                 </p>
               </div>
               <h2 className="text-2xl font-black tracking-tighter text-foreground/90 uppercase">
-                {session.lesson_id ? "Aula em foco" : "Sessão Independente"}
+                {session?.lesson_id ? "Aula em foco" : "Sessão Independente"}
               </h2>
             </div>
             
