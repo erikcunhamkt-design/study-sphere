@@ -217,46 +217,7 @@ function EstudarPage() {
               </Button>
             </div>
           </div>
-        ) : priority === "recommendation" ? (
-          <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 transition-all hover:border-primary/20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
-                    <Brain className="h-3 w-3" /> SUA PRÓXIMA AÇÃO
-                  </span>
-                  <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">Recomendação Dominus</span>
-                </div>
-                <h2 className="text-3xl font-black tracking-tighter leading-tight max-w-xl">
-                  {data.title}
-                </h2>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2 text-muted-foreground/60 font-medium">
-                    <Clock className="h-4 w-4" />
-                    <span>~{data.estimatedMinutes} min sugeridos</span>
-                  </div>
-                </div>
-              </div>
-              <Button 
-                onClick={() => {
-                  if (data.planned?.course_id || data.planned?.id) {
-                    handleContentSelect({
-                      id: data.planned.course_id || data.planned.id,
-                      name: data.planned.title,
-                      status: 'not_started'
-                    });
-                  } else {
-                    setActiveMethod("livre");
-                  }
-                }}
-                size="lg" 
-                className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg group-hover:scale-105 transition-transform"
-              >
-                Começar →
-              </Button>
-            </div>
-          </div>
-        ) : (priority === "resume" || priority === "start") && data.course ? (
+        ) : (priority === "recommendation" || priority === "start") && (data.planned || data.course) ? (
           <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 transition-all hover:border-primary/20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
               <div className="space-y-4">
@@ -265,26 +226,24 @@ function EstudarPage() {
                     <Zap className="h-3 w-3" /> SEU PRÓXIMO PASSO
                   </span>
                   <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
-                    {data.course.status === 'not_started' ? 'Aprender conteúdo' : 'Recuperação ativa'}
+                    {priority === "recommendation" ? "Recomendação Dominus" : (data.course?.status === 'not_started' ? 'Aprender conteúdo' : 'Recuperação ativa')}
                   </span>
                 </div>
                 <h2 className="text-3xl font-black tracking-tighter leading-tight max-w-xl">
-                  {data.course.status === 'not_started' ? `Começar ${data.course.name}` : `Retomar ${data.course.name}`}
+                  {data.title || data.course?.name}
                 </h2>
                 <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2 text-muted-foreground/60 font-medium">
-                    <BookOpen className="h-4 w-4" />
-                    <span>{data.course.status === 'not_started' ? 'Ainda não iniciado' : `${(data.course as any).progress?.percent || 0}% concluído`}</span>
+                  <div className="flex items-center gap-2 text-muted-foreground/60 font-medium text-xs">
+                    <BookOpen className="h-3 w-3" />
+                    <span>
+                      {priority === "recommendation" 
+                        ? (data.planned?.status === 'not_started' ? 'Ainda não iniciado' : 'Continuar planejamento')
+                        : (data.course?.status === 'not_started' ? 'Ainda não iniciado' : `${(data.course as any).progress?.percent || 0}% concluído`)}
+                    </span>
                   </div>
                 </div>
               </div>
-              <Button 
-                onClick={() => handleContentSelect(data.course)}
-                size="lg" 
-                className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg group-hover:scale-105 transition-transform shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)]"
-              >
-                {data.course.status === 'not_started' ? 'Começar estudo →' : 'Continuar estudo →'}
-              </Button>
+              {/* No button here - the main CTA is in the Recommendation card below */}
             </div>
           </div>
         ) : null}
@@ -294,11 +253,7 @@ function EstudarPage() {
       {selectedContent && (
         <section ref={methodsHubRef} id="metodos-selecao" className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="space-y-3">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Como estudar este conteúdo?</h3>
-            <div className="flex items-center gap-3">
-               <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_15px_rgba(217,0,110,0.6)]" />
-               <p className="text-2xl font-black tracking-tighter text-foreground/90">{selectedContent.name}</p>
-            </div>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Dominus Recomenda</h3>
           </div>
           
           <StudyMethodsHub onSelectMethod={setActiveMethod} selectedContent={selectedContent} />
@@ -312,7 +267,7 @@ function EstudarPage() {
       )}
 
       {/* 3. CONTINUE (CURSOS EM ANDAMENTO) */}
-      {(priority === "recommendation" || priority === "resume" || priority === "start") && data.courses && data.courses.length > 0 && (
+      {(priority === "recommendation" || priority === "resume" || priority === "start") && data.courses && data.courses.filter((c: any) => c.status === "in_progress" && c.id !== selectedContent?.id).length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
@@ -320,7 +275,7 @@ function EstudarPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.courses.filter((c: any) => c.status === "in_progress").slice(0, 3).map((course: any) => (
+            {data.courses.filter((c: any) => c.status === "in_progress" && c.id !== selectedContent?.id).slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
@@ -346,11 +301,38 @@ function EstudarPage() {
       )}
 
       {/* 4. MEUS ESTUDOS (TODOS OS CURSOS) */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Meus Estudos</h3>
-          <span className="h-px flex-1 mx-6 bg-border/20" />
-        </div>
+      {allCourses && allCourses.length > 0 && (
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Meus Estudos</h3>
+            <span className="h-px flex-1 mx-6 bg-border/20" />
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {allCourses.map((course: any) => (
+              <button
+                key={course.id}
+                onClick={() => handleContentSelect(course)}
+                className={cn(
+                  "group relative overflow-hidden rounded-2xl border border-border/20 bg-surface/10 p-4 text-left transition-all hover:border-primary/10 hover:bg-surface/20",
+                  selectedContent?.id === course.id && "border-primary/30 bg-surface/30"
+                )}
+              >
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold tracking-tight text-foreground/70 group-hover:text-foreground transition-colors truncate">
+                    {course.name}
+                  </h4>
+                  <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">
+                    <span>{course.status === 'not_started' ? 'Não iniciado' : `${course.progress?.percent || 0}%`}</span>
+                    {selectedContent?.id === course.id && <Zap className="h-2 w-2 text-primary fill-primary" />}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
         
         <div className="grid grid-cols-1 gap-3">
           {allCourses.filter(c => !c.is_archived).length > 0 ? (
