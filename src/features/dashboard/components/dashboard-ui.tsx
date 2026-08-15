@@ -95,7 +95,7 @@ export function NextStepAction({
   );
 }
 
-export function DayProgress({ current, goal, reviews }: { current: number; goal: number; reviews: number }) {
+export function DayProgress({ current, goal, reviews, state }: { current: number; goal: number; reviews: number; state?: any }) {
   const percent = Math.min(Math.round((current / goal) * 100), 100);
   
   return (
