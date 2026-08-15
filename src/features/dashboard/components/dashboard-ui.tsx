@@ -111,7 +111,7 @@ export function DayProgress({ current, goal, reviews, state }: { current: number
         <div className="text-left sm:text-right space-y-1">
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Revisões</p>
           <p className={cn("text-xl font-black tracking-tight", reviews > 0 ? "text-primary/90" : "text-emerald-500/60")}>
-            {reviews > 0 ? `${reviews} ${reviews === 1 ? 'revisão' : 'revisões'}` : "Tudo em dia"}
+            {reviews > 0 ? `${reviews} ${reviews === 1 ? 'revisão' : 'revisões'}` : (state === "new_user" ? "Inicie sua memória" : "Tudo em dia")}
           </p>
         </div>
       </div>
