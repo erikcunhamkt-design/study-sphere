@@ -254,13 +254,9 @@ function EstudarPage() {
       {/* 2. COMO ESTUDAR (CONTEXTUAL) */}
       {selectedContent && (
         <section ref={methodsHubRef} id="metodos-selecao" className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="space-y-3">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Dominus Recomenda</h3>
-          </div>
-          
           <StudyMethodsHub onSelectMethod={setActiveMethod} selectedContent={selectedContent} />
 
-          <div className="flex justify-center pt-8">
+          <div className="flex justify-center pt-8 border-t border-border/10">
             <Button variant="ghost" onClick={() => setSelectedContent(null)} className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 hover:text-foreground">
               Escolher outro conteúdo
             </Button>
