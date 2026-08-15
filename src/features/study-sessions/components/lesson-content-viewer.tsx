@@ -121,11 +121,14 @@ export function LessonContentViewer({
   const realContent = useMemo(() => getRealContent(doc?.published_content as LessonDocument), [doc?.published_content]);
   const hasContent = realContent.length > 0;
 
+  const onMaterialLoadRef = useRef(onMaterialLoad);
+  onMaterialLoadRef.current = onMaterialLoad;
+
   useEffect(() => {
     if (!isLoading && !isError) {
-      onMaterialLoad?.(hasContent, realContent.length);
+      onMaterialLoadRef.current?.(hasContent, realContent.length);
     }
-  }, [isLoading, isError, hasContent, realContent.length, onMaterialLoad]);
+  }, [isLoading, isError, hasContent, realContent.length]);
 
   if (isLoading) {
     return (
