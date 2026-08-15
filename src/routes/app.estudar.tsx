@@ -141,9 +141,9 @@ function EstudarPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-12 pb-20">
-      <header className="space-y-1">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">Estudar</h1>
+    <div className="max-w-6xl mx-auto space-y-16 pb-20">
+      <header className="space-y-3">
+        <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Estudar</h1>
         <p className="text-lg md:text-xl text-muted-foreground/40 font-medium tracking-tight">
           Escolha onde continuar ou deixe o Dominus indicar seu próximo passo.
         </p>
@@ -284,11 +284,11 @@ function EstudarPage() {
       {/* 2. COMO ESTUDAR (CONTEXTUAL) */}
       {selectedContent && (
         <section ref={methodsHubRef} id="metodos-selecao" className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Escolha como continuar</h3>
+          <div className="space-y-3">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Como estudar este conteúdo?</h3>
             <div className="flex items-center gap-3">
                <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_15px_rgba(217,0,110,0.6)]" />
-               <p className="text-2xl font-black tracking-tighter">{selectedContent.name}</p>
+               <p className="text-2xl font-black tracking-tighter text-foreground/90">{selectedContent.name}</p>
             </div>
           </div>
           

@@ -20,7 +20,7 @@ interface MethodOption {
   description: string;
   recommendation?: string;
   icon: any;
-  category: "tempo" | "aprendizagem" | "recuperacao" | "avaliacao";
+  category: "tempo" | "aprendizagem" | "recuperacao" | "avaliacao" | "sessao";
 }
 
 const METHODS: MethodOption[] = [
@@ -80,9 +80,9 @@ const METHODS: MethodOption[] = [
     id: "livre",
     title: "Livre",
     displayName: "Sessão Livre",
-    description: "Estudo flexível sem método pré-definido.",
-    icon: Clock,
-    category: "tempo"
+    description: "Estude livremente sem vincular a sessão a um método específico.",
+    icon: ListChecks,
+    category: "sessao"
   }
 ];
 
@@ -100,9 +100,9 @@ interface StudyMethodsHubProps {
 export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: StudyMethodsHubProps) {
   const categories = [
     { id: "recuperacao", label: "Recuperação", icon: Zap },
-    { id: "aprendizagem", label: "Elaboração & Anotação", icon: BookOpen },
+    { id: "aprendizagem", label: "Elaboração / Compreensão", icon: BookOpen },
     { id: "tempo", label: "Gestão de Tempo", icon: Clock },
-    // { id: "avaliacao", label: "Avaliação", icon: ListChecks },
+    { id: "sessao", label: "Modo de Sessão", icon: ListChecks },
   ];
 
   const recommendedMethodId = useMemo(() => {
@@ -170,10 +170,12 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
         </div>
 
         <div className="space-y-12">
-          {categories.map((cat) => (
+          {categories
+            .filter(cat => METHODS.some(m => m.category === cat.id && m.id !== recommendedMethodId))
+            .map((cat) => (
             <div key={cat.id} className="space-y-6">
               <div className="flex items-center gap-2 px-2">
-                <cat.icon className="h-3.5 w-3.5 text-muted-foreground/30" />
+                <cat.icon className="h-3 w-3 text-muted-foreground/30" />
                 <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/30">
                   {cat.label}
                 </h4>
@@ -184,24 +186,24 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
                   <button
                     key={method.id}
                     onClick={() => onSelectMethod(method.id)}
-                    className="group relative flex flex-col p-7 rounded-[2rem] border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30 active:scale-[0.98]"
+                    className="group relative flex flex-col p-5 rounded-[1.5rem] border border-border/20 bg-surface/10 text-left transition-all hover:border-primary/10 hover:bg-surface/20 active:scale-[0.98]"
                   >
-                    <div className="flex items-start justify-between mb-5">
-                      <div className="w-12 h-12 rounded-2xl bg-surface/40 border border-border/10 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-                        <method.icon className="h-6 w-6" />
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-surface/30 border border-border/5 flex items-center justify-center text-muted-foreground/40 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+                        <method.icon className="h-5 w-5" />
                       </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/10 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                      <ChevronRight className="h-3 w-3 text-muted-foreground/5 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                     </div>
                     
                     <div className="space-y-2">
-                      <h4 className="text-lg font-black tracking-tight text-foreground/90 group-hover:text-foreground transition-colors">
+                      <h4 className="text-base font-black tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
                         {method.displayName}
                       </h4>
-                      <p className="text-sm text-muted-foreground/50 leading-relaxed font-medium">
+                      <p className="text-[13px] text-muted-foreground/40 leading-snug font-medium">
                         {method.description}
                       </p>
-                      <div className="pt-2">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/20 group-hover:text-primary/40 transition-colors">
+                      <div className="pt-1">
+                        <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/10 group-hover:text-primary/30 transition-colors">
                           Técnica: {method.title}
                         </span>
                       </div>
