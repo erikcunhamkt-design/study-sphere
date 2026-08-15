@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Loader2, BookOpen, Clock, ChevronRight } from "lucide-react";
+import { Loader2, BookOpen, Clock, ChevronRight, AlertCircle, Timer, ArrowLeft, Settings, LogOut, CheckCircle2, Zap, Brain } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
