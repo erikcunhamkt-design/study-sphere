@@ -1,11 +1,11 @@
 /**
- * ESTUDAR — ETAPA 1 FINALIZADA (CONGELADA)
+ * ESTUDAR — LIMPEZA FINAL APROVADA
  * 
  * Este arquivo define o Cockpit de Estudos do DominusApp.
- * A lógica de recomendação baseia-se no estado do aprendizado:
- * - NOVO -> Aprender primeiro
- * - EM ANDAMENTO -> Recuperação Ativa
- * - CONCLUÍDO -> Manutenção (Flashcards)
+ * A interface é state-driven e segue a hierarquia:
+ * 1. Contexto (Próximo Passo)
+ * 2. Recomendação Dominus (Ação Única)
+ * 3. Catálogo (Meus Estudos)
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { 
