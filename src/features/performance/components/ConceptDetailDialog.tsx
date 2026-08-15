@@ -69,7 +69,7 @@ export function ConceptDetailDialog({ concept, open, onOpenChange }: ConceptDeta
                 <span className="text-[9px] font-bold uppercase tracking-widest">Próxima Previsão</span>
               </div>
               <p className="text-sm font-bold text-foreground">
-                {concept.due ? new Date(concept.due).toLocaleDateString() : "Não agendada"}
+                {concept.due || concept.memory?.due ? new Date(concept.due || concept.memory?.due).toLocaleDateString() : "Não agendada"}
               </p>
             </div>
           </div>
