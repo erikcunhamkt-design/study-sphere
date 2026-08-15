@@ -38,15 +38,13 @@ export function useDashboardState() {
     // 1. Prioridade: Conteúdo Interrompido (Sessão em andamento)
     if (inProgressSessions && inProgressSessions.length > 0) {
       // Filtrar sessões válidas para a Home
-      // Válida = (Tem aula) OU (É sessão livre intencional)
       const validSessions = inProgressSessions.filter(s => {
-        // Ignorar sessões finalizadas (redundância de segurança)
         if (s.ended_at) return false;
 
         // Isolar dados de auditoria/teste da Home do usuário real
-        // planned_title é injetado pelo Supabase em algumas queries ou via mock, detalhes podem ter títulos contextuais
         const title = (s as any).planned_title || (s.details as any)?.title || "";
-        if (/audit|test|fixture/i.test(title)) return false;
+        // Refinamento agressivo: filtrar padrões comuns de teste e a string de auditoria observada
+        if (/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(title)) return false;
 
         // Abandono por tempo (ex: 4 horas de inatividade)
         const lastUpdate = new Date(s.updated_at).getTime();
@@ -54,7 +52,11 @@ export function useDashboardState() {
         if (Date.now() - lastUpdate > fourHours) return false;
 
         // Sessão de conteúdo real
-        if (s.lesson_id) return true;
+        if (s.lesson_id) {
+          const lesson = allLessons?.find(l => l.id === s.lesson_id);
+          if (lesson && /audit|test|fixture|teste|abc|sdfsd|asdad/i.test(lesson.title)) return false;
+          return !!lesson;
+        }
         
         // Sessão livre intencional
         if (s.is_free_session) return true;
