@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { useDomainModel } from "@/features/performance/hooks/use-domain-model";
+import { useDomainModel } from "@/features/performance/hooks/use-domain-model";
 
 export function NextStepAction({
   title,
