@@ -133,9 +133,10 @@ export async function recordRecallAttempt(input: {
     p_result: input.result as any,
     p_result_source: input.resultSource as any,
     p_confidence: input.confidence,
-    p_response_time_ms: input.responseTimeMs,
-    p_published_version: input.publishedVersion,
+    p_response_time_ms: Math.round(input.responseTimeMs),
+    p_published_version: input.publishedVersion as any,
   });
+
 
   if (error) throw error;
   return data as string;
