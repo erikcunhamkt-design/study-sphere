@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
-import { Brain, ArrowRight, Clock, CheckCircle2 } from "lucide-react"
-import { useDueReviews } from "@/features/study-sessions/hooks.due"
+import { Brain, ArrowRight, Clock, CheckCircle2, Sparkles, BookOpen } from "lucide-react"
 import { useState } from "react"
 import { ReviewSession } from "@/features/study-sessions/components/review/ReviewSession"
+import { useReviewSemanticState } from "@/features/study-sessions/hooks.semantic"
 
 export const Route = createFileRoute('/app/revisar')({
   component: RevisarPage,
