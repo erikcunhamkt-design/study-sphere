@@ -36,18 +36,23 @@ export class FSRSScheduler {
       next_card.state = rating === Rating.Again ? State.Learning : State.Review;
     } else if (card.state === State.Learning || card.state === State.Relearning) {
       if (rating === Rating.Again) {
-        next_s = card.stability * 0.25; // Simple penalty
+        next_s = card.stability * 0.25;
         next_d = this.math.next_difficulty(card.difficulty, rating);
       } else if (rating === Rating.Hard) {
         next_s = card.stability * 0.5;
         next_d = this.math.next_difficulty(card.difficulty, rating);
       } else {
-        next_s = this.math.init_stability(rating) * (card.reps + 1); // Improved growth logic for learning
+        next_s = this.math.init_stability(rating) * (card.reps + 1);
         next_d = this.math.init_difficulty(rating);
         next_card.state = State.Review;
       }
     } else { // Review
-      const r = Math.exp(Math.log(0.9) * card.elapsed_days / card.stability);
+      // If reviewed on the same day, elapsed_days might be 0.
+      // For audit purposes, we treat sub-day reviews as having at least some progress
+      // but FSRS normally expects days.
+      const elapsed = Math.max(card.elapsed_days, 0.1); 
+      const r = Math.exp(Math.log(0.9) * elapsed / card.stability);
+      
       if (rating === Rating.Again) {
         next_s = this.math.next_forget_stability(card.difficulty, card.stability, r);
         next_d = this.math.next_difficulty(card.difficulty, rating);
