@@ -43,6 +43,11 @@ export function useDashboardState() {
         // Ignorar sessões finalizadas (redundância de segurança)
         if (s.ended_at) return false;
 
+        // Isolar dados de auditoria/teste da Home do usuário real
+        // planned_title é injetado pelo Supabase em algumas queries ou via mock, detalhes podem ter títulos contextuais
+        const title = (s as any).planned_title || (s.details as any)?.title || "";
+        if (/audit|test|fixture/i.test(title)) return false;
+
         // Abandono por tempo (ex: 4 horas de inatividade)
         const lastUpdate = new Date(s.updated_at).getTime();
         const fourHours = 4 * 60 * 60 * 1000;
@@ -129,7 +134,7 @@ export function useDashboardState() {
     // 4. Prioridade: Primeiro Estudo (Possui conteúdo mas nada em andamento)
     const validCourses = (activeCourses ?? []).filter(c => 
       c.name.trim().length > 2 && 
-      !/^(teste|test|abc|sdfsd|asdad)$/i.test(c.name)
+      !/audit|test|fixture|teste|abc|sdfsd|asdad/i.test(c.name)
     );
 
     if (validCourses.length > 0) {
