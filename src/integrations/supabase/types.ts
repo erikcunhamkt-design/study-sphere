@@ -917,6 +917,7 @@ export type Database = {
           is_free_session: boolean | null
           lesson_id: string | null
           method: string
+          published_version: number | null
           started_at: string
           updated_at: string
           user_id: string
@@ -930,6 +931,7 @@ export type Database = {
           is_free_session?: boolean | null
           lesson_id?: string | null
           method: string
+          published_version?: number | null
           started_at?: string
           updated_at?: string
           user_id: string
@@ -943,6 +945,7 @@ export type Database = {
           is_free_session?: boolean | null
           lesson_id?: string | null
           method?: string
+          published_version?: number | null
           started_at?: string
           updated_at?: string
           user_id?: string
