@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { calculateDomainMastery, type DomainMetrics } from "../utils/domain-interpretation";
+import { mapToHumanState, checkMetacognitiveMismatch } from "../utils/memory-interpretation";
 
 export function useDomainModel() {
   const { user } = useAuth();
@@ -57,9 +58,27 @@ export function useDomainModel() {
         (area.courses || []).forEach((course: any) => {
           (course.lessons || []).forEach((lesson: any) => {
             (lesson.concepts || []).forEach((concept: any) => {
+              const memory = msMap.get(concept.id);
+              const humanState = memory ? mapToHumanState({
+                reps: memory.reps || 0,
+                stability: memory.stability || 0,
+                difficulty: memory.difficulty || 0,
+                lastResult: memory.last_result as any,
+                lapses: memory.lapses || 0,
+                isDue: memory.due ? new Date(memory.due) <= now : false
+              }) : mapToHumanState({
+                reps: 0,
+                stability: 0,
+                difficulty: 0,
+                lastResult: null,
+                lapses: 0,
+                isDue: false
+              });
+
               allConcepts.push({
                 ...concept,
-                memory: msMap.get(concept.id)
+                memory,
+                humanState
               });
             });
           });
