@@ -66,10 +66,11 @@ describe("initialDetailsForMethod", () => {
     expect(initialDetailsForMethod("blurting")).toEqual({ texto: "" });
     expect(initialDetailsForMethod("cornell")).toEqual({ notas: "", pistas: "", resumo: "" });
     expect(initialDetailsForMethod("livre")).toEqual({});
-    expect(initialDetailsForMethod("recordacao_ativa")).toEqual({});
+    expect(initialDetailsForMethod("flashcards")).toEqual({});
   });
 
-  it("toda forma inicial passa na validação do próprio método (exceto recordacao_ativa, que não tem sessão)", () => {
+  it("toda forma inicial passa na validação do próprio método (exceto flashcards, que não tem sessão)", () => {
+
     expect(pomodoroDetailsSchema.safeParse(initialDetailsForMethod("pomodoro")).success).toBe(true);
     expect(feynmanDetailsSchema.safeParse(initialDetailsForMethod("feynman")).success).toBe(true);
     expect(blurtingDetailsSchema.safeParse(initialDetailsForMethod("blurting")).success).toBe(true);
