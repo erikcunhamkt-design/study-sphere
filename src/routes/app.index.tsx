@@ -118,7 +118,7 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
   const { data: prefs } = usePreferences();
-  const { priority, data, isLoading, dueFlashcards, hasActivity } = useDashboardState();
+  const { priority, data, isLoading, dueFlashcards, dueConcepts, hasActivity } = useDashboardState();
   const deleteSession = useDeleteStudySession();
   const navigate = useNavigate();
   
@@ -132,7 +132,7 @@ function DashboardPage() {
 
   const studyMinutes = Math.round((todaySeconds ?? 0) / 60);
   const studyGoal = prefs?.daily_study_goal_minutes ?? 60;
-  const reviewsCount = dueFlashcards?.length ?? 0;
+  const reviewsCount = (dueFlashcards?.length ?? 0) + (dueConcepts?.length ?? 0);
 
   if (isLoading) {
     return (
