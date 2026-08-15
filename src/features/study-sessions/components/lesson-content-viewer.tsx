@@ -107,12 +107,13 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
         <div className="flex flex-col gap-3 w-full max-w-[240px]">
           {canEdit ? (
             <Button asChild className="h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px]">
-              <Link to="/app/biblioteca">
+              <Link to="/app/biblioteca" search={{}}>
                 <Edit className="h-3 w-3 mr-2" />
                 Editar conteúdo →
               </Link>
             </Button>
           ) : (
+
             <Button variant="outline" onClick={() => window.history.back()} className="h-12 rounded-2xl border-border/40 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
               <ArrowLeft className="h-3 w-3 mr-2" />
               Voltar →
