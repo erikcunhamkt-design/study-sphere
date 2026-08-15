@@ -27,7 +27,7 @@ function RevisarPage() {
       <header className="space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
            <Brain className="w-3.5 h-3.5 text-primary" />
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Sistema de Memória</span>
+           <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary">Sistema de Memória</span>
         </div>
         <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Revisar</h1>
         <p className="text-muted-foreground font-medium">Recupere o que está pronto para voltar à memória.</p>
@@ -43,7 +43,7 @@ function RevisarPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
             <div className="space-y-2 relative z-10 text-left">
-              <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Sua revisão de hoje</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-primary/60">Sua revisão de hoje</span>
               <h2 className="text-5xl font-black tracking-tighter text-foreground">{dueReviews.length} conceitos</h2>
               <div className="flex items-center gap-2 text-muted-foreground/60">
                 <Clock className="w-4 h-4" />
@@ -53,7 +53,7 @@ function RevisarPage() {
 
             <Button 
               onClick={() => setIsReviewing(true)}
-              className="h-16 px-12 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_30px_-5px_rgba(217,0,110,0.3)] transition-all group relative z-10"
+              className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-lg shadow-primary/10 transition-all group relative z-10"
             >
               COMEÇAR REVISÃO <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
@@ -61,12 +61,12 @@ function RevisarPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
              <div className="p-6 rounded-[2rem] bg-surface/20 border border-border/10 space-y-1 text-left">
-               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Status</span>
-               <p className="text-lg font-black uppercase text-primary/80">Recuperação ativa</p>
+               <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Status</span>
+               <p className="text-base font-bold uppercase text-primary/80">Recuperação ativa</p>
              </div>
              <div className="p-6 rounded-[2rem] bg-surface/20 border border-border/10 space-y-1 text-left">
-               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Motor</span>
-               <p className="text-lg font-black uppercase text-foreground/60">FSRS v4 Core</p>
+               <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Motor</span>
+               <p className="text-base font-bold uppercase text-foreground/60">FSRS v4 Core</p>
              </div>
           </div>
         </div>
