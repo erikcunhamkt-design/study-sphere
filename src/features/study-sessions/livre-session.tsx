@@ -148,8 +148,10 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     if (!session) return;
     
     // Regra de conclusão: Se for o método 'aprender', precisa ter material real
+    // Regra de conclusão: Se for o método 'aprender', precisa ter material real
     if (method === "aprender" && !materialStats.hasReal) {
-      toast.error("Esta sessão não possui material real. Adicione o conteúdo para concluir o aprendizado.");
+      // Esta verificação é uma rede de segurança, o botão já deve estar escondido na UI
+      toast.error("Esta sessão não possui material real.");
       return;
     }
 
@@ -428,11 +430,15 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
 
 
               {/* Prioridade 2: COMPREENSÃO (Notas transformadas em elemento secundário) */}
-              <div className="space-y-6 pt-6 border-t border-border/5">
+              <div className={cn("space-y-6 pt-6 border-t border-border/5", !materialStats.hasReal && "opacity-50")}>
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <h3 className="text-sm font-black uppercase tracking-widest text-foreground/80">Reflexão & Notas</h3>
-                    <p className="text-[10px] text-muted-foreground/40 font-medium">Insights registrados aqui são anotações do estudante.</p>
+                    <p className="text-[10px] text-muted-foreground/40 font-medium">
+                      {materialStats.hasReal 
+                        ? "Insights registrados aqui são anotações do estudante."
+                        : "Notas ficam disponíveis como recurso secundário."}
+                    </p>
                   </div>
                   <span className="text-[9px] font-medium text-muted-foreground/20 italic">Não é o conteúdo principal</span>
                 </div>
@@ -441,12 +447,14 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/30 ml-1">
                     SUAS NOTAS
                   </Label>
-
+  
                   <Textarea
                     id="livre-nota"
                     value={nota}
                     onChange={(e) => setNota(e.target.value)}
-                    placeholder="O que você está descobrindo agora? Liste conceitos chaves, dúvidas ou relações..."
+                    placeholder={materialStats.hasReal 
+                      ? "O que você está descobrindo agora? Liste conceitos chaves, dúvidas ou relações..."
+                      : "Aguardando material para anotações..."}
                     className="min-h-[250px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-base font-medium resize-none p-6 shadow-inner focus-visible:ring-primary/20"
                     maxLength={20000}
                   />
@@ -459,17 +467,23 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
               <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-8 sticky top-8">
                 <div className="space-y-3 text-left">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <div className={cn("w-2 h-2 rounded-full", materialStats.hasReal ? "bg-primary animate-pulse" : "bg-muted-foreground/20")} />
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">O QUE FAZER AGORA</h4>
                   </div>
                   <div className="space-y-2">
                     <p className="text-base font-black text-foreground/90 uppercase tracking-tight">
-                      {method === "aprender" ? "Compreenda o conteúdo" : "Pratique livremente"}
+                      {!materialStats.hasReal && method === "aprender" 
+                        ? "Aguarde o material" 
+                        : method === "aprender" 
+                          ? "Compreenda o conteúdo" 
+                          : "Pratique livremente"}
                     </p>
                     <p className="text-xs font-medium text-muted-foreground/60 leading-relaxed">
-                      {method === "aprender" 
-                        ? "Identifique a ideia central, conecte com o que você já sabe e destaque o que ainda não está claro."
-                        : "Use o espaço de notas para registrar seu progresso e insights durante o estudo."}
+                      {!materialStats.hasReal && method === "aprender"
+                        ? "Assim que o conteúdo estiver disponível, você poderá iniciar seu primeiro contato."
+                        : method === "aprender" 
+                          ? "Identifique a ideia central, conecte com o que você já sabe e destaque o que ainda não está claro."
+                          : "Use o espaço de notas para registrar seu progresso e insights durante o estudo."}
                     </p>
                   </div>
                 </div>
@@ -503,21 +517,31 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
               </div>
 
               <div className="pt-6">
-                <Button
-                  onClick={() => void handleFinish()}
-                  disabled={finishSession.isPending || !session}
-                  size="lg"
-                  className="w-full h-20 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-[0_0_50px_-10px_rgba(217,0,110,0.4)] transition-all hover:scale-[1.05] active:scale-95"
-                >
-                  {finishSession.isPending ? (
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  ) : (
-                    "Concluir Primeiro Contato"
-                  )}
-                </Button>
-                <p className="text-[9px] font-black uppercase tracking-widest text-center mt-6 text-muted-foreground/20">
-                  Salve seu progresso para atualizar seu domínio
-                </p>
+                {materialStats.hasReal ? (
+                  <>
+                    <Button
+                      onClick={() => void handleFinish()}
+                      disabled={finishSession.isPending || !session}
+                      size="lg"
+                      className="w-full h-20 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-[0_0_50px_-10px_rgba(217,0,110,0.4)] transition-all hover:scale-[1.05] active:scale-95"
+                    >
+                      {finishSession.isPending ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        "Concluir Primeiro Contato"
+                      )}
+                    </Button>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-center mt-6 text-muted-foreground/20">
+                      Salve seu progresso para atualizar seu domínio
+                    </p>
+                  </>
+                ) : (
+                  <div className="p-6 rounded-3xl border border-dashed border-border/20 bg-surface/10 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 leading-relaxed">
+                      Sessão aguardando material real para permitir a conclusão.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
