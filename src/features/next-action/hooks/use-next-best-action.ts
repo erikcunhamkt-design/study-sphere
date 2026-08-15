@@ -47,10 +47,12 @@ export function useNextBestAction(): NextActionRecommendation {
 
     // --- P0: RESUME_SESSION ---
     const validInProgress = inProgressSessions?.filter(s => {
+      // Regra 5: Sessão concluída não pode aparecer como resume
       if (s.ended_at) return false;
+      // Regra 6 & 25: Ignorar dados de teste
       if (!isProductionEligible(s)) return false;
       
-      // Abandono por tempo (4h)
+      // Regra 1: Abandono por tempo (4h) usando updated_at
       const lastUpdate = new Date(s.updated_at);
       if (differenceInMinutes(now, lastUpdate) > 240) return false;
       
@@ -60,30 +62,52 @@ export function useNextBestAction(): NextActionRecommendation {
     if (validInProgress && validInProgress.length > 0) {
       const session = validInProgress[0];
       const lesson = allLessons?.find(l => l.id === session.lesson_id);
-      const course = courses?.find(c => c.id === lesson?.course_id);
       
-      const title = lesson?.title || (session as any).planned_title || "Sessão em andamento";
-      const timeAgo = `${differenceInMinutes(now, new Date(session.updated_at))} minutos`;
+      // Regra 25 & 26: Verificar ownership e material (isProductionEligible no lesson)
+      if (lesson && isProductionEligible(lesson)) {
+        const course = courses?.find(c => c.id === lesson.course_id);
+        
+        if (course && isProductionEligible(course)) {
+          const title = lesson.title || (session as any).planned_title || "Sessão em andamento";
+          const diffMin = differenceInMinutes(now, new Date(session.updated_at));
+          const timeAgo = diffMin === 0 ? "agora mesmo" : `${diffMin} minuto${diffMin > 1 ? 's' : ''}`;
 
-      actions.push({
-        type: 'resume',
-        priority: WEIGHTS.RESUME,
-        urgency: 1.0,
-        title: `Retomar: ${title}`,
-        description: course?.name || "Continuar de onde parou",
-        reason: formatReason('resume', { title, timeAgo }),
-        cta: "Continuar agora",
-        targetId: session.id,
-        targetType: 'session',
-        metadata: { session, lesson, course }
-      });
+          actions.push({
+            type: 'resume',
+            priority: WEIGHTS.RESUME,
+            urgency: 1.0,
+            title: `Retomar: ${title}`,
+            description: course.name || "Continuar de onde parou",
+            reason: formatReason('resume', { title, timeAgo }),
+            cta: "Continuar agora",
+            targetId: session.id,
+            targetType: 'session',
+            metadata: { session, lesson, course }
+          });
+        }
+      }
     }
 
     // --- P1: REVIEW_DUE ---
-    const dueCount = dashboard?.summary.dueReviews || 0;
+    const dueConcepts = dashboard?.concepts?.filter(c => c.isDue && !(c as any).is_archived) || [];
+    const dueCount = dueConcepts.length;
+    
     if (dueCount > 0) {
-      // Urgência baseada no volume e possivelmente no atraso (simplificado por enquanto)
-      const urgency = Math.min(0.5 + (dueCount * 0.1), 1.0);
+      // Regra 2 & 11: Urgência dinâmica baseada no atraso
+      // Encontrar o conceito mais atrasado
+      const mostDelayed = dueConcepts.reduce((prev, curr) => {
+        if (!prev.due) return curr;
+        if (!curr.due) return prev;
+        return new Date(curr.due) < new Date(prev.due) ? curr : prev;
+      });
+      
+      const delayDays = mostDelayed.due 
+        ? Math.max(0, Math.floor((now.getTime() - new Date(mostDelayed.due).getTime()) / (1000 * 60 * 60 * 24)))
+        : 0;
+
+      // Score de urgência P1: base 0.5 + bônus por volume e atraso
+      // Se delayDays > 7, urgência escala rápido
+      const urgency = Math.min(0.5 + (dueCount * 0.05) + (delayDays * 0.02), 0.95);
       
       actions.push({
         type: 'review',
@@ -91,23 +115,29 @@ export function useNextBestAction(): NextActionRecommendation {
         urgency,
         title: "Revisão Necessária",
         description: `${dueCount} conceito${dueCount > 1 ? 's aguardam' : ' aguarda'} sua recuperação.`,
-        reason: formatReason('review', { count: dueCount }),
+        reason: formatReason('review', { count: dueCount, delayDays }),
         cta: "Revisar agora",
         targetType: 'review',
-        metadata: { count: dueCount }
+        metadata: { count: dueCount, delayDays }
       });
     }
 
     // --- P2: REINFORCE (Attention Needed) ---
-    const attention = dashboard?.attentionNeeded?.[0];
+    const attentionList = dashboard?.attentionNeeded?.filter(a => isProductionEligible(a.concept as any) && !(a.concept as any).is_archived) || [];
+    const attention = attentionList[0];
+    
     if (attention) {
+      // Regra 2: Reinforce só vence se a urgência for crítica
+      const hasMismatch = (attention as any).hasMismatch;
+      const urgency = hasMismatch ? 0.92 : 0.7; // Mismatch é crítico
+
       actions.push({
         type: 'reinforce',
         priority: WEIGHTS.REINFORCE,
-        urgency: 0.7,
+        urgency,
         title: `Reforçar: ${attention.concept.title}`,
         description: "Este conceito precisa de atenção especial.",
-        reason: formatReason('reinforce', {}),
+        reason: formatReason('reinforce', { hasMismatch }),
         cta: "Reforçar conceito",
         targetId: attention.concept_id,
         targetType: 'concept',
@@ -116,12 +146,13 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P3: TEST_MEMORY (Estudou mas reps=0) ---
+    // Regra 12: Test memory é importante após primeiro contato
     const hasStudyButNoEval = (dashboard?.summary?.totalConcepts ?? 0) > 0 && (dashboard?.summary?.evaluatedMemories ?? 0) === 0;
     if (hasStudyButNoEval) {
       actions.push({
         type: 'test_memory',
         priority: WEIGHTS.TEST_MEMORY,
-        urgency: 0.6,
+        urgency: 0.65,
         title: "Testar sua Memória",
         description: "Avalie o que você aprendeu nas últimas sessões.",
         reason: formatReason('test_memory', {}),
@@ -147,14 +178,15 @@ export function useNextBestAction(): NextActionRecommendation {
         targetType: 'course'
       });
     } else if (activeCourses.length > 0) {
+      // Regra 14 & 15: Só recomendar first_study se houver curso
       const firstCourse = activeCourses[0];
       actions.push({
         type: 'first_study',
         priority: WEIGHTS.FIRST_STUDY,
-        urgency: 0.4,
+        urgency: 0.45,
         title: "Começar Primeiro Estudo",
         description: `Inicie sua jornada em ${firstCourse.name}.`,
-        reason: formatReason('first_study', {}),
+        reason: formatReason('first_study', { title: firstCourse.name }),
         cta: "Começar agora",
         targetId: firstCourse.id,
         targetType: 'course'
@@ -162,13 +194,14 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P7: ADD_CONTENT ---
+    // Regra 15: Novo usuário sem conteúdo
     if (activeCourses.length === 0 && !isLoading) {
       actions.push({
         type: 'add_content',
         priority: WEIGHTS.ADD_CONTENT,
         urgency: 0.3,
         title: "Adicionar Conteúdo",
-        description: "Você ainda não tem áreas de estudo cadastradas.",
+        description: "Para começar, você precisa de uma área de estudo.",
         reason: formatReason('add_content', {}),
         cta: "Adicionar área",
         targetType: 'course'
@@ -176,7 +209,9 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- Fallback: ALL_CLEAR ---
-    if (actions.length === 0) {
+    // Regra 17: Tudo em dia
+    if (actions.length === 0 || (actions.length === 1 && actions[0].type === 'add_content' && activeCourses.length > 0)) {
+       // Se caímos aqui e temos cursos, mas nada urgente
       actions.push({
         type: 'all_clear',
         priority: WEIGHTS.ALL_CLEAR,
@@ -188,8 +223,8 @@ export function useNextBestAction(): NextActionRecommendation {
       });
     }
 
-    // Ordenar por prioridade real e urgência
-    // P0 sempre ganha. Para outros, urgência pode influenciar se for muito alta.
+    // Regra 18 & 30: Determinismo e Ação Única Principal
+    // Ordenar por prioridade real e depois urgência
     const sortedActions = [...actions].sort((a, b) => {
       if (a.priority !== b.priority) return a.priority - b.priority;
       return b.urgency - a.urgency;
