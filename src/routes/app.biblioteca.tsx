@@ -241,8 +241,9 @@ function LibraryPage() {
               exams={filteredExams} 
               onStart={(exam) => navigate({ 
                 to: "/app/estudar",
-                search: { method: "recordacao_ativa" }
+                search: { method: "exame" }
               })} 
+
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
