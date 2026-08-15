@@ -1,137 +1,115 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-import { useAuth } from "@/hooks/use-auth";
-import * as api from "./api";
-import type { FlashcardRating } from "./schema";
-
-export function flashcardsKey(userId: string | undefined) {
-  return ["flashcards", userId] as const;
-}
-
-export function dueFlashcardsKey(userId: string | undefined) {
-  return ["flashcards-due", userId] as const;
-}
-
-export function flashcardReviewsKey(userId: string | undefined, sinceIso: string | undefined) {
-  return ["flashcard-reviews", userId, sinceIso] as const;
-}
-
-export function useFlashcards() {
-  const { user } = useAuth();
+export function useDueFlashcards(limit = 50) {
   return useQuery({
-    enabled: !!user,
-    queryKey: flashcardsKey(user?.id),
-    queryFn: () => api.fetchFlashcards(user!.id),
-  });
-}
+    queryKey: ["flashcards", "due", limit],
+    queryFn: async () => {
+      // 1. Get concept IDs that are due
+      const { data: dueConcepts, error: conceptsError } = await supabase
+        .from("memory_states")
+        .select("concept_id")
+        .lte("due", new Date().toISOString())
+        .order("due", { ascending: true })
+        .limit(limit);
 
-export function useDueFlashcards() {
-  const { user } = useAuth();
-  return useQuery({
-    enabled: !!user,
-    queryKey: dueFlashcardsKey(user?.id),
-    queryFn: () => api.fetchDueFlashcards(user!.id),
-  });
-}
+      if (conceptsError) throw conceptsError;
+      if (!dueConcepts || dueConcepts.length === 0) return [];
 
-export function useFlashcardsByDeck(deckId: string | undefined) {
-  const { user } = useAuth();
-  return useQuery({
-    enabled: !!user && !!deckId,
-    queryKey: [...flashcardsKey(user?.id), deckId],
-    queryFn: () => api.fetchFlashcardsByDeck(user!.id, deckId!),
-  });
-}
+      const conceptIds = dueConcepts.map((c) => c.concept_id);
 
-export function useDueFlashcardsByDeck(deckId: string | undefined) {
-  const { user } = useAuth();
-  return useQuery({
-    enabled: !!user && !!deckId,
-    queryKey: [...dueFlashcardsKey(user?.id), deckId],
-    queryFn: () => api.fetchDueFlashcardsByDeck(user!.id, deckId!),
-  });
-}
+      // 2. Fetch flashcards for those concepts
+      const { data: flashcards, error: flashcardsError } = await supabase
+        .from("flashcards")
+        .select(`
+          *,
+          concept:concepts (*)
+        `)
+        .in("concept_id", conceptIds);
 
-/** `sinceIso` fixo por render (não `new Date()` direto) evita invalidar/refazer a query a cada rerender. */
-
-export function useFlashcardReviews(sinceIso: string | undefined) {
-  const { user } = useAuth();
-  return useQuery({
-    enabled: !!user && !!sinceIso,
-    queryKey: flashcardReviewsKey(user?.id, sinceIso),
-    queryFn: () => api.fetchFlashcardReviews(user!.id, sinceIso!),
-  });
-}
-
-function useInvalidateFlashcardLists() {
-  const { user } = useAuth();
-  const qc = useQueryClient();
-  return () => {
-    void qc.invalidateQueries({ queryKey: flashcardsKey(user?.id) });
-    void qc.invalidateQueries({ queryKey: dueFlashcardsKey(user?.id) });
-  };
-}
-
-export function useCreateFlashcard() {
-  const { user } = useAuth();
-  const invalidate = useInvalidateFlashcardLists();
-  return useMutation({
-    mutationFn: (input: api.CreateFlashcardInput) => api.createFlashcard(user!.id, input),
-    onSuccess: invalidate,
-  });
-}
-
-export function useUpdateFlashcardContent(flashcardId: string) {
-  const invalidate = useInvalidateFlashcardLists();
-  return useMutation({
-    mutationFn: (input: api.UpdateFlashcardContentInput) =>
-      api.updateFlashcardContent(flashcardId, input),
-    onSuccess: invalidate,
-  });
-}
-
-export function useSetFlashcardArchived(flashcardId: string) {
-  const invalidate = useInvalidateFlashcardLists();
-  return useMutation({
-    mutationFn: (isArchived: boolean) => api.setFlashcardArchived(flashcardId, isArchived),
-    onSuccess: invalidate,
-  });
-}
-
-export function useDeleteFlashcard() {
-  const invalidate = useInvalidateFlashcardLists();
-  return useMutation({
-    mutationFn: (flashcardId: string) => api.deleteFlashcard(flashcardId),
-    onSuccess: invalidate,
-  });
-}
-
-export function useSubmitFlashcardReview() {
-  const { user } = useAuth();
-  const qc = useQueryClient();
-  const invalidateLists = useInvalidateFlashcardLists();
-  return useMutation({
-    mutationFn: ({ flashcardId, rating }: { flashcardId: string; rating: FlashcardRating }) =>
-      api.submitFlashcardReview(flashcardId, rating),
-    onSuccess: () => {
-      invalidateLists();
-      // Prefixo parcial: invalida qualquer janela de métricas em cache
-      // (["flashcard-reviews", userId, sinceIso]), não só uma sinceIso específica.
-      void qc.invalidateQueries({ queryKey: ["flashcard-reviews", user?.id] });
+      if (flashcardsError) throw flashcardsError;
+      
+      // Sort flashcards by the 'due' date of their concept for consistent priority
+      const dueMap = new Map(dueConcepts.map(c => [c.concept_id, c]));
+      return (flashcards || []).sort((a, b) => {
+        const dueA = new Date(dueMap.get(a.concept_id)?.due || 0).getTime();
+        const dueB = new Date(dueMap.get(b.concept_id)?.due || 0).getTime();
+        return dueA - dueB;
+      });
     },
   });
 }
 
-export function useSetFlashcardsDeck() {
-  const { user } = useAuth();
-  const qc = useQueryClient();
-  const invalidateLists = useInvalidateFlashcardLists();
-  return useMutation({
-    mutationFn: ({ flashcardIds, deckId }: { flashcardIds: string[]; deckId: string | null }) =>
-      api.setFlashcardsDeck(flashcardIds, deckId),
-    onSuccess: () => {
-      invalidateLists();
-      void qc.invalidateQueries({ queryKey: ["decks", user?.id] });
+export function useDueFlashcardsByDeck(deckId?: string, limit = 50) {
+  return useQuery({
+    queryKey: ["flashcards", "due", deckId, limit],
+    enabled: !!deckId,
+    queryFn: async () => {
+      if (!deckId) return [];
+
+      // 1. Get flashcards in this deck that have an associated concept
+      const { data: deckCards, error: deckError } = await supabase
+        .from("flashcards")
+        .select("concept_id")
+        .eq("deck_id", deckId)
+        .not("concept_id", "is", null);
+
+      if (deckError) throw deckError;
+      if (!deckCards || deckCards.length === 0) return [];
+
+      const conceptIds = [...new Set(deckCards.map(c => c.concept_id))];
+
+      // 2. Check which of these concepts are due
+      const { data: dueConcepts, error: conceptsError } = await supabase
+        .from("memory_states")
+        .select("concept_id")
+        .in("concept_id", conceptIds)
+        .lte("due", new Date().toISOString())
+        .order("due", { ascending: true })
+        .limit(limit);
+
+      if (conceptsError) throw conceptsError;
+      if (!dueConcepts || dueConcepts.length === 0) return [];
+
+      const dueIds = dueConcepts.map(c => c.concept_id);
+
+      // 3. Fetch full data for due flashcards
+      const { data: flashcards, error: flashcardsError } = await supabase
+        .from("flashcards")
+        .select(`
+          *,
+          concept:concepts (*)
+        `)
+        .eq("deck_id", deckId)
+        .in("concept_id", dueIds);
+
+      if (flashcardsError) throw flashcardsError;
+
+      const dueMap = new Map(dueConcepts.map(c => [c.concept_id, c]));
+      return (flashcards || []).sort((a, b) => {
+        const dueA = new Date(dueMap.get(a.concept_id)?.due || 0).getTime();
+        const dueB = new Date(dueMap.get(b.concept_id)?.due || 0).getTime();
+        return dueA - dueB;
+      });
+    },
+  });
+}
+
+export function useFlashcardsByDeck(deckId?: string) {
+  return useQuery({
+    queryKey: ["flashcards", "deck", deckId],
+    enabled: !!deckId,
+    queryFn: async () => {
+      if (!deckId) return [];
+      const { data, error } = await supabase
+        .from("flashcards")
+        .select(`
+          *,
+          concept:concepts (*)
+        `)
+        .eq("deck_id", deckId);
+      if (error) throw error;
+      return data;
     },
   });
 }
