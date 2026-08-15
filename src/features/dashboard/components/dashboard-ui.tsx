@@ -1,9 +1,10 @@
-import { BookOpen, Brain, ChevronRight, Clock, Layers, ListChecks, Play, Sparkles, Target } from "lucide-react";
+import { BookOpen, Brain, ChevronRight, Clock, Layers, ListChecks, Play, Sparkles, Target, Activity, TrendingUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { useDomainModel } from "@/features/performance/hooks/use-domain-model";
 
 export function NextStepAction({
   title,
@@ -135,24 +136,30 @@ export function SectionHeader({ title }: { title: string }) {
   );
 }
 
-export function MasteryCard({ percent, trend, state }: { percent?: number; trend?: number; state?: any }) {
-  return (
-    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Mapa de Domínio</h3>
-        <Brain className="h-3.5 w-3.5 text-muted-foreground/10 group-hover:text-primary/20 transition-colors" />
+export function MasteryCard({ state }: { state?: any }) {
+  const { data: domains, isLoading } = useDomainModel();
+
+  if (isLoading) {
+    return (
+      <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 h-full flex items-center justify-center">
+        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
       </div>
-      
-      {percent === undefined ? (
+    );
+  }
+
+  // Se não houver áreas ou domínios
+  if (!domains || domains.length === 0) {
+    return (
+      <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center h-full">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Mapa de Domínio</h3>
+          <Brain className="h-3.5 w-3.5 text-muted-foreground/10 group-hover:text-primary/20 transition-colors" />
+        </div>
         <div className="space-y-3">
           <div className="space-y-1">
-            <p className="text-lg font-black tracking-tight text-foreground leading-snug">Seu nível ainda está sendo construído.</p>
+            <p className="text-lg font-black tracking-tight text-foreground leading-snug">Seu mapa está começando.</p>
             <p className="text-[11px] text-muted-foreground/40 leading-relaxed font-medium max-w-[90%]">
-              {state === "new_user" 
-                ? "Sua jornada está começando. Adicione conteúdo e comece a estudar para gerar os primeiros dados de memória." 
-                : state === "no_recovery"
-                  ? "Você já tem estudos registrados! Agora realize sessões de recuperação para identificar seu nível de domínio."
-                  : "O Dominus identificará seus pontos fortes e lacunas conforme você estudar e responder questões."}
+              Sua jornada está começando. Adicione conteúdo e comece a estudar para gerar os primeiros dados de memória.
             </p>
           </div>
           <div className="pt-1">
@@ -161,22 +168,51 @@ export function MasteryCard({ percent, trend, state }: { percent?: number; trend
             </span>
           </div>
         </div>
-      ) : (
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-black tracking-tighter text-foreground">{percent}%</span>
-              <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Domínio</span>
+      </div>
+    );
+  }
+
+  // Pegar as 2 áreas com maior domínio ou mais recentes (aqui pegamos as primeiras 2 para simplicidade no cockpit)
+  const topDomains = domains.slice(0, 2);
+
+  return (
+    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center h-full">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Mapa de Domínio</h3>
+        <Link to="/app/desempenho" className="text-[9px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors">
+          Ver todos
+        </Link>
+      </div>
+      
+      <div className="space-y-4">
+        {topDomains.map(domain => (
+          <div key={domain.id} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground truncate max-w-[120px]">{domain.name}</span>
+              <span className={cn("text-[8px] font-black uppercase tracking-widest", domain.mastery.color)}>
+                {domain.mastery.label}
+              </span>
             </div>
-            {trend !== undefined && (
-              <div className="mt-2 flex items-center gap-1.5 text-[10px] font-black text-emerald-500 uppercase tracking-tighter">
-                <Target className="h-3 w-3" />
-                <span>↑ {trend}% esta semana</span>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-1 bg-surface/40 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary/40 rounded-full" 
+                  style={{ width: `${(domain.metrics.evaluatedConcepts / Math.max(domain.metrics.totalConcepts, 1)) * 100}%` }}
+                />
               </div>
-            )}
+              <span className="text-[8px] font-bold text-muted-foreground/40">
+                {domain.metrics.evaluatedConcepts}/{domain.metrics.totalConcepts}
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        ))}
+
+        {domains.length > 2 && (
+          <p className="text-[9px] font-bold text-muted-foreground/20 uppercase tracking-widest text-center pt-1">
+            + {domains.length - 2} áreas acompanhadas
+          </p>
+        )}
+      </div>
     </div>
   );
 }
