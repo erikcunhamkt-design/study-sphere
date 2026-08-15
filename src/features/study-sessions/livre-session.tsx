@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2, BookOpen, Clock, ChevronRight } from "lucide-react";
 
@@ -166,13 +166,24 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }
 
   return (
-    <div className="max-w-6xl mx-auto animate-in fade-in duration-700">
+    <div className="max-w-6xl mx-auto animate-in fade-in duration-700 pb-20">
       <div className="group relative overflow-hidden rounded-[2.5rem] border border-primary/20 bg-surface/30 p-8 md:p-12 transition-all">
         <div className="absolute -right-20 -top-20 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
         
         <div className="relative z-10 space-y-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/10 pb-8">
             <div className="space-y-2">
+              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30 mb-2">
+                <span>DominusApp</span>
+                <ChevronRight className="h-3 w-3" />
+                <span>Estudar</span>
+                {session?.lesson_id && (
+                  <>
+                    <ChevronRight className="h-3 w-3" />
+                    <span className="text-primary/60">Aprendizagem</span>
+                  </>
+                )}
+              </div>
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
                   {method === "aprender" ? (
