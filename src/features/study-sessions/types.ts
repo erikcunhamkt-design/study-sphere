@@ -7,6 +7,7 @@ export const STUDY_METHOD_VALUES = [
   "aprender",
   "flashcards",
   "exame",
+  "recordacao_ativa",
 ] as const;
 
 export type StudyMethod = (typeof STUDY_METHOD_VALUES)[number];

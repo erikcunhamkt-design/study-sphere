@@ -64,7 +64,19 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   useUnsavedTextWarning(!!session && nota.trim().length > 0 && !isFinished);
 
   async function handleStart() {
+    // Evita múltiplas chamadas se já estiver iniciando ou se já tiver sessão
+    if (optimisticStart || session || createSession.isPending) return;
+
     setOptimisticStart(new Date().toISOString());
+    
+    // Log detalhado para depuração no preview
+    console.log("[study-sessions] Iniciando sessão real:", {
+      method,
+      lessonId,
+      initialCourseId,
+      isFreeSession: !lessonId
+    });
+
     try {
       const created = await createSession.mutateAsync({
         method: method,
@@ -72,40 +84,55 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
         isFreeSession: !lessonId,
         details: { ...initialDetailsForMethod(method), courseId: initialCourseId },
       });
+      console.log("[study-sessions] Sessão criada com sucesso:", created.id);
       setSession(created);
     } catch (err) {
       setOptimisticStart(null);
-      console.error(`[study-sessions] falha ao iniciar sessão ${method}`, err);
-      toast.error("Não foi possível iniciar a sessão");
+      console.error(`[study-sessions] falha crítica ao iniciar sessão ${method}:`, err);
+      // Extrair mensagem de erro real se disponível
+      const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+      toast.error(`Não foi possível iniciar a sessão: ${errorMessage}`);
     }
   }
 
   useEffect(() => {
+    // Bloqueia execução se já estivermos no processo ou com dados carregando
+    if (session || optimisticStart || resumingSession || isLoadingLessons) return;
+
     // Caso 1: Já temos uma aula inicial (clicou em uma aula específica)
-    if (initialLessonId && !session && !optimisticStart && !resumingSession) {
-      handleStart();
+    if (initialLessonId) {
+      if (!lessonId) setLessonId(initialLessonId);
+      void handleStart();
       return;
     }
 
     // Caso 2: Temos apenas o curso (clicou em "Aprender Primeiro" no cockpit)
-    // Vamos esperar as aulas carregarem e pegar a primeira disponível
-    if (initialCourseId && !lessonId && !session && !optimisticStart && !resumingSession && !isLoadingLessons && courseLessons) {
-      const firstActiveLesson = courseLessons.find(l => !l.is_archived);
-      if (firstActiveLesson) {
-        setLessonId(firstActiveLesson.id);
-        // O próximo render vai disparar o handleStart através do useEffect de initialLessonId se mudarmos o prop,
-        // ou podemos disparar manualmente aqui agora que temos o ID local.
-      } else {
-        // Se não tem aulas, inicia avulso (sem lessonId)
-        handleStart();
+    if (initialCourseId && !lessonId) {
+      if (courseLessons && courseLessons.length > 0) {
+        const firstActiveLesson = courseLessons.find(l => !l.is_archived);
+        if (firstActiveLesson) {
+          console.log("[study-sessions] Resolvendo aula automática:", firstActiveLesson.title);
+          setLessonId(firstActiveLesson.id);
+          // O handleStart será chamado pelo useEffect de lessonId abaixo
+        } else {
+          console.log("[study-sessions] Curso sem aulas ativas, iniciando avulso");
+          void handleStart();
+        }
+      } else if (courseLessons && courseLessons.length === 0) {
+        console.log("[study-sessions] Curso sem nenhuma aula, iniciando avulso");
+        void handleStart();
       }
     }
   }, [initialLessonId, initialCourseId, isLoadingLessons, courseLessons, session, optimisticStart, resumingSession]);
 
-  // Se o lessonId foi setado via efeito de curso, inicia a sessão
+  // Se o lessonId foi setado via efeito de curso, inicia a sessão assim que o estado estabilizar
   useEffect(() => {
-    if (lessonId && !session && !optimisticStart && !resumingSession && initialCourseId) {
-      handleStart();
+    if (lessonId && !session && !optimisticStart && !resumingSession) {
+      // Pequeno delay para garantir que o estado de lessonId seja propagado se veio da resolução automática
+      const timer = setTimeout(() => {
+        void handleStart();
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [lessonId]);
 
@@ -163,11 +190,13 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }
 
   if (!session && !optimisticStart) {
-    if (isLoadingLessons) {
+    // Enquanto carrega aulas ou resolve a primeira unidade, mostramos o loader
+    // para evitar o flash da tela "Escolha o que você vai aprender"
+    if (isLoadingLessons || (initialCourseId && !lessonId && courseLessons === undefined)) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40">Preparando foco...</p>
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40">Identificando conteúdo...</p>
         </div>
       );
     }
