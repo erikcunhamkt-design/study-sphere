@@ -427,8 +427,23 @@ function PublishButton({ lessonId, doc }: { lessonId: string; doc: LessonDocumen
   
   const isUpToDate = doc && doc.published_version === doc.version;
   const hasContent = doc && doc.content && doc.content.length > 0;
+  
+  // Validação: Pelo menos um bloco real com conteúdo (Gate 1 - Etapa 4)
+  const hasRealContent = useMemo(() => {
+    if (!doc?.content || !Array.isArray(doc.content)) return false;
+    return doc.content.some((block: any) => {
+      if (block.type === "paragraph" && block.content && block.content.length > 0) return true;
+      if (block.type !== "paragraph") return true; // Imagens, títulos, etc.
+      return false;
+    });
+  }, [doc?.content]);
 
   const handlePublish = async () => {
+    if (!hasRealContent) {
+      toast.error("Não é possível publicar: adicione pelo menos um conteúdo real antes de publicar esta aula.");
+      return;
+    }
+
     try {
       await publish.mutateAsync();
       toast.success("Conteúdo publicado com sucesso! Estudantes já podem acessá-lo.");
@@ -441,24 +456,38 @@ function PublishButton({ lessonId, doc }: { lessonId: string; doc: LessonDocumen
   if (!doc) return null;
 
   return (
-    <Button 
-      size="sm" 
-      variant={isUpToDate ? "outline" : "default"}
-      disabled={publish.isPending || isUpToDate || !hasContent}
-      onClick={handlePublish}
-      className={cn(
-        "h-8 px-3 text-[10px] font-black uppercase tracking-widest transition-all",
-        !isUpToDate && hasContent && "bg-primary hover:bg-primary/90 text-white shadow-[0_0_15px_-3px_rgba(217,0,110,0.4)]"
-      )}
-    >
-      {publish.isPending ? (
-        <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
-      ) : isUpToDate ? (
-        <CheckCircle2 className="h-3 w-3 mr-1.5 text-emerald-500" />
-      ) : (
-        <Zap className="h-3 w-3 mr-1.5" />
-      )}
-      {isUpToDate ? "Publicado" : "Publicar"}
-    </Button>
+    <div className="flex flex-col items-end gap-1.5">
+      <Button 
+        size="sm" 
+        variant={isUpToDate ? "outline" : "default"}
+        disabled={publish.isPending || isUpToDate || !hasContent}
+        onClick={handlePublish}
+        className={cn(
+          "h-8 px-3 text-[10px] font-black uppercase tracking-widest transition-all",
+          !isUpToDate && hasContent && "bg-primary hover:bg-primary/90 text-white shadow-[0_0_15px_-3px_rgba(217,0,110,0.4)]"
+        )}
+      >
+        {publish.isPending ? (
+          <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+        ) : isUpToDate ? (
+          <CheckCircle2 className="h-3 w-3 mr-1.5 text-emerald-500" />
+        ) : (
+          <Zap className="h-3 w-3 mr-1.5" />
+        )}
+        {isUpToDate ? "Publicado" : "Publicar Alterações"}
+      </Button>
+      
+      <p className="text-[9px] font-bold tracking-tight uppercase">
+        {isUpToDate ? (
+          <span className="text-emerald-500/60">
+            Publicado em {doc.published_at ? new Date(doc.published_at).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '—'}
+          </span>
+        ) : doc.published_version ? (
+          <span className="text-amber-500/60">Alterações não publicadas (Alunos vêem v{doc.published_version})</span>
+        ) : (
+          <span className="text-muted-foreground/40 text-[8px]">Aguardando primeira publicação</span>
+        )}
+      </p>
+    </div>
   );
 }
