@@ -33,7 +33,10 @@ export function usePerformanceDashboard() {
         .from("cognitive_evidences")
         .select(`
           *,
-          concept:concepts (*)
+          concept:concept_id (
+            id,
+            title
+          )
         `)
         .eq("user_id", user.id)
         .eq("is_test_data", false)
