@@ -103,17 +103,9 @@ export function useDeleteStudySession() {
 export function useRecordRecallAttempt() {
   const invalidate = useInvalidateStudySessionLists();
   return useMutation({
-    mutationFn: (input: {
-      sessionId: string;
-      questionId: string;
-      response: string;
-      result: string;
-      resultSource: string;
-      confidence: number;
-      responseTimeMs: number;
-      publishedVersion: number | null;
-    }) => api.recordRecallAttempt(input),
+    mutationFn: (input: api.RecordRecallAttemptInput) => api.recordRecallAttempt(input),
     onSuccess: invalidate,
   });
 }
+
 
