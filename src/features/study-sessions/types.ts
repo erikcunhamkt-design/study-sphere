@@ -34,7 +34,10 @@ export interface LivreDetails {
   nota?: string;
   anotacoes?: string;
   courseId?: string;
+  blocksCount?: number;
+  completedAt?: string;
 }
+
 
 export type StudySessionDetails =
   | PomodoroDetails
