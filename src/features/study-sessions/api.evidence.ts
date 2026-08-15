@@ -33,9 +33,13 @@ export interface MemoryState {
   id: string;
   userId: string;
   conceptId: string;
-  strength: number;
   stability: number;
   difficulty: number;
+  due: string;
+  lastReview: string | null;
+  reps: number;
+  lapses: number;
+  state: number;
   lastRecalledAt: string | null;
   lastResult: RecallResult | null;
   lastConfidence: number | null;
@@ -44,6 +48,7 @@ export interface MemoryState {
   failedRecalls: number;
   updatedAt: string;
 }
+
 
 export async function getMemoryState(conceptId: string): Promise<MemoryState | null> {
   const { data: { user } } = await supabase.auth.getUser();
