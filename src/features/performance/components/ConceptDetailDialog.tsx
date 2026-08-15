@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Calendar, Clock, BarChart3, Brain, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { RecallResult } from "@/features/study-sessions/types";
-import { HUMAN_STATES, type MemoryHumanState } from "../utils/memory-interpretation";
+import { HUMAN_STATES, type MemoryHumanState, mapToHumanState } from "../utils/memory-interpretation";
 
 interface ConceptDetailDialogProps {
   concept: any;
@@ -16,7 +16,14 @@ interface ConceptDetailDialogProps {
 export function ConceptDetailDialog({ concept, open, onOpenChange }: ConceptDetailDialogProps) {
   if (!concept) return null;
 
-  const humanState = concept.humanState;
+  const humanState = concept.humanState || (concept.memory ? mapToHumanState({
+    reps: concept.memory.reps || 0,
+    stability: concept.memory.stability || 0,
+    difficulty: concept.memory.difficulty || 0,
+    lastResult: concept.memory.last_result as any,
+    lapses: concept.memory.lapses || 0,
+    isDue: concept.memory.due ? new Date(concept.memory.due) <= new Date() : false
+  }) : HUMAN_STATES.novo);
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -33,7 +40,7 @@ export function ConceptDetailDialog({ concept, open, onOpenChange }: ConceptDeta
             )}
           </div>
           <DialogTitle className="text-2xl font-black tracking-tight text-foreground leading-tight">
-            {concept.concept?.title}
+            {concept.concept?.title || concept.title}
           </DialogTitle>
         </DialogHeader>
 
@@ -53,7 +60,7 @@ export function ConceptDetailDialog({ concept, open, onOpenChange }: ConceptDeta
                 <span className="text-[9px] font-bold uppercase tracking-widest">Última Recuperação</span>
               </div>
               <p className="text-sm font-bold text-foreground">
-                {concept.last_recalled_at ? new Date(concept.last_recalled_at).toLocaleDateString() : "Nunca"}
+                {concept.last_recalled_at || concept.memory?.last_recalled_at ? new Date(concept.last_recalled_at || concept.memory?.last_recalled_at).toLocaleDateString() : "Nunca"}
               </p>
             </div>
             <div className="space-y-1">
@@ -62,7 +69,7 @@ export function ConceptDetailDialog({ concept, open, onOpenChange }: ConceptDeta
                 <span className="text-[9px] font-bold uppercase tracking-widest">Próxima Previsão</span>
               </div>
               <p className="text-sm font-bold text-foreground">
-                {concept.due ? new Date(concept.due).toLocaleDateString() : "Não agendada"}
+                {concept.due || concept.memory?.due ? new Date(concept.due || concept.memory?.due).toLocaleDateString() : "Não agendada"}
               </p>
             </div>
           </div>
@@ -73,15 +80,15 @@ export function ConceptDetailDialog({ concept, open, onOpenChange }: ConceptDeta
             </h4>
             <div className="grid grid-cols-3 gap-3">
               <div className="p-3 rounded-2xl bg-surface/30 border border-border/5 text-center">
-                <p className="text-lg font-black text-foreground">{concept.reps || 0}</p>
+                <p className="text-lg font-black text-foreground">{concept.reps || concept.memory?.reps || 0}</p>
                 <p className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/40">Tentativas</p>
               </div>
               <div className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 text-center">
-                <p className="text-lg font-black text-emerald-500">{concept.successful_recalls || 0}</p>
+                <p className="text-lg font-black text-emerald-500">{concept.successful_recalls || concept.memory?.successful_recalls || 0}</p>
                 <p className="text-[8px] font-bold uppercase tracking-widest text-emerald-500/40">Sucessos</p>
               </div>
               <div className="p-3 rounded-2xl bg-red-500/5 border border-red-500/10 text-center">
-                <p className="text-lg font-black text-red-500">{concept.lapses || 0}</p>
+                <p className="text-lg font-black text-red-500">{concept.lapses || concept.memory?.lapses || 0}</p>
                 <p className="text-[8px] font-bold uppercase tracking-widest text-red-500/40">Falhas</p>
               </div>
             </div>

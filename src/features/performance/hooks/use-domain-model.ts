@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { calculateDomainMastery, type DomainMetrics } from "../utils/domain-interpretation";
+import { mapToHumanState, checkMetacognitiveMismatch } from "../utils/memory-interpretation";
 
 export function useDomainModel() {
   const { user } = useAuth();
@@ -57,20 +58,41 @@ export function useDomainModel() {
         (area.courses || []).forEach((course: any) => {
           (course.lessons || []).forEach((lesson: any) => {
             (lesson.concepts || []).forEach((concept: any) => {
+              const memory = msMap.get(concept.id);
+              const humanState = memory ? mapToHumanState({
+                reps: memory.reps || 0,
+                stability: memory.stability || 0,
+                difficulty: memory.difficulty || 0,
+                lastResult: memory.last_result as any,
+                lapses: memory.lapses || 0,
+                isDue: memory.due ? new Date(memory.due) <= now : false
+              }) : mapToHumanState({
+                reps: 0,
+                stability: 0,
+                difficulty: 0,
+                lastResult: null,
+                lapses: 0,
+                isDue: false
+              });
+
               allConcepts.push({
                 ...concept,
-                memory: msMap.get(concept.id)
+                memory,
+                humanState
               });
             });
           });
         });
 
         const evaluated = allConcepts.filter(c => c.memory && (c.memory.reps || 0) > 0);
+        
+        // Regra de Atenção: falhas recentes ou desalinhamento metacognitivo
+        // Importante: "due" gera alerta visual, mas não é falha cognitiva por si só
         const attention = allConcepts.filter(c => {
           if (!c.memory) return false;
-          const isDue = c.memory.due ? new Date(c.memory.due) <= now : false;
           const isFailing = c.memory.last_result === 'incorrect' || c.memory.last_result === 'partial';
-          return isDue || isFailing;
+          const hasMismatch = (c.memory.last_confidence || 0) >= 3 && isFailing;
+          return isFailing || hasMismatch;
         });
 
         const hasMismatch = evaluated.some(c => 

@@ -65,21 +65,23 @@ export function calculateDomainMastery(metrics: DomainMetrics): DomainStateInfo 
 
   const coverage = evaluatedConcepts / totalConcepts;
 
-  // 1. Forte: Cobertura alta + Estabilidade + Sem problemas
-  if (coverage >= 0.85 && attentionConcepts === 0 && avgStability >= 30 && !hasMismatch) {
+  // 1. Forte: Cobertura alta + Estabilidade + Sem problemas + Sem atrasos
+  // Exige cobertura quase total (85%) e memória sólida
+  if (coverage >= 0.85 && attentionConcepts === 0 && avgStability >= 30 && !hasMismatch && metrics.dueConcepts === 0) {
     return DOMAIN_STATES.forte;
   }
 
-  // 2. Consistente: Cobertura média/alta + Estabilidade + Sem problemas críticos
+  // 2. Consistente: Cobertura média/alta + Estabilidade + Sem falhas recentes
+  // Permite alguns conceitos devidos (due), mas não falhas recentes ou lacunas críticas
   if (coverage >= 0.6 && attentionConcepts === 0 && avgStability >= 10) {
     return DOMAIN_STATES.consistente;
   }
 
-  // 3. Em construção vs Em desenvolvimento baseado na cobertura
+  // 3. Em construção: Cobertura muito baixa (<30%)
   if (coverage < 0.3) {
     return DOMAIN_STATES.em_construcao;
   }
 
-  // Se tem cobertura mas tem atenção ou baixa estabilidade
+  // 4. Em desenvolvimento: Cobertura razoável mas com falhas, instabilidades ou desalinhamentos
   return DOMAIN_STATES.em_desenvolvimento;
 }
