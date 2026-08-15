@@ -239,7 +239,7 @@ function EstudarPage() {
                     <BookOpen className="h-3 w-3" />
                     <span>
                       {priority === "recommendation" 
-                        ? (data.planned?.status === 'not_started' ? 'Ainda não iniciado' : 'Continuar planejamento')
+                        ? (data.planned?.status as any === 'not_started' ? 'Ainda não iniciado' : 'Continuar planejamento')
                         : (data.course?.status === 'not_started' ? 'Ainda não iniciado' : `${(data.course as any).progress?.percent || 0}% concluído`)}
                     </span>
                   </div>
