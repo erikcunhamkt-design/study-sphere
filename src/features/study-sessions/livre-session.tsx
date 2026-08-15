@@ -39,6 +39,10 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   const [isFinished, setIsFinished] = useState(false);
   const [showLessonSwitcher, setShowLessonSwitcher] = useState(false);
   
+  // Estado para controle de material real e progresso
+  const [materialStats, setMaterialStats] = useState({ hasReal: false, blocksCount: 0 });
+  const [blocksViewed, setBlocksViewed] = useState(0);
+
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
   
@@ -129,9 +133,6 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
 
   const { data: lessonDoc } = useLessonDocument(effectiveLessonId || "");
   
-  // Estado para controle de material real e progresso
-  const [materialStats, setMaterialStats] = useState({ hasReal: false, blocksCount: 0 });
-  const [blocksViewed, setBlocksViewed] = useState(0);
 
   // Se o lessonId foi setado via efeito de curso, inicia a sessão assim que o estado estabilizar
   useEffect(() => {
