@@ -28,6 +28,7 @@ export async function fetchAllCourses(userId: string): Promise<Course[]> {
     .from("courses")
     .select(COLUMNS)
     .eq("user_id", userId)
+    .eq("is_test_data", false)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true })
     .order("id", { ascending: true });

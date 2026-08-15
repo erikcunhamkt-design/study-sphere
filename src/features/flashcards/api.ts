@@ -11,6 +11,7 @@ export async function fetchFlashcards(userId: string): Promise<FlashcardRow[]> {
     .from("flashcards")
     .select(FLASHCARD_COLUMNS)
     .eq("user_id", userId)
+    .eq("is_test_data", false)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as FlashcardRow[];
@@ -24,6 +25,7 @@ export async function fetchDueFlashcards(userId: string): Promise<FlashcardRow[]
     .select(FLASHCARD_COLUMNS)
     .eq("user_id", userId)
     .eq("is_archived", false)
+    .eq("is_test_data", false)
     .or(`state.eq.novo,due_at.lte.${nowIso}`)
     .order("due_at", { ascending: true, nullsFirst: true });
   if (error) throw error;
@@ -37,6 +39,7 @@ export async function fetchFlashcardsByDeck(userId: string, deckId: string): Pro
     .eq("user_id", userId)
     .eq("deck_id", deckId)
     .eq("is_archived", false)
+    .eq("is_test_data", false)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as FlashcardRow[];
@@ -51,6 +54,7 @@ export async function fetchDueFlashcardsByDeck(userId: string, deckId: string): 
     .eq("user_id", userId)
     .eq("deck_id", deckId)
     .eq("is_archived", false)
+    .eq("is_test_data", false)
     .or(`state.eq.novo,due_at.lte.${nowIso}`)
     .order("due_at", { ascending: true, nullsFirst: true });
   if (error) throw error;
