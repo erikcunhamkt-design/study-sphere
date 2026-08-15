@@ -95,7 +95,7 @@ export const applyFsrsReview = createServerFn({ method: "POST" })
       lapses: currentState.lapses,
       state: currentState.state,
       last_review: currentState.last_review ? new Date(currentState.last_review) : undefined,
-      due: new Date(currentState.due),
+      due: new Date(currentState.due || new Date().toISOString()),
     } : {
       stability: 0,
       difficulty: 0,
@@ -104,6 +104,7 @@ export const applyFsrsReview = createServerFn({ method: "POST" })
       state: State.New,
       due: new Date(),
     };
+
 
     // 3. Calculate next state
     const result = memoryEngine.applyReview(
