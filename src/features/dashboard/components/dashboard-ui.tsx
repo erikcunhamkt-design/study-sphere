@@ -135,7 +135,7 @@ export function SectionHeader({ title }: { title: string }) {
   );
 }
 
-export function MasteryCard({ percent, trend }: { percent?: number; trend?: number }) {
+export function MasteryCard({ percent, trend, state }: { percent?: number; trend?: number; state?: any }) {
   return (
     <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center">
       <div className="flex items-center justify-between mb-4">
