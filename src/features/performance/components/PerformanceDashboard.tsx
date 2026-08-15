@@ -188,7 +188,7 @@ export function PerformanceDashboard() {
               <p className="text-2xl font-black text-foreground">{data.studyProgress.startedConcepts}</p>
             </div>
             <div className="space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Consolidados</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Estáveis</span>
               <p className="text-2xl font-black text-foreground">{data.studyProgress.completedConcepts}</p>
             </div>
           </CardContent>
