@@ -172,6 +172,7 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
   };
 
 
+
   if (isLoadingQuestions) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
