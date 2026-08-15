@@ -5,6 +5,7 @@ export const STUDY_METHOD_VALUES = [
   "blurting",
   "cornell",
   "livre",
+  "aprender",
 ] as const;
 
 export type StudyMethod = (typeof STUDY_METHOD_VALUES)[number];

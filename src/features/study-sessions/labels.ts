@@ -7,4 +7,5 @@ export const STUDY_METHOD_LABELS: Record<StudyMethod, string> = {
   blurting: "Blurting",
   cornell: "Cornell",
   livre: "Livre",
+  aprender: "Aprender",
 };

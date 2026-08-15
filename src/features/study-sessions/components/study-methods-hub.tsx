@@ -7,15 +7,16 @@ import {
   ChevronRight,
   ArrowRight,
   Layers,
-  BookOpen
+  BookOpen,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StudyMethod } from "../types";
-import { COURSE_STATUS_LABELS } from "@/features/studies/utils";
 
 interface MethodOption {
   id: StudyMethod;
   title: string;
+  displayName: string;
   description: string;
   recommendation?: string;
   icon: any;
@@ -24,23 +25,27 @@ interface MethodOption {
 
 const METHODS: MethodOption[] = [
   {
-    id: "pomodoro",
-    title: "Pomodoro",
-    description: "Foco profundo com intervalos.",
-    icon: Clock,
-    category: "tempo"
+    id: "aprender",
+    title: "Aprender",
+    displayName: "Aprender primeiro",
+    description: "Explore o conteúdo pela primeira vez para compreender a base.",
+    recommendation: "Este conteúdo ainda não foi estudado. Primeiro compreenda o material; depois o Dominus poderá testar o que você realmente reteve.",
+    icon: BookOpen,
+    category: "aprendizagem"
   },
   {
     id: "feynman",
     title: "Feynman",
-    description: "Explique o conceito com suas próprias palavras.",
-    recommendation: "Você está começando este conteúdo agora. Tente explicar o que aprendeu para fixar.",
+    displayName: "Explicar conceito",
+    description: "Explique o conceito com suas próprias palavras para verificar se entendeu.",
+    recommendation: "Você já teve contato suficiente com o conteúdo. Agora tente explicar para consolidar o entendimento.",
     icon: Brain,
     category: "aprendizagem"
   },
   {
     id: "cornell",
     title: "Cornell",
+    displayName: "Anotar e Organizar",
     description: "Estruture suas anotações com pistas e resumos.",
     icon: BookOpen,
     category: "aprendizagem"
@@ -48,26 +53,30 @@ const METHODS: MethodOption[] = [
   {
     id: "blurting",
     title: "Blurting",
-    description: "Escreva tudo o que lembra sem consultar o material.",
-    recommendation: "Você já viu este conteúdo antes. Teste sua memória sem olhar as notas.",
+    displayName: "Recuperar o que lembra",
+    description: "Escreva tudo o que você lembra sem consultar o material.",
+    recommendation: "Você já teve contato com este conteúdo. Agora tente lembrar sem consultar o material.",
     icon: Zap,
     category: "recuperacao"
   },
   {
     id: "recordacao_ativa",
     title: "Flashcards",
-    description: "Repetição espaçada inteligente com cartões.",
-    recommendation: "É hora de reforçar este conteúdo com revisões rápidas.",
+    displayName: "Testar Memória",
+    description: "Teste sua memória com perguntas e respostas.",
+    recommendation: "Você já estudou este conteúdo. Agora teste o que consegue lembrar através de flashcards.",
     icon: Layers,
     category: "recuperacao"
   },
   {
-    id: "livre",
-    title: "Simulado",
-    description: "Pratique com questões reais e avalie seu nível.",
-    icon: ListChecks,
-    category: "avaliacao"
+    id: "pomodoro",
+    title: "Pomodoro",
+    displayName: "Pomodoro",
+    description: "Gestão de tempo: foco profundo com intervalos.",
+    icon: Clock,
+    category: "tempo"
   }
+  // Simulados removidos temporariamente por falta de infra de questões se não houver
 ];
 
 interface StudyMethodsHubProps {
@@ -83,104 +92,120 @@ interface StudyMethodsHubProps {
 
 export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: StudyMethodsHubProps) {
   const categories = [
+    { id: "recuperacao", label: "Recuperação", icon: Zap },
+    { id: "aprendizagem", label: "Elaboração & Anotação", icon: BookOpen },
     { id: "tempo", label: "Gestão de Tempo", icon: Clock },
-    { id: "aprendizagem", label: "Aprendizagem", icon: BookOpen },
-    { id: "recuperacao", label: "Recuperação Ativa", icon: Brain },
-    { id: "avaliacao", label: "Avaliação", icon: ListChecks },
+    // { id: "avaliacao", label: "Avaliação", icon: ListChecks },
   ];
 
-  // Lógica simples de recomendação do Dominus
   const recommendedMethodId = useMemo(() => {
     if (!selectedContent) return null;
-    if (selectedContent.status === 'not_started') return 'feynman';
+    
+    // ESTADO A - NOVO
+    if (selectedContent.status === 'not_started') return 'aprender';
+    
+    // ESTADO B - JÁ ESTUDADO (In progress)
     if (selectedContent.status === 'in_progress') return 'blurting';
+    
+    // ESTADO D - BOM DOMÍNIO (Completed)
     if (selectedContent.status === 'completed') return 'recordacao_ativa';
+    
     return null;
   }, [selectedContent]);
 
   const recommendedMethod = METHODS.find(m => m.id === recommendedMethodId);
 
-
   return (
-    <div className={cn("space-y-12", className)}>
+    <div className={cn("space-y-16", className)}>
       {recommendedMethod && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Brain className="h-4 w-4 text-primary" />
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+        <div className="space-y-8">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+            </div>
+            <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-primary">
               Dominus Recomenda
             </h3>
-            <span className="h-px flex-1 ml-4 bg-primary/20" />
+            <div className="h-px flex-1 ml-2 bg-gradient-to-r from-primary/30 to-transparent" />
           </div>
 
           <button
             onClick={() => onSelectMethod(recommendedMethod.id)}
-            className="group relative w-full overflow-hidden rounded-[2rem] border border-primary/30 bg-primary/5 p-8 text-left transition-all hover:bg-primary/10 hover:border-primary/50"
+            className="group relative w-full overflow-hidden rounded-[2.5rem] border border-primary/30 bg-surface/40 p-10 text-left transition-all hover:bg-surface/60 hover:border-primary/50 shadow-[0_0_50px_-12px_rgba(217,0,110,0.15)]"
           >
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 blur-[60px] rounded-full pointer-events-none" />
-            <div className="flex items-center gap-6 relative z-10">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                <recommendedMethod.icon className="h-8 w-8" />
+            <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-8 relative z-10">
+              <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                <recommendedMethod.icon className="h-10 w-10" />
               </div>
-              <div className="flex-1 space-y-2">
-                <h4 className="text-xl font-black tracking-tight text-foreground">
-                  {recommendedMethod.title}
+              <div className="flex-1 space-y-3">
+                <h4 className="text-2xl font-black tracking-tighter text-foreground">
+                  {recommendedMethod.displayName}
                 </h4>
-                <p className="text-sm text-muted-foreground/80 leading-relaxed max-w-xl">
-                  {recommendedMethod.recommendation || recommendedMethod.description}
+                <p className="text-base text-muted-foreground/80 leading-relaxed max-w-2xl font-medium">
+                  {recommendedMethod.recommendation}
                 </p>
               </div>
-              <div className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white font-black text-sm group-hover:gap-4 transition-all">
-                COMEÇAR <ArrowRight className="h-4 w-4" />
+              <div className="flex items-center gap-3 px-8 py-4 rounded-full bg-primary text-white font-black text-sm shadow-[0_0_30px_-5px_rgba(217,0,110,0.4)] group-hover:translate-x-2 transition-all duration-300">
+                Começar <ArrowRight className="h-4 w-4" />
               </div>
             </div>
           </button>
-
-          <div className="flex items-center justify-center py-4">
-             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">ou escolha outra forma de estudar</p>
-          </div>
         </div>
       )}
 
-      {categories.map((cat) => (
-        <div key={cat.id} className="space-y-4">
-          <div className="flex items-center gap-2">
-            <cat.icon className="h-4 w-4 text-muted-foreground/40" />
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
-              {cat.label}
-            </h3>
-            <span className="h-px flex-1 ml-4 bg-border/20" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {METHODS.filter(m => m.category === cat.id).map((method) => (
-              <button
-                key={method.id}
-                onClick={() => onSelectMethod(method.id)}
-                className="group relative flex flex-col p-6 rounded-[1.5rem] border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30 active:scale-[0.98]"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
-                    <method.icon className="h-5 w-5" />
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </div>
-                
-                <div className="space-y-1">
-                  <h4 className="font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                    {method.title}
-                  </h4>
-                  <p className="text-xs text-muted-foreground/60 leading-relaxed">
-                    {method.description}
-                  </p>
-                </div>
-
-                <div className="absolute inset-0 rounded-[1.5rem] bg-primary/0 group-hover:bg-primary/[0.02] pointer-events-none transition-colors" />
-              </button>
-            ))}
-          </div>
+      <div className="space-y-12">
+        <div className="flex items-center gap-3">
+          <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
+            Outras formas de estudar
+          </h3>
+          <div className="h-px flex-1 bg-border/20" />
         </div>
-      ))}
+
+        <div className="space-y-12">
+          {categories.map((cat) => (
+            <div key={cat.id} className="space-y-6">
+              <div className="flex items-center gap-2 px-2">
+                <cat.icon className="h-3.5 w-3.5 text-muted-foreground/30" />
+                <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/30">
+                  {cat.label}
+                </h4>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {METHODS.filter(m => m.category === cat.id && m.id !== recommendedMethodId).map((method) => (
+                  <button
+                    key={method.id}
+                    onClick={() => onSelectMethod(method.id)}
+                    className="group relative flex flex-col p-7 rounded-[2rem] border border-border/40 bg-surface/20 text-left transition-all hover:border-primary/20 hover:bg-surface/30 active:scale-[0.98]"
+                  >
+                    <div className="flex items-start justify-between mb-5">
+                      <div className="w-12 h-12 rounded-2xl bg-surface/40 border border-border/10 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+                        <method.icon className="h-6 w-6" />
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/10 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-black tracking-tight text-foreground/90 group-hover:text-foreground transition-colors">
+                        {method.displayName}
+                      </h4>
+                      <p className="text-sm text-muted-foreground/50 leading-relaxed font-medium">
+                        {method.description}
+                      </p>
+                      <div className="pt-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/20 group-hover:text-primary/40 transition-colors">
+                          Técnica: {method.title}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
