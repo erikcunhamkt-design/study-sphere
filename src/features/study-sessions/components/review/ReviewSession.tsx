@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Brain, ArrowRight, CheckCircle2, Loader2, Clock, Send, Sparkles, BookOpen } from "lucide-react";
+import { Brain, ArrowRight, CheckCircle2, Loader2, Clock, Send, Sparkles, BookOpen, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
