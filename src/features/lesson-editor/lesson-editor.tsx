@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LabEditorFormattingToolbar } from "@/features/lab-editor/formatting-toolbar";
+import { cn } from "@/lib/utils";
 import "@/features/lab-editor/theme.css";
 import { FlashcardFormDialog } from "@/features/flashcards/flashcard-form-dialog";
 import { FlashcardList } from "@/features/flashcards/flashcard-list";
