@@ -19,6 +19,7 @@ export type Database = {
           attempted_at: string
           concept_id: string | null
           confidence: number
+          confidence_source: string
           created_at: string
           id: string
           lesson_id: string | null
@@ -34,6 +35,7 @@ export type Database = {
           attempted_at?: string
           concept_id?: string | null
           confidence: number
+          confidence_source?: string
           created_at?: string
           id?: string
           lesson_id?: string | null
@@ -49,6 +51,7 @@ export type Database = {
           attempted_at?: string
           concept_id?: string | null
           confidence?: number
+          confidence_source?: string
           created_at?: string
           id?: string
           lesson_id?: string | null
@@ -1186,6 +1189,9 @@ export type Database = {
         | "incorrect"
         | "no_answer"
         | "abandoned"
+        | "self_reported_correct"
+        | "self_reported_partial"
+        | "self_reported_incorrect"
       result_source: "self_assessment" | "objective" | "manual" | "ai"
     }
     CompositeTypes: {
@@ -1320,6 +1326,9 @@ export const Constants = {
         "incorrect",
         "no_answer",
         "abandoned",
+        "self_reported_correct",
+        "self_reported_partial",
+        "self_reported_incorrect",
       ],
       result_source: ["self_assessment", "objective", "manual", "ai"],
     },
