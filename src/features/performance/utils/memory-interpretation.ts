@@ -17,31 +17,31 @@ export interface HumanStateInfo {
 export const HUMAN_STATES: Record<MemoryHumanState, HumanStateInfo> = {
   novo: {
     label: "Novo",
-    description: "Ainda não avaliado.",
+    description: "Ainda não possui evidência cognitiva suficiente.",
     color: "text-muted-foreground/60 bg-muted/10",
     state: "novo",
   },
   aprendizagem: {
     label: "Em aprendizagem",
-    description: "Poucas evidências.",
+    description: "Conceito em processo inicial de construção de memória.",
     color: "text-blue-500 bg-blue-500/10",
     state: "aprendizagem",
   },
   reforco: {
     label: "Precisa de reforço",
-    description: "Você teve dificuldade nas últimas recuperações.",
+    description: "Histórico recente com dificuldades ou falhas de recuperação.",
     color: "text-orange-500 bg-orange-500/10",
     state: "reforco",
   },
   consolidacao: {
     label: "Em consolidação",
-    description: "Você já conseguiu recuperar este conceito várias vezes.",
+    description: "Conceito recuperado com consistência em intervalos crescentes.",
     color: "text-magenta bg-magenta/10",
     state: "consolidacao",
   },
   estavel: {
     label: "Estável",
-    description: "Memória com histórico consistente e sem revisão imediata.",
+    description: "Histórico consistente e sem necessidade imediata de recuperação.",
     color: "text-emerald-500 bg-emerald-500/10",
     state: "estavel",
   },
