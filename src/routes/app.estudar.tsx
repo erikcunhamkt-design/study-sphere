@@ -123,7 +123,7 @@ function EstudarPage() {
         ) : activeMethod === "cornell" ? (
           <CornellSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "aprender" || activeMethod === "livre" ? (
-          <LivreSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
+          <LivreSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} method={activeMethod} />
         ) : (
           <RecordacaoAtivaHub onBack={backToHub} deckId={deckId} mode={mode} />
         )}

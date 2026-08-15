@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, BookOpen, Clock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,18 +11,19 @@ import { useCreateStudySession, useFinishStudySession } from "./hooks";
 import { initialDetailsForMethod } from "./schema";
 import { useElapsedSeconds } from "./use-elapsed-seconds";
 import { useUnsavedTextWarning } from "./use-unsaved-warning";
-import type { LivreDetails, StudySessionRow } from "./types";
+import type { LivreDetails, StudySessionRow, StudyMethod } from "./types";
 
 interface LivreSessionProps {
   resumingSession: StudySessionRow | null;
   onDone: () => void;
   plannedId?: string;
+  method?: StudyMethod;
 }
 
 /** Fallback estável para useElapsedSeconds antes de a sessão existir — nunca exibido (o timer só aparece depois do INSERT). */
 const NO_SESSION_ISO = new Date(0).toISOString();
 
-export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessionProps) {
+export function LivreSession({ resumingSession, onDone, plannedId, method = "livre" }: LivreSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
   const [nota, setNota] = useState("");
@@ -51,15 +52,15 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
     setOptimisticStart(new Date().toISOString());
     try {
       const created = await createSession.mutateAsync({
-        method: "livre",
+        method: method,
         lessonId,
         isFreeSession: !lessonId,
-        details: initialDetailsForMethod("livre"),
+        details: initialDetailsForMethod(method),
       });
       setSession(created);
     } catch (err) {
       setOptimisticStart(null);
-      console.error("[study-sessions] falha ao iniciar sessão livre", err);
+      console.error(`[study-sessions] falha ao iniciar sessão ${method}`, err);
       toast.error("Não foi possível iniciar a sessão");
     }
   }
@@ -78,20 +79,26 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
 
   if (!session && !optimisticStart) {
     return (
-      <div className="space-y-4 rounded-xl border border-border bg-surface p-6">
-        <LessonPicker value={lessonId} onChange={setLessonId} />
+      <div className="space-y-6 rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10">
+        <div className="space-y-4">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">
+            {method === "aprender" ? "O que você vai aprender?" : "O que você quer estudar?"}
+          </h3>
+          <LessonPicker value={lessonId} onChange={setLessonId} />
+        </div>
         <Button
           onClick={() => void handleStart()}
           disabled={createSession.isPending}
-          className="w-full"
+          size="lg"
+          className="w-full h-16 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform active:scale-95"
         >
           {createSession.isPending ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              <Loader2 className="h-5 w-5 animate-spin mr-2" aria-hidden />
               Iniciando...
             </>
           ) : (
-            "Iniciar sessão livre"
+            method === "aprender" ? "Iniciar Aprendizado →" : "Iniciar Sessão Livre →"
           )}
         </Button>
       </div>
@@ -106,7 +113,9 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
-              Estudo Livre
+              {method === "aprender" ? (
+                <><BookOpen className="h-3 w-3" /> Aprender</>
+              ) : "Estudo Livre"}
             </span>
             <p className="text-[10px] font-bold tabular-nums text-muted-foreground/40 uppercase tracking-widest">
               {formatSeconds(elapsed)} decorridos
@@ -118,12 +127,14 @@ export function LivreSession({ resumingSession, onDone, plannedId }: LivreSessio
         </div>
 
         <div className="space-y-4">
-          <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Nota da Sessão (opcional)</Label>
+          <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">
+            {method === "aprender" ? "Anotações do Aprendizado" : "Nota da Sessão (opcional)"}
+          </Label>
           <Textarea
             id="livre-nota"
             value={nota}
             onChange={(e) => setNota(e.target.value)}
-            placeholder="O que você está estudando agora?"
+            placeholder={method === "aprender" ? "O que você está descobrindo agora?" : "O que você está estudando agora?"}
             className="min-h-[160px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-base font-medium resize-none p-6"
             maxLength={20000}
           />
