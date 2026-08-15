@@ -238,11 +238,23 @@ function DashboardPage() {
           />
         )}
 
+        {priority === "test_memory" && (
+          <NextStepAction
+            title="PRÓXIMO PASSO"
+            subtitle="Sua memória ainda não foi avaliada"
+            description="O próximo passo é descobrir o que realmente ficou. Você já estudou, mas ainda não testou o que consegue recuperar."
+            ctaText="Testar memória"
+            to="/app/estudar"
+            search={{}}
+            icon={Sparkles}
+          />
+        )}
+
         {priority === "maintenance" && (
           <NextStepAction
             title="TUDO EM DIA"
-            subtitle="Continue avançando"
-            description="Nenhuma revisão pendente. Escolha seu próximo passo de aprendizagem."
+            subtitle="Nenhuma revisão prevista"
+            description="Você está em dia com suas revisões. Continue estudando para expandir seu conhecimento."
             ctaText="Continuar estudando"
             to="/app/meus-estudos/$areaId/cursos/$courseId"
             params={{ 
