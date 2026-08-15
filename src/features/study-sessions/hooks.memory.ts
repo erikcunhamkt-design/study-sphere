@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { applyFsrsReview, rebuildMemoryState } from "./engine.server";
+import { applyFsrsReview, rebuildMemoryState } from "@/lib/memory/engine.server";
 
 export function useApplyFsrsReview() {
   const qc = useQueryClient();
