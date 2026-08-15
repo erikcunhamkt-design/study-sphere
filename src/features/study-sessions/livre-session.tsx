@@ -446,12 +446,18 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                 
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">DICAS</h4>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {method === "aprender" ? (
-                      ['Conecte com o que já sabe', 'Identifique termos novos', 'Não tente decorar tudo agora'].map((tip, i) => (
-                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
-                          <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
-                          {tip}
+                      [
+                        { label: 'Conecte com o que já sabe', icon: <Brain className="h-3 w-3" /> },
+                        { label: 'Identifique termos novos', icon: <Zap className="h-3 w-3" /> },
+                        { label: 'Não tente decorar tudo agora', icon: <BookOpen className="h-3 w-3" /> }
+                      ].map((tip, i) => (
+                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left group">
+                          <div className="mt-0.5 p-1 rounded-md bg-primary/5 text-primary/40 group-hover:text-primary/60 transition-colors shrink-0">
+                            {tip.icon}
+                          </div>
+                          <span className="leading-relaxed">{tip.label}</span>
                         </li>
                       ))
                     ) : (
