@@ -336,37 +336,83 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left">
-            <div className="lg:col-span-8 space-y-6">
+            <div className="lg:col-span-8 space-y-10">
+              {/* Prioridade 1: CONTEÚDO REAL */}
               <div className="space-y-4">
-                <Label htmlFor="livre-nota" className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 ml-1">
-                  {method === "aprender" ? "Compreensão do Material" : "Notas da Sessão"}
-                </Label>
-                <Textarea
-                  id="livre-nota"
-                  value={nota}
-                  onChange={(e) => setNota(e.target.value)}
-                  placeholder={method === "aprender" ? "O que você está descobrindo agora? Use este espaço para anotar pontos chave..." : "O que você está estudando agora?"}
-                  className="min-h-[400px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-lg font-medium resize-none p-8 shadow-inner"
-                  maxLength={20000}
-                />
+                <div className="flex items-center justify-between px-1">
+                  <Label className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
+                    Material de Estudo
+                  </Label>
+                  {lessonData && (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/40">
+                      Aula {lessonData.position + 1} de {courseLessons?.length || "?"}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="min-h-[500px] rounded-[2.5rem] border border-border/10 bg-surface/20 p-8 md:p-12 shadow-sm transition-all overflow-hidden">
+                  {lessonId ? (
+                    <LessonContentViewer lessonId={lessonId} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
+                      <AlertCircle className="h-10 w-10 text-muted-foreground/20" />
+                      <p className="text-sm font-bold text-muted-foreground/40 uppercase tracking-widest">
+                        Nenhuma aula selecionada
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Prioridade 2: COMPREENSÃO (Notas transformadas em elemento secundário) */}
+              <div className="space-y-6 pt-6 border-t border-border/5">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-foreground/80">Reflexão & Notas</h3>
+                  <p className="text-xs text-muted-foreground/40 font-medium">Capture insights e conexões durante a leitura.</p>
+                </div>
+                
+                <div className="space-y-4">
+                  <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/30 ml-1">
+                    SUAS NOTAS
+                  </Label>
+                  <Textarea
+                    id="livre-nota"
+                    value={nota}
+                    onChange={(e) => setNota(e.target.value)}
+                    placeholder="O que você está descobrindo agora? Liste conceitos chaves, dúvidas ou relações..."
+                    className="min-h-[250px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-base font-medium resize-none p-6 shadow-inner focus-visible:ring-primary/20"
+                    maxLength={20000}
+                  />
+                </div>
               </div>
             </div>
             
             <div className="lg:col-span-4 space-y-10">
-              <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-6">
-                <div className="space-y-2 text-left">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">O que preciso fazer?</h4>
-                  <p className="text-sm font-bold text-foreground/70 leading-relaxed">
-                    {method === "aprender" 
-                      ? "Seu objetivo agora é a compreensão profunda do material. Leia, anote e conecte ideias."
-                      : "Estude o conteúdo da forma que preferir, usando o espaço de notas para registro."}
-                  </p>
+              {/* Prioridade 3: ORIENTAÇÃO PEDAGÓGICA CONTEXTUAL */}
+              <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-8 sticky top-8">
+                <div className="space-y-3 text-left">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">O QUE FAZER AGORA</h4>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-base font-black text-foreground/90 uppercase tracking-tight">
+                      {method === "aprender" ? "Compreenda o conteúdo" : "Pratique livremente"}
+                    </p>
+                    <p className="text-xs font-medium text-muted-foreground/60 leading-relaxed">
+                      {method === "aprender" 
+                        ? "Identifique a ideia central, conecte com o que você já sabe e destaque o que ainda não está claro."
+                        : "Use o espaço de notas para registrar seu progresso e insights durante o estudo."}
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Dicas Dominus</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">DICAS</h4>
                   <ul className="space-y-3">
                     {method === "aprender" ? (
+                      ['Conecte com o que já sabe', 'Identifique termos novos', 'Não tente decorar tudo agora'].map((tip, i) => (
+
                       ['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
                         <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
                           <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
