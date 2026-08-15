@@ -172,7 +172,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
         
         <div className="relative z-10 space-y-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/10 pb-8">
-            <div className="space-y-2">
+            <div className="space-y-2 text-left">
               <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30 mb-2">
                 <span>DominusApp</span>
                 <ChevronRight className="h-3 w-3" />
@@ -217,7 +217,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left">
             <div className="lg:col-span-8 space-y-6">
               <div className="space-y-4">
                 <Label htmlFor="livre-nota" className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 ml-1">
@@ -236,7 +236,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
             
             <div className="lg:col-span-4 space-y-10">
               <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-6">
-                <div className="space-y-2">
+                <div className="space-y-2 text-left">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Contexto</h4>
                   <p className="text-sm font-bold text-foreground/70 leading-relaxed">
                     Esta é sua fase de <strong>primeiro contato</strong>. O objetivo é a compreensão profunda, não a memorização imediata.
@@ -247,7 +247,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Dicas Dominus</h4>
                   <ul className="space-y-3">
                     {['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
-                      <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium">
+                      <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
                         <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
                         {tip}
                       </li>
