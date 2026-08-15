@@ -163,6 +163,15 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }
 
   if (!session && !optimisticStart) {
+    if (isLoadingLessons) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40">Preparando foco...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="rounded-[2.5rem] border border-border/40 bg-surface/20 p-8 md:p-12 space-y-10">
@@ -315,21 +324,32 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
             <div className="lg:col-span-4 space-y-10">
               <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-6">
                 <div className="space-y-2 text-left">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Contexto</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">O que preciso fazer?</h4>
                   <p className="text-sm font-bold text-foreground/70 leading-relaxed">
-                    Esta é sua fase de <strong>primeiro contato</strong>. O objetivo é a compreensão profunda, não a memorização imediata.
+                    {method === "aprender" 
+                      ? "Seu objetivo agora é a compreensão profunda do material. Leia, anote e conecte ideias."
+                      : "Estude o conteúdo da forma que preferir, usando o espaço de notas para registro."}
                   </p>
                 </div>
                 
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Dicas Dominus</h4>
                   <ul className="space-y-3">
-                    {['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
-                      <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
-                        <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
-                        {tip}
-                      </li>
-                    ))}
+                    {method === "aprender" ? (
+                      ['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
+                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
+                          <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
+                          {tip}
+                        </li>
+                      ))
+                    ) : (
+                      ['Mantenha o foco absoluto', 'Elimine distrações', 'Faça pausas se necessário'].map((tip, i) => (
+                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
+                          <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
+                          {tip}
+                        </li>
+                      ))
+                    )}
                   </ul>
                 </div>
               </div>
