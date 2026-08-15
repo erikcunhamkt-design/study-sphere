@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Loader2, BookOpen, Clock, ChevronRight } from "lucide-react";
+import { Loader2, BookOpen, Clock, ChevronRight, AlertCircle, Timer, ArrowLeft, Settings, LogOut, CheckCircle2, Zap, Brain } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import { useLessonsByCourse, useLesson } from "@/features/studies/hooks/use-lessons";
 import { useCourse } from "@/features/studies/hooks/use-courses";
 import { useCourseModule } from "@/features/studies/hooks/use-course-modules";
+import { LessonContentViewer } from "./components/lesson-content-viewer";
+import { useLessonDocument } from "@/features/lesson-editor/hooks";
 
 interface LivreSessionProps {
   resumingSession: StudySessionRow | null;
@@ -125,6 +127,9 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     }
   }, [initialLessonId, initialCourseId, isLoadingLessons, courseLessons, session, optimisticStart, resumingSession]);
 
+  const { data: lessonDoc } = useLessonDocument(effectiveLessonId || "");
+  const hasMaterial = lessonDoc?.content && Array.isArray(lessonDoc.content) && lessonDoc.content.length > 0;
+
   // Se o lessonId foi setado via efeito de curso, inicia a sessão assim que o estado estabilizar
   useEffect(() => {
     if (lessonId && !session && !optimisticStart && !resumingSession) {
@@ -137,52 +142,86 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }, [lessonId]);
 
   async function handleFinish() {
+    if (!session) return;
+    
+    // Regra de conclusão: Se for o método 'aprender', precisa ter material
+    if (method === "aprender" && !hasMaterial) {
+      toast.error("Esta sessão não possui material. Adicione o conteúdo para concluir o aprendizado.");
+      return;
+    }
+
+    // Condição mínima: pelo menos 10 segundos
+    if (elapsed < 10) {
+      toast.error("Contato muito curto. Dedique um pouco mais de tempo à compreensão.");
+      return;
+    }
+
     const details: LivreDetails = nota.trim() ? { nota: nota.trim() } : {};
     try {
       await finishSession.mutateAsync(details);
-      toast.success("Sessão concluída");
+      toast.success(method === "aprender" ? "Primeiro contato concluído!" : "Sessão concluída");
       setIsFinished(true);
     } catch (err) {
-      console.error("[study-sessions] falha ao concluir sessão livre", err);
+      console.error("[study-sessions] falha ao concluir sessão", err);
       toast.error("Não foi possível concluir a sessão");
     }
   }
 
-  // 12. FINAL DA PRIMEIRA SESSÃO (ou qualquer sessão de aprendizado concluída)
+  // 17. FINAL DA SESSÃO - Refinado
   if (isFinished) {
     return (
-      <div className="group relative overflow-hidden rounded-[2.5rem] border border-primary/20 bg-surface/30 p-10 md:p-16 text-center animate-in fade-in zoom-in duration-700">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-        
-        <div className="relative z-10 space-y-10">
-          <div className="mx-auto w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-            <BookOpen className="h-12 w-12" />
+      <div className="max-w-4xl mx-auto py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="flex flex-col items-center text-center space-y-12">
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
+            <div className="relative w-24 h-24 rounded-[2rem] bg-primary flex items-center justify-center text-white shadow-[0_0_50px_-10px_rgba(217,0,110,0.5)]">
+              <CheckCircle2 className="h-12 w-12" />
+            </div>
           </div>
           
           <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground uppercase">
               {method === "aprender" ? "Primeiro contato concluído" : "Sessão concluída"}
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground/60 max-w-2xl mx-auto font-medium">
-              Agora vamos descobrir quanto desse conteúdo você realmente reteve.
+            </h1>
+            <p className="text-muted-foreground/60 text-lg max-w-lg mx-auto font-medium leading-relaxed">
+              {method === "aprender" 
+                ? "Você terminou sua primeira etapa com este conteúdo. Seu cérebro agora possui as bases necessárias."
+                : "Seu progresso foi registrado com sucesso."}
             </p>
           </div>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              onClick={onDone}
-              size="lg"
-              className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform hover:scale-105 active:scale-95"
-            >
-              Testar memória <ChevronRight className="ml-2 h-6 w-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={onDone}
-              className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground"
-            >
-              Voltar ao hub
-            </Button>
+
+          <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6 pt-10">
+            <div className="p-8 rounded-[2.5rem] bg-surface/40 border border-border/20 space-y-6 text-left relative overflow-hidden group hover:border-primary/40 transition-all">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-10 -mt-10" />
+              <div className="space-y-2">
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary">AGORA TESTE O QUE VOCÊ RETEVE</h3>
+                <p className="text-sm text-muted-foreground/60 leading-relaxed font-medium">
+                  O Dominus pode verificar quanto desse conteúdo você consegue recuperar sem consultar o material.
+                </p>
+              </div>
+              <Button 
+                onClick={onDone}
+                className="w-full h-12 rounded-2xl bg-primary/10 hover:bg-primary text-primary hover:text-white font-black uppercase tracking-widest text-[10px] transition-all"
+              >
+                Testar memória →
+              </Button>
+            </div>
+
+            <div className="p-8 rounded-[2.5rem] bg-surface/10 border border-border/5 space-y-6 text-left flex flex-col justify-between opacity-60 hover:opacity-100 transition-all">
+              <div className="space-y-2">
+                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/40">ENCERRAR POR HOJE</h3>
+                <p className="text-sm text-muted-foreground/40 font-medium leading-relaxed">
+                  Volte para o cockpit para ver suas estatísticas de saúde cerebral.
+                </p>
+              </div>
+              <Button 
+                variant="ghost"
+                onClick={onDone}
+                className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-surface/20"
+              >
+                Voltar ao Cockpit
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -334,41 +373,91 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left">
-            <div className="lg:col-span-8 space-y-6">
+            <div className="lg:col-span-8 space-y-10">
+              {/* Prioridade 1: CONTEÚDO REAL */}
               <div className="space-y-4">
-                <Label htmlFor="livre-nota" className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 ml-1">
-                  {method === "aprender" ? "Compreensão do Material" : "Notas da Sessão"}
-                </Label>
-                <Textarea
-                  id="livre-nota"
-                  value={nota}
-                  onChange={(e) => setNota(e.target.value)}
-                  placeholder={method === "aprender" ? "O que você está descobrindo agora? Use este espaço para anotar pontos chave..." : "O que você está estudando agora?"}
-                  className="min-h-[400px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-lg font-medium resize-none p-8 shadow-inner"
-                  maxLength={20000}
-                />
+                <div className="flex items-center justify-between px-1">
+                  <Label className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
+                    Material de Estudo
+                  </Label>
+                  {lessonData && (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/40">
+                      Aula {lessonData.position + 1} de {courseLessons?.length || "?"}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="min-h-[500px] rounded-[2.5rem] border border-border/10 bg-surface/20 p-8 md:p-12 shadow-sm transition-all overflow-hidden">
+                  {lessonId ? (
+                    <LessonContentViewer lessonId={lessonId} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
+                      <AlertCircle className="h-10 w-10 text-muted-foreground/20" />
+                      <p className="text-sm font-bold text-muted-foreground/40 uppercase tracking-widest">
+                        Nenhuma aula selecionada
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Prioridade 2: COMPREENSÃO (Notas transformadas em elemento secundário) */}
+              <div className="space-y-6 pt-6 border-t border-border/5">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-foreground/80">Reflexão & Notas</h3>
+                  <p className="text-xs text-muted-foreground/40 font-medium">Capture insights e conexões durante a leitura.</p>
+                </div>
+                
+                <div className="space-y-4">
+                  <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/30 ml-1">
+                    SUAS NOTAS
+                  </Label>
+                  <Textarea
+                    id="livre-nota"
+                    value={nota}
+                    onChange={(e) => setNota(e.target.value)}
+                    placeholder="O que você está descobrindo agora? Liste conceitos chaves, dúvidas ou relações..."
+                    className="min-h-[250px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-base font-medium resize-none p-6 shadow-inner focus-visible:ring-primary/20"
+                    maxLength={20000}
+                  />
+                </div>
               </div>
             </div>
             
             <div className="lg:col-span-4 space-y-10">
-              <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-6">
-                <div className="space-y-2 text-left">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">O que preciso fazer?</h4>
-                  <p className="text-sm font-bold text-foreground/70 leading-relaxed">
-                    {method === "aprender" 
-                      ? "Seu objetivo agora é a compreensão profunda do material. Leia, anote e conecte ideias."
-                      : "Estude o conteúdo da forma que preferir, usando o espaço de notas para registro."}
-                  </p>
+              {/* Prioridade 3: ORIENTAÇÃO PEDAGÓGICA CONTEXTUAL */}
+              <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-8 sticky top-8">
+                <div className="space-y-3 text-left">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">O QUE FAZER AGORA</h4>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-base font-black text-foreground/90 uppercase tracking-tight">
+                      {method === "aprender" ? "Compreenda o conteúdo" : "Pratique livremente"}
+                    </p>
+                    <p className="text-xs font-medium text-muted-foreground/60 leading-relaxed">
+                      {method === "aprender" 
+                        ? "Identifique a ideia central, conecte com o que você já sabe e destaque o que ainda não está claro."
+                        : "Use o espaço de notas para registrar seu progresso e insights durante o estudo."}
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Dicas Dominus</h4>
-                  <ul className="space-y-3">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">DICAS</h4>
+                  <ul className="space-y-4">
                     {method === "aprender" ? (
-                      ['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
-                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
-                          <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
-                          {tip}
+                      [
+                        { label: 'Conecte com o que já sabe', icon: <Brain className="h-3 w-3" /> },
+                        { label: 'Identifique termos novos', icon: <Zap className="h-3 w-3" /> },
+                        { label: 'Não tente decorar tudo agora', icon: <BookOpen className="h-3 w-3" /> }
+                      ].map((tip, i) => (
+                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left group">
+                          <div className="mt-0.5 p-1 rounded-md bg-primary/5 text-primary/40 group-hover:text-primary/60 transition-colors shrink-0">
+                            {tip.icon}
+                          </div>
+                          <span className="leading-relaxed">{tip.label}</span>
                         </li>
                       ))
                     ) : (
