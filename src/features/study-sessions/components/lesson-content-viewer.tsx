@@ -15,6 +15,7 @@ import type { LessonDocument } from "@/features/lesson-editor/document-schema";
 interface LessonContentViewerProps {
   lessonId: string;
   onMaterialLoad?: (hasRealMaterial: boolean, blocksCount: number) => void;
+  onProgress?: (blocksViewed: number) => void;
   canEdit?: boolean;
 }
 
@@ -137,6 +138,6 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
     );
   }
 
-  return <ViewerInner key={lessonId} blocks={realContent} lessonId={lessonId} />;
+  return <ViewerInner key={lessonId} blocks={realContent} lessonId={lessonId} onProgress={onProgress} />;
 }
 
