@@ -134,7 +134,7 @@ export function useDashboardState() {
     // 4. Prioridade: Primeiro Estudo (Possui conteúdo mas nada em andamento)
     const validCourses = (activeCourses ?? []).filter(c => 
       c.name.trim().length > 2 && 
-      !/^(teste|test|abc|sdfsd|asdad)$/i.test(c.name)
+      !/audit|test|fixture|teste|abc|sdfsd|asdad/i.test(c.name)
     );
 
     if (validCourses.length > 0) {
