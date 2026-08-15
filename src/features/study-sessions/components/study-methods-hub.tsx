@@ -178,7 +178,7 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
             <div className="h-px w-20 bg-border/20" />
           </div>
           
-          {!showAll && (
+          {!showAll && METHODS.some(m => m.category !== recommendedMethod?.category && m.id !== recommendedMethodId) && (
             <button 
               onClick={() => setShowAll(true)}
               className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors flex items-center gap-1"
@@ -186,6 +186,7 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
               Ver todas <ChevronRight className="h-3 w-3" />
             </button>
           )}
+
         </div>
 
         {showAll && (
