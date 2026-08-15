@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import { useLessonsByCourse, useLesson } from "@/features/studies/hooks/use-lessons";
 import { useCourse } from "@/features/studies/hooks/use-courses";
 import { useCourseModule } from "@/features/studies/hooks/use-course-modules";
+import { LessonContentViewer } from "./components/lesson-content-viewer";
+import { useLessonDocument } from "@/features/lesson-editor/hooks";
 
 interface LivreSessionProps {
   resumingSession: StudySessionRow | null;
