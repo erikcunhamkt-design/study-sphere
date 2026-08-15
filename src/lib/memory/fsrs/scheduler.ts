@@ -50,7 +50,7 @@ export class FSRSScheduler {
       // If reviewed on the same day, elapsed_days might be 0.
       // For audit purposes, we treat sub-day reviews as having at least some progress
       // but FSRS normally expects days.
-      const elapsed = Math.max(card.elapsed_days, 0.1); 
+      const elapsed = card.elapsed_days || 1; // Simulation for audit / intraday reviews
       const r = Math.exp(Math.log(0.9) * elapsed / card.stability);
       
       if (rating === Rating.Again) {
