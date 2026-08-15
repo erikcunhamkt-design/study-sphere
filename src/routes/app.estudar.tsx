@@ -19,12 +19,11 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-
-
+import { useNextBestAction } from "@/features/next-action/hooks/use-next-best-action";
 import { PageHeader } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useStudyState } from "@/features/study-sessions/use-study-state";
+import { useDeleteStudySession } from "@/features/study-sessions/hooks";
 import { STUDY_METHOD_LABELS } from "@/features/study-sessions/labels";
 import type { StudyMethod, StudySessionRow } from "@/features/study-sessions/types";
 import { PomodoroSession } from "@/features/study-sessions/pomodoro-session";
@@ -73,7 +72,10 @@ function EstudarPage() {
   } | null>(null);
   const methodsHubRef = useRef<HTMLDivElement>(null);
 
-  const { priority, data, isLoading, allCourses } = useStudyState();
+  const { primary: action, isLoading, dashboard } = useNextBestAction() as any;
+  const allCourses = dashboard?.courses || [];
+  const priority = action.type;
+  const data = action.metadata || {};
 
   // Se já começou com um planejado ou recomendação, vamos preencher o selectedContent
   useEffect(() => {
@@ -169,7 +171,7 @@ function EstudarPage() {
 
       {/* 1. PRÓXIMO PASSO (HERO) */}
       <section>
-        {priority === "onboarding" ? (
+        {action.type === 'add_content' ? (
           <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-12 text-center transition-all hover:border-primary/20">
              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
              <div className="relative z-10 space-y-6">
@@ -177,9 +179,9 @@ function EstudarPage() {
                  <Zap className="h-8 w-8 fill-primary/20" />
                </div>
                <div className="space-y-2">
-                 <h2 className="text-3xl font-black tracking-tighter">Comece seu primeiro estudo</h2>
+                 <h2 className="text-3xl font-black tracking-tighter">{action.title}</h2>
                  <p className="text-muted-foreground/60 max-w-md mx-auto font-medium">
-                   Adicione ou escolha um conteúdo para começar a construir seu mapa de conhecimento e dominar seus objetivos.
+                   {action.description}
                  </p>
                </div>
                <Button 
@@ -187,11 +189,11 @@ function EstudarPage() {
                 size="lg" 
                 className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold"
                >
-                 Adicionar conteúdo <Plus className="ml-2 h-4 w-4" />
+                 {action.cta} <Plus className="ml-2 h-4 w-4" />
                </Button>
              </div>
           </div>
-        ) : priority === "resume" && data.session ? (
+        ) : action.type === 'resume' && action.metadata?.session ? (
           <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-10 transition-all hover:bg-surface/40">
             <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
@@ -200,33 +202,59 @@ function EstudarPage() {
                   <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
                     <Clock className="h-3 w-3" /> RETOMAR
                   </span>
-                  {data.context && <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">{data.context}</span>}
+                  {action.metadata.course?.name && <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">{action.metadata.course.name}</span>}
                 </div>
                 <h2 className="text-3xl md:text-4xl font-black tracking-tighter leading-tight max-w-xl">
-                  {data.title}
+                  {action.metadata.lesson?.title || action.metadata.session?.planned_title || "Sessão em andamento"}
                 </h2>
                 <div className="flex items-center gap-6">
                    <div className="space-y-1">
                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">MÉTODO</p>
-                     <p className="text-sm font-bold text-foreground/80">{STUDY_METHOD_LABELS[(data.session as StudySessionRow).method]}</p>
+                     <p className="text-sm font-bold text-foreground/80">{STUDY_METHOD_LABELS[action.metadata.session.method as keyof typeof STUDY_METHOD_LABELS] || action.metadata.session.method}</p>
                    </div>
                    <div className="h-8 w-px bg-border/20" />
                    <div className="space-y-1">
                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">DURAÇÃO ATUAL</p>
-                     <p className="text-sm font-bold text-foreground/80">{Math.floor(((data.session as StudySessionRow).duration_seconds || 0) / 60)} min</p>
+                     <p className="text-sm font-bold text-foreground/80">{Math.floor((action.metadata.session.duration_seconds || 0) / 60)} min</p>
                    </div>
                 </div>
               </div>
               <Button 
-                onClick={() => handleResume(data.session as StudySessionRow)}
+                onClick={() => handleResume(action.metadata.session)}
                 size="lg" 
                 className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] group-hover:scale-105 transition-transform"
               >
-                Continuar <ArrowRight className="ml-2 h-6 w-6" />
+                {action.cta} <ArrowRight className="ml-2 h-6 w-6" />
               </Button>
             </div>
           </div>
-        ) : (priority === "recommendation" || priority === "start") && (data.planned || data.course) ? (
+        ) : action.type === 'review' || action.type === 'reinforce' || action.type === 'test_memory' ? (
+          <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-10 transition-all hover:bg-surface/40">
+            <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+                    <Zap className="h-3 w-3" /> {action.title.toUpperCase()}
+                  </span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-black tracking-tighter leading-tight max-w-xl">
+                  {action.description}
+                </h2>
+                <p className="text-sm font-medium text-muted-foreground/60">{action.reason}</p>
+              </div>
+              <Button 
+                asChild
+                size="lg" 
+                className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] group-hover:scale-105 transition-transform"
+              >
+                <Link to={action.type === 'reinforce' ? "/app/desempenho" : (action.type === 'review' ? "/app/revisar" : "/app/estudar")}>
+                  {action.cta} <ArrowRight className="ml-2 h-6 w-6" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        ) : (action.type === 'continue' || action.type === 'first_study') && action.metadata?.course ? (
           <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 transition-all hover:border-primary/20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
               <div className="space-y-4">
@@ -235,47 +263,28 @@ function EstudarPage() {
                     <Zap className="h-3 w-3" /> SEU PRÓXIMO PASSO
                   </span>
                   <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
-                    {priority === "recommendation" ? "Recomendação Dominus" : (data.course?.status === 'not_started' ? 'Aprender conteúdo' : 'Recuperação ativa')}
+                    {action.type === 'first_study' ? 'Aprender conteúdo' : 'Recuperação ativa'}
                   </span>
                 </div>
                 <h2 className="text-3xl font-black tracking-tighter leading-tight max-w-xl">
-                  {data.title || data.course?.name}
+                  {action.metadata.course.name}
                 </h2>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2 text-muted-foreground/60 font-medium text-xs">
-                    <BookOpen className="h-3 w-3" />
-                    <span>
-                      {priority === "recommendation" 
-                        ? (data.planned?.status as any === 'not_started' ? 'Ainda não iniciado' : 'Continuar planejamento')
-                        : (data.course?.status === 'not_started' ? 'Ainda não iniciado' : `${(data.course as any).progress?.percent || 0}% concluído`)}
-                    </span>
-                  </div>
-                </div>
+                <p className="text-sm font-medium text-muted-foreground/60">{action.reason}</p>
               </div>
               <Button 
                 onClick={() => {
-                  if (priority === "recommendation" && data.planned) {
-                    setSelectedContent({
-                      id: data.planned.course_id || data.planned.id,
-                      name: data.planned.title,
-                      status: 'not_started',
-                      type: 'course'
-                    });
-                    setActiveMethod('aprender');
-                  } else if (data.course) {
-                    setSelectedContent({
-                      id: data.course.id,
-                      name: data.course.name,
-                      status: data.course.status,
-                      type: 'course'
-                    });
-                    setActiveMethod(data.course.status === 'not_started' ? 'aprender' : 'flashcards');
-                  }
+                  setSelectedContent({
+                    id: action.metadata.course.id,
+                    name: action.metadata.course.name,
+                    status: action.metadata.course.status,
+                    type: 'course'
+                  });
+                  setActiveMethod(action.metadata.course.status === 'not_started' ? 'aprender' : 'flashcards');
                 }}
                 size="lg" 
                 className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] group-hover:scale-105 transition-transform"
               >
-                Começar <ArrowRight className="ml-2 h-6 w-6" />
+                {action.cta} <ArrowRight className="ml-2 h-6 w-6" />
               </Button>
             </div>
           </div>
