@@ -167,41 +167,61 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     }
   }
 
-  // 12. FINAL DA PRIMEIRA SESSÃO (ou qualquer sessão de aprendizado concluída)
+  // 17. FINAL DA SESSÃO - Refinado
   if (isFinished) {
     return (
-      <div className="group relative overflow-hidden rounded-[2.5rem] border border-primary/20 bg-surface/30 p-10 md:p-16 text-center animate-in fade-in zoom-in duration-700">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-        
-        <div className="relative z-10 space-y-10">
-          <div className="mx-auto w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-            <BookOpen className="h-12 w-12" />
+      <div className="max-w-4xl mx-auto py-20 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="flex flex-col items-center text-center space-y-12">
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
+            <div className="relative w-24 h-24 rounded-[2rem] bg-primary flex items-center justify-center text-white shadow-[0_0_50px_-10px_rgba(217,0,110,0.5)]">
+              <CheckCircle2 className="h-12 w-12" />
+            </div>
           </div>
           
           <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground uppercase">
               {method === "aprender" ? "Primeiro contato concluído" : "Sessão concluída"}
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground/60 max-w-2xl mx-auto font-medium">
-              Agora vamos descobrir quanto desse conteúdo você realmente reteve.
+            </h1>
+            <p className="text-muted-foreground/60 text-lg max-w-lg mx-auto font-medium leading-relaxed">
+              {method === "aprender" 
+                ? "Você terminou sua primeira etapa com este conteúdo. Seu cérebro agora possui as bases necessárias."
+                : "Seu progresso foi registrado com sucesso."}
             </p>
           </div>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              onClick={onDone}
-              size="lg"
-              className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform hover:scale-105 active:scale-95"
-            >
-              Testar memória <ChevronRight className="ml-2 h-6 w-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={onDone}
-              className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground"
-            >
-              Voltar ao hub
-            </Button>
+
+          <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6 pt-10">
+            <div className="p-8 rounded-[2.5rem] bg-surface/40 border border-border/20 space-y-6 text-left relative overflow-hidden group hover:border-primary/40 transition-all">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-10 -mt-10" />
+              <div className="space-y-2">
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary">AGORA TESTE O QUE VOCÊ RETEVE</h3>
+                <p className="text-sm text-muted-foreground/60 leading-relaxed font-medium">
+                  O Dominus pode verificar quanto desse conteúdo você consegue recuperar sem consultar o material.
+                </p>
+              </div>
+              <Button 
+                onClick={onDone}
+                className="w-full h-12 rounded-2xl bg-primary/10 hover:bg-primary text-primary hover:text-white font-black uppercase tracking-widest text-[10px] transition-all"
+              >
+                Testar memória →
+              </Button>
+            </div>
+
+            <div className="p-8 rounded-[2.5rem] bg-surface/10 border border-border/5 space-y-6 text-left flex flex-col justify-between opacity-60 hover:opacity-100 transition-all">
+              <div className="space-y-2">
+                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/40">ENCERRAR POR HOJE</h3>
+                <p className="text-sm text-muted-foreground/40 font-medium leading-relaxed">
+                  Volte para o cockpit para ver suas estatísticas de saúde cerebral.
+                </p>
+              </div>
+              <Button 
+                variant="ghost"
+                onClick={onDone}
+                className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-surface/20"
+              >
+                Voltar ao Cockpit
+              </Button>
+            </div>
           </div>
         </div>
       </div>
