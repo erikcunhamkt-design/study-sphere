@@ -44,7 +44,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   const effectiveLessonId = lessonId || session?.lesson_id;
   const { data: lessonData } = useLesson(effectiveLessonId || undefined);
   
-  const effectiveCourseId = initialCourseId || lessonData?.course_id || resumingSession?.details?.courseId;
+  const effectiveCourseId = initialCourseId || lessonData?.course_id || (session?.details as any)?.courseId;
   const { data: courseData } = useCourse(effectiveCourseId || undefined);
   const { data: courseLessons, isLoading: isLoadingLessons } = useLessonsByCourse(effectiveCourseId || undefined);
   const { data: moduleData } = useCourseModule(lessonData?.module_id || undefined);
@@ -70,7 +70,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
         method: method,
         lessonId: lessonId,
         isFreeSession: !lessonId,
-        details: initialDetailsForMethod(method),
+        details: { ...initialDetailsForMethod(method), courseId: initialCourseId },
       });
       setSession(created);
     } catch (err) {
@@ -283,7 +283,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
             <div className="p-6 rounded-3xl border border-primary/20 bg-surface/40 animate-in slide-in-from-top-2 duration-300">
                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-4">Mudar foco para outra aula</h3>
                <LessonPicker 
-                value={effectiveLessonId} 
+                value={effectiveLessonId || null} 
                 onChange={(newId) => {
                   setLessonId(newId);
                   setShowLessonSwitcher(false);
