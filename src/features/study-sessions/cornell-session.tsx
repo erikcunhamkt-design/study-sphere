@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, BookOpen, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -23,11 +23,12 @@ export function CornellSession({ resumingSession, onDone, plannedId }: CornellSe
   const [notas, setNotas] = useState("");
   const [pistas, setPistas] = useState("");
   const [resumo, setResumo] = useState("");
+  const [isFinished, setIsFinished] = useState(false);
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
 
   const isDirty = notas.trim().length > 0 || pistas.trim().length > 0 || resumo.trim().length > 0;
-  useUnsavedTextWarning(!!session && isDirty);
+  useUnsavedTextWarning(!!session && isDirty && !isFinished);
 
   async function handleStart() {
     try {
@@ -53,97 +54,162 @@ export function CornellSession({ resumingSession, onDone, plannedId }: CornellSe
     try {
       await finishSession.mutateAsync(details);
       toast.success("Sessão concluída");
-      onDone();
+      setIsFinished(true);
     } catch (err) {
       console.error("[study-sessions] falha ao concluir sessão Cornell", err);
       toast.error("Não foi possível concluir a sessão");
     }
   }
 
+  if (isFinished) {
+    return (
+      <div className="group relative overflow-hidden rounded-[2.5rem] border border-primary/20 bg-surface/30 p-10 md:p-16 text-center animate-in fade-in zoom-in duration-700">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
+        
+        <div className="relative z-10 space-y-10">
+          <div className="mx-auto w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+            <BookOpen className="h-12 w-12" />
+          </div>
+          
+          <div className="space-y-4">
+            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground uppercase">
+              Notas Estruturadas
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground/60 max-w-2xl mx-auto font-medium">
+              Você organizou o conhecimento em pistas, notas e resumo. Essa estrutura facilita a revisão futura.
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button 
+              onClick={onDone}
+              size="lg"
+              className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform hover:scale-105 active:scale-95"
+            >
+              Testar memória <ChevronRight className="ml-2 h-6 w-6" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              onClick={onDone}
+              className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground"
+            >
+              Voltar ao hub
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!session) {
     return (
-      <div className="space-y-4 rounded-xl border border-border bg-surface p-6">
-        <LessonPicker value={lessonId} onChange={setLessonId} />
-        <Button
-          onClick={() => void handleStart()}
-          disabled={createSession.isPending}
-          className="w-full"
-        >
-          {createSession.isPending ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-              Iniciando...
-            </>
-          ) : (
-            "Começar anotações Cornell"
-          )}
-        </Button>
+      <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="rounded-[2.5rem] border border-border/40 bg-surface/20 p-8 md:p-12 space-y-10 text-center">
+          <div className="space-y-4">
+            <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 ml-1">
+              Sobre o que são suas notas?
+            </h3>
+            <div className="max-w-md mx-auto text-left">
+              <LessonPicker value={lessonId} onChange={setLessonId} />
+            </div>
+          </div>
+          
+          <Button
+            onClick={() => void handleStart()}
+            disabled={createSession.isPending}
+            size="lg"
+            className="w-full max-w-md h-16 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-all active:scale-95"
+          >
+            {createSession.isPending ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin mr-2" aria-hidden />
+                Iniciando...
+              </>
+            ) : (
+              "Começar anotações Cornell →"
+            )}
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-[2rem] border border-primary/20 bg-surface/30 p-8 md:p-10 transition-all">
-      <div className="absolute -right-20 -top-20 w-[300px] h-[300px] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
-      
-      <div className="relative z-10 space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
-              Método Cornell
-            </span>
-            <p className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
-              Ação: Anotação estruturada
-            </p>
+    <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
+      <div className="group relative overflow-hidden rounded-[2.5rem] border border-primary/20 bg-surface/30 p-8 md:p-12 transition-all">
+        <div className="absolute -right-20 -top-20 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
+        
+        <div className="relative z-10 space-y-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/10 pb-8">
+            <div className="space-y-2 text-left">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+                  <BookOpen className="h-3 w-3" /> MÉTODO CORNELL
+                </span>
+                <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+                  Ação: Anotação estruturada
+                </span>
+              </div>
+              <h2 className="text-2xl font-black tracking-tighter text-foreground/90 uppercase">
+                {session?.lesson_id ? "Aula em foco" : "Sessão Independente"}
+              </h2>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/5 transition-all">
+              Sair sem salvar
+            </Button>
           </div>
-          <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-primary">
-            Sair sem salvar
-          </Button>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="md:col-span-1 space-y-4">
-            <Label htmlFor="cornell-pistas" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Pistas</Label>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div className="md:col-span-4 space-y-4">
+              <Label htmlFor="cornell-pistas" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Pistas & Perguntas</Label>
+              <Textarea
+                id="cornell-pistas"
+                value={pistas}
+                onChange={(e) => setPistas(e.target.value)}
+                className="min-h-[400px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-sm font-medium resize-none p-6 shadow-inner"
+                placeholder="Identifique palavras-chave e crie perguntas sobre o conteúdo ao lado..."
+              />
+            </div>
+            <div className="md:col-span-8 space-y-4">
+              <Label htmlFor="cornell-notas" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Notas de Estudo</Label>
+              <Textarea
+                id="cornell-notas"
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+                className="min-h-[400px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-lg font-medium resize-none p-8 shadow-inner"
+                placeholder="Faça suas anotações principais aqui durante o contato com o material..."
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-4">
+            <Label htmlFor="cornell-resumo" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Resumo (O quadro geral)</Label>
             <Textarea
-              id="cornell-pistas"
-              value={pistas}
-              onChange={(e) => setPistas(e.target.value)}
-              className="min-h-[200px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-sm font-medium resize-none p-4"
-              placeholder="Palavras-chave e perguntas..."
+              id="cornell-resumo"
+              value={resumo}
+              onChange={(e) => setResumo(e.target.value)}
+              className="min-h-[150px] rounded-3xl border-border/20 bg-surface/40 focus:bg-surface/60 transition-all text-lg font-medium resize-none p-8 shadow-inner"
+              placeholder="Resuma o conteúdo em poucas frases após terminar as notas..."
             />
           </div>
-          <div className="md:col-span-3 space-y-4">
-            <Label htmlFor="cornell-notas" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Notas Principais</Label>
-            <Textarea
-              id="cornell-notas"
-              value={notas}
-              onChange={(e) => setNotas(e.target.value)}
-              className="min-h-[200px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-base font-medium resize-none p-6"
-              placeholder="Anotações durante o estudo..."
-            />
+
+          <div className="flex justify-center pt-6">
+            <Button
+              onClick={() => void handleFinish()}
+              disabled={finishSession.isPending || !session}
+              size="lg"
+              className="w-full max-w-md h-20 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-[0_0_50px_-10px_rgba(217,0,110,0.4)] transition-all hover:scale-[1.05] active:scale-95"
+            >
+              {finishSession.isPending ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                "Finalizar Estruturação"
+              )}
+            </Button>
           </div>
         </div>
-
-        <div className="space-y-4">
-          <Label htmlFor="cornell-resumo" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Resumo Final</Label>
-          <Textarea
-            id="cornell-resumo"
-            value={resumo}
-            onChange={(e) => setResumo(e.target.value)}
-            className="min-h-[100px] rounded-2xl border-border/40 bg-surface/40 focus:bg-surface/60 transition-colors text-base font-medium resize-none p-6"
-            placeholder="Resuma o conteúdo em poucas frases..."
-          />
-        </div>
-
-        <Button
-          onClick={() => void handleFinish()}
-          disabled={finishSession.isPending}
-          size="lg"
-          className="w-full h-16 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] transition-transform active:scale-95"
-        >
-          Concluir Notas
-        </Button>
       </div>
     </div>
   );
 }
+
