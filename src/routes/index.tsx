@@ -31,7 +31,11 @@ export const Route = createFileRoute('/')({
 })
 
 function LandingPage() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
+
+  if (loading) return null;
+
+
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden">
