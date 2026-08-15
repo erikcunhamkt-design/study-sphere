@@ -55,6 +55,33 @@ export type RecallResult =
 
 export type ResultSource = 'self_assessment' | 'objective' | 'manual' | 'ai';
 
+export interface ConceptRow {
+  id: string;
+  user_id: string;
+  lesson_id: string | null;
+  title: string;
+  description: string | null;
+  is_archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MemoryStateRow {
+  id: string;
+  user_id: string;
+  concept_id: string;
+  strength: number;
+  stability: number;
+  difficulty: number;
+  last_recalled_at: string | null;
+  last_result: RecallResult | null;
+  last_confidence: number | null;
+  attempt_count: number;
+  successful_recalls: number;
+  failed_recalls: number;
+  updated_at: string;
+}
+
 export interface RecuperacaoDetails {
   questionAttempts: {
     questionId: string;
@@ -81,6 +108,7 @@ export interface CognitiveEvidenceRow {
   result: RecallResult;
   result_source: ResultSource;
   confidence: number;
+  confidence_source: string;
   response_time_ms: number;
   concept_id: string | null;
   attempted_at: string;

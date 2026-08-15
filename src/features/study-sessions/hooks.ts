@@ -102,10 +102,24 @@ export function useDeleteStudySession() {
 
 export function useRecordRecallAttempt() {
   const invalidate = useInvalidateStudySessionLists();
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: api.RecordRecallAttemptInput) => api.recordRecallAttempt(input),
-    onSuccess: invalidate,
+    onSuccess: (evidenceId, variables) => {
+      invalidate();
+      // Invalida especificamente o estado de memória se houver conceito
+      void qc.invalidateQueries({ queryKey: ["memory-state"] });
+    },
   });
 }
+
+export function useMemoryState(conceptId: string | undefined) {
+  return useQuery({
+    enabled: !!conceptId,
+    queryKey: ["memory-state", conceptId],
+    queryFn: () => api.getMemoryState(conceptId!),
+  });
+}
+
 
 
