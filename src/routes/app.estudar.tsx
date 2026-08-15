@@ -40,7 +40,7 @@ export const Route = createFileRoute("/app/estudar")({
       ? (search.mode as "review" | "training")
       : undefined;
     
-    const method = typeof search.method === "string" && ["pomodoro", "feynman", "blurting", "cornell", "recordacao_ativa", "livre"].includes(search.method)
+    const method = typeof search.method === "string" && ["pomodoro", "feynman", "blurting", "cornell", "recordacao_ativa", "livre", "aprender"].includes(search.method)
       ? (search.method as StudyMethod)
       : undefined;
 
@@ -122,7 +122,7 @@ function EstudarPage() {
           <BlurtingSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "cornell" ? (
           <CornellSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
-        ) : activeMethod === "livre" ? (
+        ) : activeMethod === "aprender" || activeMethod === "livre" ? (
           <LivreSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : (
           <RecordacaoAtivaHub onBack={backToHub} deckId={deckId} mode={mode} />
@@ -256,11 +256,11 @@ function EstudarPage() {
                     <Zap className="h-3 w-3" /> SEU PRÓXIMO PASSO
                   </span>
                   <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
-                    {data.course.status === 'not_started' ? 'Começar Estudo' : 'Continuar Aprendizado'}
+                    {data.course.status === 'not_started' ? 'Aprender conteúdo' : 'Recuperação ativa'}
                   </span>
                 </div>
                 <h2 className="text-3xl font-black tracking-tighter leading-tight max-w-xl">
-                  {data.course.status === 'not_started' ? `Começar ${data.course.name}` : `Continuar ${data.course.name}`}
+                  {data.course.status === 'not_started' ? `Começar ${data.course.name}` : `Retomar ${data.course.name}`}
                 </h2>
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2 text-muted-foreground/60 font-medium">
@@ -285,10 +285,10 @@ function EstudarPage() {
       {selectedContent && (
         <section ref={methodsHubRef} id="metodos-selecao" className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="space-y-2">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Como você quer estudar?</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Escolha como continuar</h3>
             <div className="flex items-center gap-3">
-               <div className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(217,0,110,0.5)]" />
-               <p className="text-xl font-black tracking-tight">{selectedContent.name}</p>
+               <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_15px_rgba(217,0,110,0.6)]" />
+               <p className="text-2xl font-black tracking-tighter">{selectedContent.name}</p>
             </div>
           </div>
           
