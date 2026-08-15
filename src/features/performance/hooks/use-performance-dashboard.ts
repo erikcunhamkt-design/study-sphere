@@ -92,7 +92,7 @@ export function usePerformanceDashboard() {
 
       // Attention Section
       const attentionNeeded = interpretedConcepts
-        .filter(c => c.humanState.state === "reforco" || c.hasMismatch || c.isDue)
+        .filter(c => c.humanState.state === "reforco" || c.hasMismatch)
         .sort((a, b) => {
           if (a.hasMismatch && !b.hasMismatch) return -1;
           if (!a.hasMismatch && b.hasMismatch) return 1;
