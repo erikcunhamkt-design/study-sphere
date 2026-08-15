@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Loader2, BookOpen, Clock, ChevronRight, AlertCircle, Timer, ArrowLeft, ArrowRight, Settings, LogOut, CheckCircle2, Zap, Brain } from "lucide-react";
+import { Loader2, BookOpen, Clock, ChevronRight, AlertCircle, Timer, ArrowLeft, ArrowRight, Settings, LogOut, CheckCircle2, Zap, Brain, Dna } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ import { useLessonsByCourse, useLesson } from "@/features/studies/hooks/use-less
 import { useCourse } from "@/features/studies/hooks/use-courses";
 import { useCourseModule } from "@/features/studies/hooks/use-course-modules";
 import { LessonContentViewer } from "./components/lesson-content-viewer";
+import { RecuperacaoSession } from "./components/recuperacao-session";
 import { useLessonDocument } from "@/features/lesson-editor/hooks";
 
 interface LivreSessionProps {
@@ -37,6 +38,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   const [nota, setNota] = useState("");
   const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const [isFinished, setIsFinished] = useState(false);
+  const [isEnteringRecall, setIsEnteringRecall] = useState(false);
   const [showLessonSwitcher, setShowLessonSwitcher] = useState(false);
   
   // Estado para controle de material real e progresso
@@ -188,6 +190,16 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
 
 
   // Nova transição agressiva para Recuperação Ativa
+  if (isEnteringRecall && lessonId) {
+    return (
+      <RecuperacaoSession 
+        lessonId={lessonId} 
+        courseId={effectiveCourseId}
+        onDone={onDone}
+      />
+    );
+  }
+
   if (isFinished) {
     return (
       <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center p-6 animate-in fade-in duration-700">
@@ -239,10 +251,16 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
             <Button
               size="lg"
-              onClick={onDone}
+              onClick={() => {
+                if (method === "aprender") {
+                  setIsEnteringRecall(true);
+                } else {
+                  onDone();
+                }
+              }}
               className="w-full sm:w-auto h-16 px-12 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_50px_-10px_rgba(217,0,110,0.5)] transition-all hover:scale-105 active:scale-95"
             >
-              TESTAR MEMÓRIA <ArrowRight className="ml-2 h-5 w-5" />
+              {method === "aprender" ? "TESTAR MEMÓRIA" : "CONCLUIR"} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
