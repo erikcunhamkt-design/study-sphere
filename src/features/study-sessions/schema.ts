@@ -67,6 +67,8 @@ export function initialDetailsForMethod(method: StudyMethod): StudySessionDetail
     case "flashcards":
     case "exame":
       return {};
+    case "recuperacao":
+      return { questionAttempts: [], lessonId: "", courseId: "" };
     default:
       return {};
   }

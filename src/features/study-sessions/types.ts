@@ -5,6 +5,7 @@ export const STUDY_METHOD_VALUES = [
   "cornell",
   "livre",
   "aprender",
+  "recuperacao",
   "flashcards",
   "exame",
   "recordacao_ativa",
@@ -42,6 +43,21 @@ export interface LivreDetails {
   completedAt?: string;
 }
 
+export interface RecuperacaoDetails {
+  questionAttempts: {
+    questionId: string;
+    response: string;
+    confidence: "nenhum" | "dificil" | "lembrei" | "facil";
+    responseTimeSeconds: number;
+    isCorrect?: boolean;
+    attemptedAt: string;
+  }[];
+  lessonId: string;
+  courseId?: string;
+  publishedVersion?: number | null;
+  completedAt?: string;
+}
+
 
 export type StudySessionDetails =
   | PomodoroDetails
@@ -49,6 +65,7 @@ export type StudySessionDetails =
   | BlurtingDetails
   | CornellDetails
   | LivreDetails
+  | RecuperacaoDetails
   | Record<string, never>;
 
 export interface StudySessionRow {
