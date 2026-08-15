@@ -81,9 +81,9 @@ function RevisarPage() {
                Você não tem nenhum conceito devido agora. Sua memória está consolidada.
              </p>
            </div>
-           <Button asChild variant="outline" className="h-14 px-8 rounded-full border-border/40 font-black uppercase tracking-widest text-[10px]">
-             <Link to="/app/biblioteca" search={{ tab: 'materials' }}>Continuar estudando <ArrowRight className="ml-2 w-4 h-4" /></Link>
-           </Button>
+             <Button asChild variant="outline" className="h-14 px-8 rounded-full border-border/40 font-black uppercase tracking-widest text-[10px]">
+               <Link to="/app/biblioteca" search={{ tab: 'materials' }}>Continuar estudando <ArrowRight className="ml-2 w-4 h-4" /></Link>
+             </Button>
         </div>
       )}
     </div>
