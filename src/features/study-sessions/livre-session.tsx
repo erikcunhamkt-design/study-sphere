@@ -61,7 +61,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     );
   })();
 
-  const elapsed = useElapsedSeconds(clockAnchor);
+  const elapsed = useElapsedSeconds(clockAnchor, method === "aprender" && !materialStats.hasReal);
 
   useUnsavedTextWarning(!!session && nota.trim().length > 0 && !isFinished);
 
