@@ -122,24 +122,31 @@ function EstudarPage() {
   // Renderização da Sessão Ativa
   if (activeMethod) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
-        {activeMethod === "pomodoro" ? (
-          <PomodoroSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
-        ) : activeMethod === "feynman" ? (
-          <FeynmanSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
-        ) : activeMethod === "blurting" ? (
-          <BlurtingSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
-        ) : activeMethod === "cornell" ? (
-          <CornellSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
-        ) : activeMethod === "aprender" || activeMethod === "livre" ? (
-          <LivreSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} method={activeMethod} />
-        ) : (
-          <RecordacaoAtivaHub onBack={backToHub} deckId={deckId} mode={mode} />
-        )}
+      <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+        <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-10">
+          {activeMethod === "pomodoro" ? (
+            <PomodoroSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
+          ) : activeMethod === "feynman" ? (
+            <FeynmanSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
+          ) : activeMethod === "blurting" ? (
+            <BlurtingSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
+          ) : activeMethod === "cornell" ? (
+            <CornellSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
+          ) : activeMethod === "aprender" || activeMethod === "livre" ? (
+            <LivreSession 
+              resumingSession={resumingSession} 
+              onDone={backToHub} 
+              plannedId={plannedId} 
+              method={activeMethod}
+              initialLessonId={selectedContent?.type === 'lesson' ? selectedContent.id : undefined}
+            />
+          ) : (
+            <RecordacaoAtivaHub onBack={backToHub} deckId={deckId} mode={mode} />
+          )}
+        </div>
       </div>
     );
   }
-
 
   if (isLoading) {
     return (
@@ -151,7 +158,7 @@ function EstudarPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-16 pb-20">
+    <div className="max-w-6xl mx-auto space-y-16 pb-20 px-4 md:px-0">
       <header className="space-y-3">
         <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Estudar</h1>
         <p className="text-lg md:text-xl text-muted-foreground/40 font-medium tracking-tight">
@@ -244,7 +251,31 @@ function EstudarPage() {
                   </div>
                 </div>
               </div>
-              {/* No button here - the main CTA is in the Recommendation card below */}
+              <Button 
+                onClick={() => {
+                  if (priority === "recommendation" && data.planned) {
+                    setSelectedContent({
+                      id: data.planned.course_id || data.planned.id,
+                      name: data.planned.title,
+                      status: 'not_started',
+                      type: 'course'
+                    });
+                    setActiveMethod('aprender');
+                  } else if (data.course) {
+                    setSelectedContent({
+                      id: data.course.id,
+                      name: data.course.name,
+                      status: data.course.status,
+                      type: 'course'
+                    });
+                    setActiveMethod(data.course.status === 'not_started' ? 'aprender' : 'flashcards');
+                  }
+                }}
+                size="lg" 
+                className="h-16 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)] group-hover:scale-105 transition-transform"
+              >
+                Começar <ArrowRight className="ml-2 h-6 w-6" />
+              </Button>
             </div>
           </div>
         ) : null}
@@ -255,11 +286,13 @@ function EstudarPage() {
         <section ref={methodsHubRef} id="metodos-selecao" className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <StudyMethodsHub onSelectMethod={setActiveMethod} selectedContent={selectedContent} />
 
-          <div className="flex justify-center pt-8 border-t border-border/10">
-            <Button variant="ghost" onClick={() => setSelectedContent(null)} className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 hover:text-foreground">
-              Escolher outro conteúdo
-            </Button>
-          </div>
+          {allCourses && allCourses.length > 1 && (
+            <div className="flex justify-center pt-8 border-t border-border/10">
+              <Button variant="ghost" onClick={() => setSelectedContent(null)} className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 hover:text-foreground">
+                Escolher outro conteúdo
+              </Button>
+            </div>
+          )}
         </section>
       )}
 

@@ -19,14 +19,15 @@ interface LivreSessionProps {
   onDone: () => void;
   plannedId?: string;
   method?: StudyMethod;
+  initialLessonId?: string;
 }
 
 /** Fallback estável para useElapsedSeconds antes de a sessão existir — nunca exibido (o timer só aparece depois do INSERT). */
 const NO_SESSION_ISO = new Date(0).toISOString();
 
-export function LivreSession({ resumingSession, onDone, plannedId, method = "livre" }: LivreSessionProps) {
+export function LivreSession({ resumingSession, onDone, plannedId, method = "livre", initialLessonId }: LivreSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
-  const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
+  const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? initialLessonId ?? null);
   const [nota, setNota] = useState("");
   const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const [isFinished, setIsFinished] = useState(false);
@@ -52,7 +53,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     try {
       const created = await createSession.mutateAsync({
         method: method,
-        lessonId,
+        lessonId: lessonId,
         isFreeSession: !lessonId,
         details: initialDetailsForMethod(method),
       });
@@ -63,6 +64,12 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
       toast.error("Não foi possível iniciar a sessão");
     }
   }
+
+  useEffect(() => {
+    if (initialLessonId && !session && !optimisticStart && !resumingSession) {
+      handleStart();
+    }
+  }, [initialLessonId]);
 
   async function handleFinish() {
     const details: LivreDetails = nota.trim() ? { nota: nota.trim() } : {};
@@ -182,9 +189,21 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
               </h2>
             </div>
             
-            <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/5 transition-all">
-              Sair sem salvar
-            </Button>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex flex-col items-end gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Progresso da sessão</span>
+                  <span className="text-xs font-black text-primary">20%</span>
+                </div>
+                <div className="w-32 h-1 bg-surface/40 rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[20%] transition-all duration-1000" />
+                </div>
+              </div>
+
+              <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/5 transition-all">
+                Sair da sessão
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
