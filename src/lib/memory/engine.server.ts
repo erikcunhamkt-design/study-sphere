@@ -142,8 +142,9 @@ export const applyFsrsReview = createServerFn({ method: "POST" })
       await supabaseAdmin
         .from("cognitive_evidences")
         .update({ confidence_mismatch: true })
-        .eq("id", evidenceId);
+        .eq("id", evidenceId as string);
     }
+
 
     return { success: true, card: result.card };
   });
