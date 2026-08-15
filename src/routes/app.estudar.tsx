@@ -51,7 +51,7 @@ export const Route = createFileRoute("/app/estudar")({
       ? (search.mode as "review" | "training")
       : undefined;
     
-    const method = typeof search.method === "string" && ["pomodoro", "feynman", "blurting", "cornell", "recordacao_ativa", "livre", "aprender"].includes(search.method)
+    const method = typeof search.method === "string" && ["pomodoro", "feynman", "blurting", "cornell", "flashcards", "exame", "livre", "aprender"].includes(search.method)
       ? (search.method as StudyMethod)
       : undefined;
 
@@ -139,6 +139,7 @@ function EstudarPage() {
       </div>
     );
   }
+
 
   if (isLoading) {
     return (
