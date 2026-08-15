@@ -7,6 +7,7 @@ import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
 import { calculateCourseProgress } from "@/features/studies/utils";
 import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
 import { useDueReviews } from "@/features/study-sessions/hooks.due";
+import { useReviewSemanticState } from "@/features/study-sessions/hooks.semantic";
 import { isProductionEligible } from "@/lib/eligibility";
 
 import { useReviewSemanticState } from "@/features/study-sessions/hooks.semantic";
