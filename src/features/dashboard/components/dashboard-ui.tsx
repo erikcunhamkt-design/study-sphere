@@ -148,7 +148,11 @@ export function MasteryCard({ percent, trend, state }: { percent?: number; trend
           <div className="space-y-1">
             <p className="text-lg font-black tracking-tight text-foreground leading-snug">Seu nível ainda está sendo construído.</p>
             <p className="text-[11px] text-muted-foreground/40 leading-relaxed font-medium max-w-[90%]">
-              O Dominus identificará seus pontos fortes e lacunas conforme você estudar e responder questões.
+              {state === "new_user" 
+                ? "Sua jornada está começando. Adicione conteúdo e comece a estudar para gerar os primeiros dados de memória." 
+                : state === "no_recovery"
+                  ? "Você já tem estudos registrados! Agora realize sessões de recuperação para identificar seu nível de domínio."
+                  : "O Dominus identificará seus pontos fortes e lacunas conforme você estudar e responder questões."}
             </p>
           </div>
           <div className="pt-1">
