@@ -119,7 +119,10 @@ export function useDashboardState() {
 
     // 3. Prioridade: Recomendação (Cursos em andamento)
     const activeCourses = (courses ?? []).filter((c) => !c.is_archived);
-    const inProgressCourses = activeCourses.filter((c) => c.status === "in_progress");
+    const inProgressCourses = activeCourses.filter((c) => 
+      c.status === "in_progress" && 
+      !/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(c.name)
+    );
 
     if (inProgressCourses.length > 0) {
       const target = inProgressCourses[0];
