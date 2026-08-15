@@ -66,7 +66,7 @@ const METHODS: MethodOption[] = [
     category: "recuperacao"
   },
   {
-    id: "recordacao_ativa",
+    id: "flashcards",
     title: "Flashcards",
     displayName: "Testar memória",
     description: "Responda perguntas e compare com a resposta.",
@@ -74,6 +74,7 @@ const METHODS: MethodOption[] = [
     icon: Layers,
     category: "recuperacao"
   },
+
   {
     id: "pomodoro",
     title: "Pomodoro",
@@ -123,7 +124,8 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
     if (selectedContent.status === 'in_progress') return 'blurting';
     
     // ESTADO D - BOM DOMÍNIO (Completed)
-    if (selectedContent.status === 'completed') return 'recordacao_ativa';
+    if (selectedContent.status === 'completed') return 'flashcards';
+
     
     return null;
   }, [selectedContent]);
