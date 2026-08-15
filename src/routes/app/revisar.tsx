@@ -29,7 +29,7 @@ function RevisarPage() {
            <Brain className="w-3.5 h-3.5 text-primary" />
            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Sistema de Memória</span>
         </div>
-        <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-foreground">Revisar</h1>
+        <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Revisar</h1>
         <p className="text-muted-foreground font-medium">Recupere o que está pronto para voltar à memória.</p>
       </header>
 
@@ -44,7 +44,7 @@ function RevisarPage() {
             
             <div className="space-y-2 relative z-10 text-left">
               <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Sua revisão de hoje</span>
-              <h2 className="text-5xl font-black tracking-tighter italic text-foreground">{dueReviews.length} conceitos</h2>
+              <h2 className="text-5xl font-black tracking-tighter text-foreground">{dueReviews.length} conceitos</h2>
               <div className="flex items-center gap-2 text-muted-foreground/60">
                 <Clock className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-widest">Estimativa: {Math.max(dueReviews.length * 2, 5)} min</span>
@@ -62,11 +62,11 @@ function RevisarPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
              <div className="p-6 rounded-[2rem] bg-surface/20 border border-border/10 space-y-1 text-left">
                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Status</span>
-               <p className="text-lg font-black uppercase italic text-primary/80">Recuperação ativa</p>
+               <p className="text-lg font-black uppercase text-primary/80">Recuperação ativa</p>
              </div>
              <div className="p-6 rounded-[2rem] bg-surface/20 border border-border/10 space-y-1 text-left">
                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Motor</span>
-               <p className="text-lg font-black uppercase italic text-foreground/60">FSRS v4 Core</p>
+               <p className="text-lg font-black uppercase text-foreground/60">FSRS v4 Core</p>
              </div>
           </div>
         </div>
@@ -76,12 +76,12 @@ function RevisarPage() {
              <BookOpen className="w-10 h-10" />
            </div>
            <div className="space-y-3">
-             <h2 className="text-3xl font-black tracking-tight text-foreground uppercase italic">Comece sua memória</h2>
+             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Comece sua memória</h2>
              <p className="text-muted-foreground font-medium max-w-sm mx-auto">
                Estude um conteúdo e faça sua primeira recuperação para começar a construir seu histórico de memória.
              </p>
            </div>
-           <Button asChild className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-xs italic transition-all shadow-[0_0_20px_-5px_rgba(217,0,110,0.3)]">
+            <Button asChild className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest text-[10px] transition-all shadow-lg shadow-primary/10">
              <Link to="/app/biblioteca" search={{ tab: 'materials' }}>Começar estudo <ArrowRight className="ml-2 w-4 h-4" /></Link>
            </Button>
         </div>
@@ -91,12 +91,12 @@ function RevisarPage() {
              <Sparkles className="w-10 h-10" />
            </div>
            <div className="space-y-3">
-             <h2 className="text-3xl font-black tracking-tight text-foreground uppercase italic">Sua memória ainda não foi avaliada</h2>
+             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Sua memória ainda não foi avaliada</h2>
              <p className="text-muted-foreground font-medium max-w-sm mx-auto">
                O próximo passo é descobrir o que realmente ficou. Você já estudou, mas ainda não testou o que consegue recuperar.
              </p>
            </div>
-           <Button asChild className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-xs italic transition-all shadow-[0_0_20px_-5px_rgba(217,0,110,0.3)]">
+           <Button asChild className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest text-[10px] transition-all shadow-lg shadow-primary/10">
              <Link to="/app/estudar" search={{}}>Testar memória <ArrowRight className="ml-2 w-4 h-4" /></Link>
            </Button>
         </div>
@@ -106,12 +106,12 @@ function RevisarPage() {
              <CheckCircle2 className="w-10 h-10" />
            </div>
            <div className="space-y-3">
-             <h2 className="text-3xl font-black tracking-tight text-foreground uppercase italic">Tudo em dia</h2>
+             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Tudo em dia</h2>
              <p className="text-muted-foreground font-medium max-w-sm mx-auto">
                Nenhuma revisão está prevista para agora. Continue estudando e o Dominus indicará quando um conceito estiver pronto para ser recuperado novamente.
              </p>
            </div>
-           <Button asChild variant="outline" className="h-14 px-10 rounded-full border-border/40 font-black uppercase tracking-widest text-xs italic transition-all text-muted-foreground/60 hover:text-foreground">
+           <Button asChild variant="outline" className="h-12 px-8 rounded-full border-border/40 font-bold uppercase tracking-widest text-[10px] transition-all text-muted-foreground/60 hover:text-foreground">
              <Link to="/app/biblioteca" search={{ tab: 'materials' }}>Continuar estudando <ArrowRight className="ml-2 w-4 h-4" /></Link>
            </Button>
         </div>
