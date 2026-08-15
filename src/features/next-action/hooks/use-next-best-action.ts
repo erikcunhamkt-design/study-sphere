@@ -116,7 +116,7 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P3: TEST_MEMORY (Estudou mas reps=0) ---
-    const hasStudyButNoEval = dashboard?.summary.totalConcepts > 0 && dashboard?.summary.evaluatedMemories === 0;
+    const hasStudyButNoEval = (dashboard?.summary?.totalConcepts ?? 0) > 0 && (dashboard?.summary?.evaluatedMemories ?? 0) === 0;
     if (hasStudyButNoEval) {
       actions.push({
         type: 'test_memory',
