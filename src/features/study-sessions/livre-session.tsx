@@ -501,7 +501,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   {finishSession.isPending ? (
                     <Loader2 className="h-6 w-6 animate-spin" />
                   ) : (
-                    "Concluir Estudo"
+                    "Concluir Primeiro Contato"
                   )}
                 </Button>
                 <p className="text-[9px] font-black uppercase tracking-widest text-center mt-6 text-muted-foreground/20">
