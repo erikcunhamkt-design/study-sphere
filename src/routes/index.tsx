@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Brain, ArrowRight, ShieldCheck, Zap, Sparkles, BookOpen, GraduationCap, Github } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
-import { Header } from '@/components/layout/Header'
+import { MarketingHeader } from '@/components/marketing/MarketingHeader'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -13,7 +13,7 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-magenta/30 selection:text-magenta-foreground overflow-x-hidden">
-      <Header />
+      <MarketingHeader />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6">
@@ -99,7 +99,7 @@ function LandingPage() {
             PRONTO PARA O DOMÍNIO?
           </h2>
           <p className="text-muted-foreground font-medium mb-10 text-lg relative z-10">
-            O seu tempo é limitado. Não o desperdice com métodos de estudo que não funcionam.
+            O seu tempo é limited. Não o desperdice com métodos de estudo que não funcionam.
           </p>
           <Button asChild size="lg" className="h-16 px-12 rounded-full bg-magenta hover:bg-magenta/90 text-white font-black text-lg shadow-[0_0_40px_-10px_rgba(217,0,110,0.5)] relative z-10">
             <Link to={user ? "/app" : "/cadastro"}>
