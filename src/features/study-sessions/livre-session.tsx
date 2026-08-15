@@ -13,6 +13,9 @@ import { useElapsedSeconds } from "./use-elapsed-seconds";
 import { useUnsavedTextWarning } from "./use-unsaved-warning";
 import type { LivreDetails, StudySessionRow, StudyMethod } from "./types";
 import { cn } from "@/lib/utils";
+import { useLessonsByCourse, useLesson } from "@/features/studies/hooks/use-lessons";
+import { useCourse } from "@/features/studies/hooks/use-courses";
+import { useCourseModule } from "@/features/studies/hooks/use-course-modules";
 
 interface LivreSessionProps {
   resumingSession: StudySessionRow | null;
@@ -20,19 +23,31 @@ interface LivreSessionProps {
   plannedId?: string;
   method?: StudyMethod;
   initialLessonId?: string;
+  courseId?: string;
 }
 
 /** Fallback estável para useElapsedSeconds antes de a sessão existir — nunca exibido (o timer só aparece depois do INSERT). */
 const NO_SESSION_ISO = new Date(0).toISOString();
 
-export function LivreSession({ resumingSession, onDone, plannedId, method = "livre", initialLessonId }: LivreSessionProps) {
+export function LivreSession({ resumingSession, onDone, plannedId, method = "livre", initialLessonId, courseId: initialCourseId }: LivreSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? initialLessonId ?? null);
   const [nota, setNota] = useState("");
   const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const [isFinished, setIsFinished] = useState(false);
+  const [showLessonSwitcher, setShowLessonSwitcher] = useState(false);
+  
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "", plannedId);
+  
+  // Data fetching para contexto
+  const effectiveLessonId = lessonId || session?.lesson_id;
+  const { data: lessonData } = useLesson(effectiveLessonId || undefined);
+  
+  const effectiveCourseId = initialCourseId || lessonData?.course_id || (session?.details as any)?.courseId;
+  const { data: courseData } = useCourse(effectiveCourseId || undefined);
+  const { data: courseLessons, isLoading: isLoadingLessons } = useLessonsByCourse(effectiveCourseId || undefined);
+  const { data: moduleData } = useCourseModule(lessonData?.module_id || undefined);
   
   const clockAnchor = (() => {
     const candidates = [optimisticStart, session?.started_at].filter(
@@ -55,7 +70,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
         method: method,
         lessonId: lessonId,
         isFreeSession: !lessonId,
-        details: initialDetailsForMethod(method),
+        details: { ...initialDetailsForMethod(method), courseId: initialCourseId },
       });
       setSession(created);
     } catch (err) {
@@ -66,10 +81,33 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }
 
   useEffect(() => {
+    // Caso 1: Já temos uma aula inicial (clicou em uma aula específica)
     if (initialLessonId && !session && !optimisticStart && !resumingSession) {
       handleStart();
+      return;
     }
-  }, [initialLessonId]);
+
+    // Caso 2: Temos apenas o curso (clicou em "Aprender Primeiro" no cockpit)
+    // Vamos esperar as aulas carregarem e pegar a primeira disponível
+    if (initialCourseId && !lessonId && !session && !optimisticStart && !resumingSession && !isLoadingLessons && courseLessons) {
+      const firstActiveLesson = courseLessons.find(l => !l.is_archived);
+      if (firstActiveLesson) {
+        setLessonId(firstActiveLesson.id);
+        // O próximo render vai disparar o handleStart através do useEffect de initialLessonId se mudarmos o prop,
+        // ou podemos disparar manualmente aqui agora que temos o ID local.
+      } else {
+        // Se não tem aulas, inicia avulso (sem lessonId)
+        handleStart();
+      }
+    }
+  }, [initialLessonId, initialCourseId, isLoadingLessons, courseLessons, session, optimisticStart, resumingSession]);
+
+  // Se o lessonId foi setado via efeito de curso, inicia a sessão
+  useEffect(() => {
+    if (lessonId && !session && !optimisticStart && !resumingSession && initialCourseId) {
+      handleStart();
+    }
+  }, [lessonId]);
 
   async function handleFinish() {
     const details: LivreDetails = nota.trim() ? { nota: nota.trim() } : {};
@@ -125,6 +163,15 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }
 
   if (!session && !optimisticStart) {
+    if (isLoadingLessons) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40">Preparando foco...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="rounded-[2.5rem] border border-border/40 bg-surface/20 p-8 md:p-12 space-y-10">
@@ -172,19 +219,20 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
         
         <div className="relative z-10 space-y-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/10 pb-8">
-            <div className="space-y-2 text-left">
+            <div className="space-y-3 text-left">
               <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30 mb-2">
                 <span>DominusApp</span>
                 <ChevronRight className="h-3 w-3" />
-                <span>Estudar</span>
-                {session?.lesson_id && (
+                <span className="truncate max-w-[150px]">{courseData?.name || "Estudos"}</span>
+                {lessonData && (
                   <>
                     <ChevronRight className="h-3 w-3" />
-                    <span className="text-primary/60">Aprendizagem</span>
+                    <span className="text-primary/60 truncate max-w-[150px]">{lessonData.title}</span>
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-3">
+              
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
                   {method === "aprender" ? (
                     <><BookOpen className="h-3 w-3" /> APRENDER</>
@@ -194,20 +242,43 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                 <p className="text-[10px] font-black tabular-nums text-muted-foreground/40 uppercase tracking-widest">
                   <Clock className="h-3 w-3 inline mr-1.5" /> {formatSeconds(elapsed)}
                 </p>
+                {effectiveCourseId && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowLessonSwitcher(!showLessonSwitcher)}
+                    className="h-6 px-3 rounded-full bg-surface/40 hover:bg-surface/60 text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest transition-all"
+                  >
+                    Trocar aula
+                  </Button>
+                )}
               </div>
-              <h2 className="text-2xl font-black tracking-tighter text-foreground/90 uppercase">
-                {session?.lesson_id ? "Aula em foco" : "Sessão Independente"}
-              </h2>
+
+              <div className="space-y-1">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">O QUE ESTOU ESTUDANDO</p>
+                <h2 className="text-2xl font-black tracking-tighter text-foreground/90 uppercase truncate">
+                  {courseData?.name || "Sessão Independente"}
+                </h2>
+              </div>
+
+              {lessonData && (
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">ONDE ESTOU</p>
+                  <p className="text-sm font-bold text-primary/80">
+                    {moduleData ? `${moduleData.name} · ` : ""}{lessonData.title}
+                  </p>
+                </div>
+              )}
             </div>
             
             <div className="flex items-center gap-4">
               <div className="hidden md:flex flex-col items-end gap-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Progresso da sessão</span>
-                  <span className="text-xs font-black text-primary">20%</span>
+                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Ação recomendada</span>
+                  <span className="text-xs font-black text-primary">Compreensão</span>
                 </div>
                 <div className="w-32 h-1 bg-surface/40 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-[20%] transition-all duration-1000" />
+                  <div className="h-full bg-primary w-[30%] transition-all duration-1000" />
                 </div>
               </div>
 
@@ -216,6 +287,22 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
               </Button>
             </div>
           </div>
+
+          {showLessonSwitcher && (
+            <div className="p-6 rounded-3xl border border-primary/20 bg-surface/40 animate-in slide-in-from-top-2 duration-300">
+               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-4">Mudar foco para outra aula</h3>
+               <LessonPicker 
+                value={effectiveLessonId || null} 
+                onChange={(newId) => {
+                  setLessonId(newId);
+                  setShowLessonSwitcher(false);
+                  toast.success("Foco alterado");
+                  // Se a sessão já foi criada no banco, idealmente faríamos um UPDATE aqui.
+                  // Mas para o MVP de UX, apenas mudar o lessonId local já reflete na UI e em futuras persistências de detalhes.
+                }} 
+               />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left">
             <div className="lg:col-span-8 space-y-6">
@@ -237,21 +324,32 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
             <div className="lg:col-span-4 space-y-10">
               <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-6">
                 <div className="space-y-2 text-left">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Contexto</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">O que preciso fazer?</h4>
                   <p className="text-sm font-bold text-foreground/70 leading-relaxed">
-                    Esta é sua fase de <strong>primeiro contato</strong>. O objetivo é a compreensão profunda, não a memorização imediata.
+                    {method === "aprender" 
+                      ? "Seu objetivo agora é a compreensão profunda do material. Leia, anote e conecte ideias."
+                      : "Estude o conteúdo da forma que preferir, usando o espaço de notas para registro."}
                   </p>
                 </div>
                 
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Dicas Dominus</h4>
                   <ul className="space-y-3">
-                    {['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
-                      <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
-                        <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
-                        {tip}
-                      </li>
-                    ))}
+                    {method === "aprender" ? (
+                      ['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
+                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
+                          <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
+                          {tip}
+                        </li>
+                      ))
+                    ) : (
+                      ['Mantenha o foco absoluto', 'Elimine distrações', 'Faça pausas se necessário'].map((tip, i) => (
+                        <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
+                          <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
+                          {tip}
+                        </li>
+                      ))
+                    )}
                   </ul>
                 </div>
               </div>

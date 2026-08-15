@@ -139,6 +139,7 @@ function EstudarPage() {
               plannedId={plannedId} 
               method={activeMethod}
               initialLessonId={selectedContent?.type === 'lesson' ? selectedContent.id : undefined}
+              courseId={selectedContent?.type === 'course' ? selectedContent.id : undefined}
             />
           ) : (
             <RecordacaoAtivaHub onBack={backToHub} deckId={deckId} mode={mode} />

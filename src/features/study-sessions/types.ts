@@ -32,6 +32,7 @@ export interface CornellDetails {
 export interface LivreDetails {
   nota?: string;
   anotacoes?: string;
+  courseId?: string;
 }
 
 export type StudySessionDetails =
