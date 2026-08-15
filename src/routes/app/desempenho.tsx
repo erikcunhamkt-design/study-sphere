@@ -2,6 +2,15 @@ import { createFileRoute } from '@tanstack/react-router';
 import { PerformanceDashboard } from '@/features/performance/components/PerformanceDashboard';
 
 export const Route = createFileRoute('/app/desempenho')({
+  head: () => ({
+    title: 'Desempenho | DominusApp',
+    meta: [
+      {
+        name: 'description',
+        content: 'Análise cognitiva da sua memória. Entenda o que você está aprendendo e onde precisa prestar atenção.',
+      },
+    ],
+  }),
   component: DesempenhoPage,
 });
 
