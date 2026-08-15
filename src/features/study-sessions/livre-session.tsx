@@ -418,15 +418,19 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
 
               {/* Prioridade 2: COMPREENSÃO (Notas transformadas em elemento secundário) */}
               <div className="space-y-6 pt-6 border-t border-border/5">
-                <div className="space-y-2">
-                  <h3 className="text-sm font-black uppercase tracking-widest text-foreground/80">Reflexão & Notas</h3>
-                  <p className="text-xs text-muted-foreground/40 font-medium">Capture insights e conexões durante a leitura.</p>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-foreground/80">Reflexão & Notas</h3>
+                    <p className="text-[10px] text-muted-foreground/40 font-medium">Insights registrados aqui são anotações do estudante.</p>
+                  </div>
+                  <span className="text-[9px] font-medium text-muted-foreground/20 italic">Não é o conteúdo principal</span>
                 </div>
                 
                 <div className="space-y-4">
                   <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/30 ml-1">
                     SUAS NOTAS
                   </Label>
+
                   <Textarea
                     id="livre-nota"
                     value={nota}
