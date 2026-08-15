@@ -35,6 +35,8 @@ export interface LivreDetails {
   anotacoes?: string;
   courseId?: string;
   blocksCount?: number;
+  blocksViewed?: number;
+  progressPercent?: number;
   completedAt?: string;
 }
 

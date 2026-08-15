@@ -7,7 +7,7 @@ import { lessonEditorSchema } from "@/features/lesson-editor/schema";
 import { resolveMediaUrl } from "@/features/lesson-editor/media-upload";
 import { pt } from "@blocknote/core/locales";
 import { useTheme } from "@/hooks/use-theme";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import type { LessonDocument } from "@/features/lesson-editor/document-schema";
@@ -15,41 +15,42 @@ import type { LessonDocument } from "@/features/lesson-editor/document-schema";
 interface LessonContentViewerProps {
   lessonId: string;
   onMaterialLoad?: (hasRealMaterial: boolean, blocksCount: number) => void;
+  onProgress?: (blocksViewed: number) => void;
   canEdit?: boolean;
 }
 
 /**
- * Filtra placeholders de QA e blocos vazios do conteúdo real.
+ * Filtra placeholders e blocos vazios do conteúdo real.
  */
 function getRealContent(content: LessonDocument | undefined) {
   if (!content || !Array.isArray(content)) return [];
 
   return content.filter((block: any) => {
-    // 1. Remover parágrafos vazios ou apenas com espaços
+    // 1. Remover parágrafos vazios
     if (block.type === "paragraph" && (!block.content || block.content.length === 0)) {
       return false;
     }
-    if (block.type === "paragraph" && block.content?.length === 1 && block.content[0].text?.trim() === "") {
-      return false;
-    }
-
-    // 2. Remover placeholders de QA clássicos ("Conteúdo de [tipo]")
-    // Estes IDs "qa33-*" são gerados pelo seed de QA.
-    if (block.id?.startsWith("qa33-")) {
-      const contentArray = block.content;
-      const text = Array.isArray(contentArray) ? contentArray[0]?.text || "" : "";
-      if (text.toLowerCase().includes("conteúdo de")) return false;
-      if (text.toLowerCase().includes("qa fase")) return false;
-      if (block.type === "image" && !block.props?.url) return false;
-    }
+    
+    // 2. Garantir que imagens tenham URL
+    if (block.type === "image" && !block.props?.url) return false;
 
     return true;
   });
 }
 
-/** Renderiza o documento. Só é montado quando há blocos reais (BlockNote falha com array vazio). */
-function ViewerInner({ blocks, lessonId }: { blocks: any[]; lessonId: string }) {
+/** Renderiza o documento. */
+function ViewerInner({ 
+  blocks, 
+  lessonId, 
+  onProgress 
+}: { 
+  blocks: any[]; 
+  lessonId: string; 
+  onProgress?: (count: number) => void 
+}) {
   const { resolvedTheme } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const viewedIds = useRef<Set<string>>(new Set());
 
   const editor = useCreateBlockNote(
     {
@@ -61,8 +62,41 @@ function ViewerInner({ blocks, lessonId }: { blocks: any[]; lessonId: string }) 
     [lessonId, blocks],
   );
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !onProgress) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const blockId = entry.target.getAttribute("data-id");
+            if (blockId && !viewedIds.current.has(blockId)) {
+              viewedIds.current.add(blockId);
+              onProgress(viewedIds.current.size);
+            }
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const updateObservers = () => {
+      // O BlockNote renderiza blocos com [data-id]
+      const blockElements = container.querySelectorAll("[data-id]");
+      blockElements.forEach((el) => observer.observe(el));
+    };
+
+    const timer = setTimeout(updateObservers, 500);
+    
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [blocks, onProgress]);
+
   return (
-    <div className="lab-editor-bn-theme lesson-viewer-mode select-text cursor-auto">
+    <div ref={containerRef} className="lab-editor-bn-theme lesson-viewer-mode select-text cursor-auto">
       <BlockNoteView
         editor={editor}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
@@ -75,10 +109,16 @@ function ViewerInner({ blocks, lessonId }: { blocks: any[]; lessonId: string }) 
   );
 }
 
-export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: LessonContentViewerProps) {
+export function LessonContentViewer({ 
+  lessonId, 
+  onMaterialLoad, 
+  onProgress,
+  canEdit 
+}: LessonContentViewerProps) {
   const { data: doc, isLoading, isError } = useLessonDocument(lessonId);
 
-  const realContent = useMemo(() => getRealContent(doc?.content), [doc?.content]);
+  // O estudante consome published_content
+  const realContent = useMemo(() => getRealContent(doc?.published_content as LessonDocument), [doc?.published_content]);
   const hasContent = realContent.length > 0;
 
   useEffect(() => {
@@ -118,10 +158,10 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
         </div>
         <div className="space-y-3">
           <h3 className="text-xl font-black tracking-tight text-foreground/80 uppercase">
-            Esta aula ainda não possui material
+            Esta aula ainda não possui material publicado
           </h3>
           <p className="text-sm text-muted-foreground/40 max-w-xs mx-auto font-medium leading-relaxed">
-            O conteúdo precisa ser adicionado antes que você possa iniciar esta etapa.
+            O material precisa ser publicado pelo autor antes que você possa iniciar o primeiro contato.
           </p>
         </div>
 
@@ -130,7 +170,7 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
             <Button asChild className="h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px]">
               <Link to="/app/biblioteca" search={{ tab: "materials" }}>
                 <Edit className="h-3 w-3 mr-2" />
-                Editar conteúdo →
+                Editar e Publicar →
               </Link>
             </Button>
           ) : (
@@ -144,6 +184,5 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
     );
   }
 
-  return <ViewerInner key={lessonId} blocks={realContent} lessonId={lessonId} />;
+  return <ViewerInner key={lessonId} blocks={realContent} lessonId={lessonId} onProgress={onProgress} />;
 }
-

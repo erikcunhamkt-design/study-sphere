@@ -163,6 +163,8 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     const details: LivreDetails = {
       ...(nota.trim() ? { nota: nota.trim() } : {}),
       blocksCount: materialStats.blocksCount,
+      blocksViewed: blocksViewed,
+      progressPercent: materialStats.blocksCount > 0 ? Math.round((blocksViewed / materialStats.blocksCount) * 100) : 0,
       completedAt: new Date().toISOString()
     };
     
@@ -369,7 +371,10 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   </span>
                 </div>
                 <div className="w-32 h-1 bg-surface/40 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-full transition-all duration-1000" />
+                  <div 
+                    className="h-full bg-primary transition-all duration-700" 
+                    style={{ width: `${materialStats.blocksCount > 0 ? (blocksViewed / materialStats.blocksCount) * 100 : 0}%` }}
+                  />
                 </div>
               </div>
 
@@ -416,6 +421,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                     <LessonContentViewer 
                       lessonId={lessonId} 
                       onMaterialLoad={(hasReal, count) => setMaterialStats({ hasReal, blocksCount: count })}
+                      onProgress={(count) => setBlocksViewed(count)}
                       canEdit={true}
                     />
                   ) : (

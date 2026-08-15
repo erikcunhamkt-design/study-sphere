@@ -7,6 +7,9 @@ export interface LessonDocumentRow {
   content: LessonDocument;
   schema_version: number;
   version: number;
+  published_content: LessonDocument | null;
+  published_version: number | null;
+  published_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -89,3 +89,13 @@ export async function restoreLessonDocumentVersion(
   if (error) throw error;
   return data as unknown as RestoreLessonDocumentResult;
 }
+
+export async function publishLessonDocument(
+  lessonId: string,
+): Promise<{ document_id: string; published_version: number; published_at: string }> {
+  const { data, error } = await supabase.rpc("publish_lesson_document", {
+    p_lesson_id: lessonId,
+  });
+  if (error) throw error;
+  return data as unknown as { document_id: string; published_version: number; published_at: string };
+}
