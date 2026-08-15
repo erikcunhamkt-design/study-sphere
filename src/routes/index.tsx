@@ -6,6 +6,27 @@ import { MarketingHeader } from '@/components/marketing/MarketingHeader'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/')({
+  head: () => ({
+    title: 'DominusApp - Do estudo ao domínio',
+    meta: [
+      {
+        name: 'description',
+        content: 'Transforme estudo em conhecimento real com o DominusApp. Use o motor FSRS v4 para consolidar sua memória através da recuperação ativa.',
+      },
+      {
+        property: 'og:title',
+        content: 'DominusApp - Do estudo ao domínio',
+      },
+      {
+        property: 'og:description',
+        content: 'O novo padrão de estudo baseado em ciência cognitiva e recuperação ativa.',
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+    ],
+  }),
   component: LandingPage,
 })
 
