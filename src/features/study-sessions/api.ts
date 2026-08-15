@@ -115,3 +115,29 @@ export async function deleteStudySession(sessionId: string): Promise<void> {
   const { error } = await supabase.from("study_sessions").delete().eq("id", sessionId);
   if (error) throw error;
 }
+
+export async function recordRecallAttempt(input: {
+  sessionId: string;
+  questionId: string;
+  response: string;
+  result: string;
+  resultSource: string;
+  confidence: number;
+  responseTimeMs: number;
+  publishedVersion: number | null;
+}): Promise<string> {
+  const { data, error } = await supabase.rpc("record_recall_attempt", {
+    p_session_id: input.sessionId,
+    p_question_id: input.questionId,
+    p_response: input.response,
+    p_result: input.result as any,
+    p_result_source: input.resultSource as any,
+    p_confidence: input.confidence,
+    p_response_time_ms: input.responseTimeMs,
+    p_published_version: input.publishedVersion,
+  });
+
+  if (error) throw error;
+  return data as string;
+}
+

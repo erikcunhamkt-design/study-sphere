@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
-import { useCreateStudySession, useFinishStudySession } from "../hooks";
+import { useCreateStudySession, useFinishStudySession, useRecordRecallAttempt } from "../hooks";
 import { useQuestions } from "@/features/questions/hooks";
 import { useLesson } from "@/features/studies/hooks/use-lessons";
 import { useCourse } from "@/features/studies/hooks/use-courses";
@@ -32,6 +32,21 @@ interface RecuperacaoSessionProps {
 }
 
 type ConfidenceLevel = "nenhum" | "dificil" | "lembrei" | "facil";
+
+const CONFIDENCE_MAP: Record<ConfidenceLevel, number> = {
+  nenhum: 1,
+  dificil: 2,
+  lembrei: 3,
+  facil: 4,
+};
+
+const RESULT_MAP: Record<ConfidenceLevel, string> = {
+  nenhum: "incorrect",
+  dificil: "partial",
+  lembrei: "correct",
+  facil: "correct",
+};
+
 
 export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession }: RecuperacaoSessionProps) {
   const { user } = useAuth();

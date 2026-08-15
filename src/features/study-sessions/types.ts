@@ -43,13 +43,17 @@ export interface LivreDetails {
   completedAt?: string;
 }
 
+export type RecallResult = 'correct' | 'partial' | 'incorrect' | 'no_answer' | 'abandoned';
+export type ResultSource = 'self_assessment' | 'objective' | 'manual' | 'ai';
+
 export interface RecuperacaoDetails {
   questionAttempts: {
     questionId: string;
+    evidenceId?: string;
     response: string;
-    confidence: "nenhum" | "dificil" | "lembrei" | "facil";
-    responseTimeSeconds: number;
-    isCorrect?: boolean;
+    result: RecallResult;
+    confidence: number; // 1-4
+    responseTimeMs: number;
     attemptedAt: string;
   }[];
   lessonId: string;
@@ -57,6 +61,23 @@ export interface RecuperacaoDetails {
   publishedVersion?: number | null;
   completedAt?: string;
 }
+
+export interface CognitiveEvidenceRow {
+  id: string;
+  user_id: string;
+  lesson_id: string | null;
+  question_id: string | null;
+  session_id: string | null;
+  published_version: number | null;
+  result: RecallResult;
+  result_source: ResultSource;
+  confidence: number;
+  response_time_ms: number;
+  concept_id: string | null;
+  attempted_at: string;
+  created_at: string;
+}
+
 
 
 export type StudySessionDetails =
