@@ -3,7 +3,7 @@ import { pt } from "@blocknote/core/locales";
 import { SuggestionMenuController, useCreateBlockNote, useEditorChange } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 import "@blocknote/shadcn/style.css";
-import { Users } from "lucide-react";
+import { Users, Loader2, CheckCircle2, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
