@@ -47,8 +47,35 @@ function getRealContent(content: LessonDocument | undefined) {
   });
 }
 
-export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: LessonContentViewerProps) {
+/** Renderiza o documento. Só é montado quando há blocos reais (BlockNote falha com array vazio). */
+function ViewerInner({ blocks, lessonId }: { blocks: any[]; lessonId: string }) {
   const { resolvedTheme } = useTheme();
+
+  const editor = useCreateBlockNote(
+    {
+      schema: lessonEditorSchema,
+      dictionary: pt,
+      resolveFileUrl: resolveMediaUrl,
+      initialContent: blocks,
+    },
+    [lessonId, blocks],
+  );
+
+  return (
+    <div className="lab-editor-bn-theme lesson-viewer-mode select-text cursor-auto">
+      <BlockNoteView
+        editor={editor}
+        theme={resolvedTheme === "dark" ? "dark" : "light"}
+        editable={false}
+        formattingToolbar={false}
+        slashMenu={false}
+        sideMenu={false}
+      />
+    </div>
+  );
+}
+
+export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: LessonContentViewerProps) {
   const { data: doc, isLoading, isError } = useLessonDocument(lessonId);
 
   const realContent = useMemo(() => getRealContent(doc?.content), [doc?.content]);
@@ -59,13 +86,6 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
       onMaterialLoad?.(hasContent, realContent.length);
     }
   }, [isLoading, isError, hasContent, realContent.length, onMaterialLoad]);
-
-  const editor = useCreateBlockNote({
-    schema: lessonEditorSchema,
-    dictionary: pt,
-    resolveFileUrl: resolveMediaUrl,
-    initialContent: realContent as any,
-  }, [lessonId, hasContent]);
 
   if (isLoading) {
     return (
@@ -104,7 +124,7 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
             O conteúdo precisa ser adicionado antes que você possa iniciar esta etapa.
           </p>
         </div>
-        
+
         <div className="flex flex-col gap-3 w-full max-w-[240px]">
           {canEdit ? (
             <Button asChild className="h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px]">
@@ -114,7 +134,6 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
               </Link>
             </Button>
           ) : (
-
             <Button variant="outline" onClick={() => window.history.back()} className="h-12 rounded-2xl border-border/40 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
               <ArrowLeft className="h-3 w-3 mr-2" />
               Voltar →
@@ -125,16 +144,6 @@ export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: Lesso
     );
   }
 
-  return (
-    <div className="lab-editor-bn-theme lesson-viewer-mode select-text cursor-auto">
-      <BlockNoteView
-        editor={editor}
-        theme={resolvedTheme === "dark" ? "dark" : "light"}
-        editable={false}
-        formattingToolbar={false}
-        slashMenu={false}
-        sideMenu={false}
-      />
-    </div>
-  );
+  return <ViewerInner key={lessonId} blocks={realContent} lessonId={lessonId} />;
 }
+
