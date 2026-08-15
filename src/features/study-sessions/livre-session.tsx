@@ -446,7 +446,13 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   {lessonId ? (
                     <LessonContentViewer 
                       lessonId={lessonId} 
-                      onMaterialLoad={(hasReal, count) => setMaterialStats({ hasReal, blocksCount: count })}
+                      onMaterialLoad={(hasReal, count) =>
+                        setMaterialStats((prev) =>
+                          prev.hasReal === hasReal && prev.blocksCount === count
+                            ? prev
+                            : { hasReal, blocksCount: count }
+                        )
+                      }
                       onProgress={(count) => setBlocksViewed(count)}
                       canEdit={true}
                     />
