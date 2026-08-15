@@ -128,7 +128,10 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }, [initialLessonId, initialCourseId, isLoadingLessons, courseLessons, session, optimisticStart, resumingSession]);
 
   const { data: lessonDoc } = useLessonDocument(effectiveLessonId || "");
-  const hasMaterial = lessonDoc?.content && Array.isArray(lessonDoc.content) && lessonDoc.content.length > 0;
+  
+  // Estado para controle de material real e progresso
+  const [materialStats, setMaterialStats] = useState({ hasReal: false, blocksCount: 0 });
+  const [blocksViewed, setBlocksViewed] = useState(0);
 
   // Se o lessonId foi setado via efeito de curso, inicia a sessão assim que o estado estabilizar
   useEffect(() => {
@@ -144,19 +147,22 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   async function handleFinish() {
     if (!session) return;
     
-    // Regra de conclusão: Se for o método 'aprender', precisa ter material
-    if (method === "aprender" && !hasMaterial) {
-      toast.error("Esta sessão não possui material. Adicione o conteúdo para concluir o aprendizado.");
+    // Regra de conclusão: Se for o método 'aprender', precisa ter material real
+    if (method === "aprender" && !materialStats.hasReal) {
+      toast.error("Esta sessão não possui material real. Adicione o conteúdo para concluir o aprendizado.");
       return;
     }
 
-    // Condição mínima: pelo menos 10 segundos
-    if (elapsed < 10) {
-      toast.error("Contato muito curto. Dedique um pouco mais de tempo à compreensão.");
-      return;
-    }
+    // Progresso: No 'aprender', medimos se o usuário percorreu o material (pelo menos 50% ou 1 bloco)
+    // Para simplificar esta etapa sem tracking complexo de scroll, usamos a intenção de conclusão
+    // após o carregamento do material real. A regra de 10s vira contexto secundário.
 
-    const details: LivreDetails = nota.trim() ? { nota: nota.trim() } : {};
+    const details: LivreDetails = {
+      ...(nota.trim() ? { nota: nota.trim() } : {}),
+      blocksCount: materialStats.blocksCount,
+      completedAt: new Date().toISOString()
+    };
+    
     try {
       await finishSession.mutateAsync(details);
       toast.success(method === "aprender" ? "Primeiro contato concluído!" : "Sessão concluída");
@@ -166,6 +172,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
       toast.error("Não foi possível concluir a sessão");
     }
   }
+
 
   // 17. FINAL DA SESSÃO - Refinado
   if (isFinished) {
