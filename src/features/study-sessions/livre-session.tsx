@@ -388,18 +388,22 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                   <Label className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
-                    Material de Estudo
+                    MATERIAL DE ESTUDO
                   </Label>
-                  {lessonData && (
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/40">
-                      Aula {lessonData.position + 1} de {courseLessons?.length || "?"}
+                  {materialStats.hasReal && (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 bg-primary/5 px-2 py-0.5 rounded-full">
+                      {materialStats.blocksCount} BLOCOS
                     </span>
                   )}
                 </div>
                 
                 <div className="min-h-[500px] rounded-[2.5rem] border border-border/10 bg-surface/20 p-8 md:p-12 shadow-sm transition-all overflow-hidden">
                   {lessonId ? (
-                    <LessonContentViewer lessonId={lessonId} />
+                    <LessonContentViewer 
+                      lessonId={lessonId} 
+                      onMaterialLoad={(hasReal, count) => setMaterialStats({ hasReal, blocksCount: count })}
+                      canEdit={true}
+                    />
                   ) : (
                     <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
                       <AlertCircle className="h-10 w-10 text-muted-foreground/20" />
@@ -410,6 +414,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   )}
                 </div>
               </div>
+
 
               {/* Prioridade 2: COMPREENSÃO (Notas transformadas em elemento secundário) */}
               <div className="space-y-6 pt-6 border-t border-border/5">
