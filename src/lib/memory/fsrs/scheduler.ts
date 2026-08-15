@@ -42,7 +42,7 @@ export class FSRSScheduler {
         next_s = card.stability * 0.5;
         next_d = this.math.next_difficulty(card.difficulty, rating);
       } else {
-        next_s = this.math.init_stability(rating) * 2; // Progressive
+        next_s = this.math.init_stability(rating) * (card.reps + 1); // Improved growth logic for learning
         next_d = this.math.init_difficulty(rating);
         next_card.state = State.Review;
       }
