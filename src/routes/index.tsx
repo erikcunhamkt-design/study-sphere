@@ -31,9 +31,10 @@ export const Route = createFileRoute('/')({
 })
 
 function LandingPage() {
-  const { user, isLoading } = useAuth()
+  const { user, loading } = useAuth()
 
-  if (isLoading) return null;
+  if (loading) return null;
+
 
 
   return (
