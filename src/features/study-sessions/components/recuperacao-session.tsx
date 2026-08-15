@@ -65,6 +65,8 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
 
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "");
+  const recordAttempt = useRecordRecallAttempt();
+
 
   // Filtrar questões reais da aula e material (Gate 1 - Etapa 4 e 22)
   const lessonQuestions = useMemo(() => {
@@ -115,27 +117,44 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
   };
 
   const handleAssess = async (confidence: ConfidenceLevel) => {
-    const duration = (Date.now() - startTime) / 1000;
+    if (!session) return;
     
-    const newAttempt = {
-      questionId: currentQuestion.id,
-      response: response.trim(),
-      confidence,
-      responseTimeSeconds: duration,
-      attemptedAt: new Date().toISOString()
-    };
+    const durationMs = Date.now() - startTime;
+    const confidenceValue = CONFIDENCE_MAP[confidence];
+    const result = RESULT_MAP[confidence];
+    
+    try {
+      const evidenceId = await recordAttempt.mutateAsync({
+        sessionId: session.id,
+        questionId: currentQuestion.id,
+        response: response.trim(),
+        result,
+        resultSource: "self_assessment",
+        confidence: confidenceValue,
+        responseTimeMs: durationMs,
+        publishedVersion: lessonDoc?.published_version ?? null
+      });
 
-    const updatedAttempts = [...attempts, newAttempt];
-    setAttempts(updatedAttempts);
+      const newAttempt = {
+        questionId: currentQuestion.id,
+        evidenceId,
+        response: response.trim(),
+        result: result as any,
+        confidence: confidenceValue,
+        responseTimeMs: durationMs,
+        attemptedAt: new Date().toISOString()
+      };
 
-    if (currentIndex < lessonQuestions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setResponse("");
-      setIsRevealed(false);
-      setStartTime(Date.now());
-    } else {
-      // Finalizar sessão
-      try {
+      const updatedAttempts = [...attempts, newAttempt];
+      setAttempts(updatedAttempts);
+
+      if (currentIndex < lessonQuestions.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+        setResponse("");
+        setIsRevealed(false);
+        setStartTime(Date.now());
+      } else {
+        // Finalizar sessão
         const details: RecuperacaoDetails = {
           questionAttempts: updatedAttempts,
           lessonId,
@@ -145,12 +164,13 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
         };
         await finishSession.mutateAsync(details);
         setIsFinished(true);
-      } catch (err) {
-        console.error("Erro ao finalizar recuperação:", err);
-        toast.error("Erro ao salvar progresso.");
       }
+    } catch (err) {
+      console.error("Erro ao registrar tentativa:", err);
+      toast.error("Erro ao salvar progresso.");
     }
   };
+
 
   if (isLoadingQuestions) {
     return (
@@ -184,7 +204,7 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
   }
 
   if (isFinished) {
-    const recoveredCount = attempts.filter(a => a.confidence === "lembrei" || a.confidence === "facil").length;
+    const recoveredCount = attempts.filter(a => a.result === "correct").length;
     
     return (
       <div className="max-w-2xl mx-auto text-center space-y-12 py-10 animate-in fade-in duration-700">
