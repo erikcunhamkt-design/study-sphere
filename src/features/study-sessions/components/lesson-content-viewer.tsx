@@ -7,6 +7,7 @@ import { lessonEditorSchema } from "@/features/lesson-editor/schema";
 import { resolveMediaUrl } from "@/features/lesson-editor/media-upload";
 import { pt } from "@blocknote/core/locales";
 import { useTheme } from "@/hooks/use-theme";
+import { useEffect, useMemo } from "react";
 
 interface LessonContentViewerProps {
   lessonId: string;
@@ -16,12 +17,15 @@ export function LessonContentViewer({ lessonId }: LessonContentViewerProps) {
   const { resolvedTheme } = useTheme();
   const { data: doc, isLoading, isError } = useLessonDocument(lessonId);
 
+  // O initialContent só é aplicado na criação.
+  // Como a aula pode mudar via switcher, usamos useMemo para o editor
+  // ou lidamos com o carregamento de blocos.
   const editor = useCreateBlockNote({
     schema: lessonEditorSchema,
     dictionary: pt,
     resolveFileUrl: resolveMediaUrl,
     initialContent: doc?.content as any,
-  });
+  }, [lessonId, !!doc]); // Re-cria se mudar o ID ou se o doc chegar
 
   if (isLoading) {
     return (
@@ -67,7 +71,7 @@ export function LessonContentViewer({ lessonId }: LessonContentViewerProps) {
   }
 
   return (
-    <div className="lab-editor-bn-theme lesson-viewer-mode">
+    <div className="lab-editor-bn-theme lesson-viewer-mode select-text cursor-text">
       <BlockNoteView
         editor={editor}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
@@ -79,3 +83,4 @@ export function LessonContentViewer({ lessonId }: LessonContentViewerProps) {
     </div>
   );
 }
+
