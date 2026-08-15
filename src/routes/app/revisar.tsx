@@ -23,7 +23,7 @@ function RevisarPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-6 space-y-12">
+    <div className="max-w-4xl mx-auto py-12 px-6 space-y-8">
       <header className="space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
            <Brain className="w-3.5 h-3.5 text-primary" />
@@ -71,12 +71,12 @@ function RevisarPage() {
           </div>
         </div>
       ) : state === "new_user" ? (
-        <div className="py-16 text-center space-y-8 animate-in fade-in duration-700">
-           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
-             <BookOpen className="w-8 h-8" />
+        <div className="py-8 text-center space-y-8 animate-in fade-in duration-700">
+           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
+             <BookOpen className="w-7 h-7" />
            </div>
            <div className="space-y-3">
-             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Comece sua memória</h2>
+             <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground uppercase">Comece sua memória</h2>
              <p className="text-muted-foreground font-medium max-w-sm mx-auto">
                Estude um conteúdo e faça sua primeira recuperação para começar a construir seu histórico de memória.
              </p>
@@ -86,12 +86,12 @@ function RevisarPage() {
            </Button>
         </div>
       ) : state === "no_recovery" ? (
-        <div className="py-16 text-center space-y-8 animate-in fade-in duration-700">
-           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
-             <RefreshCcw className="w-8 h-8" />
+        <div className="py-8 text-center space-y-8 animate-in fade-in duration-700">
+           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
+             <RefreshCcw className="w-7 h-7" />
            </div>
            <div className="space-y-3">
-             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Sua memória ainda não foi avaliada</h2>
+             <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground uppercase">Sua memória ainda não foi avaliada</h2>
              <p className="text-muted-foreground font-medium max-w-sm mx-auto">
                O próximo passo é descobrir o que realmente ficou. Você já estudou, mas ainda não testou o que consegue recuperar.
              </p>
@@ -101,12 +101,12 @@ function RevisarPage() {
            </Button>
         </div>
       ) : (
-        <div className="py-16 text-center space-y-8 animate-in fade-in duration-700">
-           <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto text-emerald-500">
-             <CheckCircle2 className="w-8 h-8" />
+        <div className="py-8 text-center space-y-8 animate-in fade-in duration-700">
+           <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto text-emerald-500">
+             <CheckCircle2 className="w-7 h-7" />
            </div>
            <div className="space-y-3">
-             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Tudo em dia</h2>
+             <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground uppercase">Tudo em dia</h2>
              <p className="text-muted-foreground font-medium max-w-sm mx-auto">
                Nenhuma revisão está prevista para agora. Continue estudando e o Dominus indicará quando um conceito estiver pronto para ser recuperado novamente.
              </p>
