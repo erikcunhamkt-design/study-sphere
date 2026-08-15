@@ -23,7 +23,7 @@ function DesempenhoPage() {
         </div>
         <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Desempenho</h1>
         <p className="text-muted-foreground font-medium max-w-2xl">
-          Entenda o que você está aprendendo, o que está retendo e onde precisa prestar atenção para otimizar sua memória.
+          Entenda o que você está aprendendo, seu histórico de recuperações e onde precisa prestar atenção para otimizar sua memória.
         </p>
       </header>
 
