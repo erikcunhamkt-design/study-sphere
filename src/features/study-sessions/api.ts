@@ -115,3 +115,7 @@ export async function deleteStudySession(sessionId: string): Promise<void> {
   const { error } = await supabase.from("study_sessions").delete().eq("id", sessionId);
   if (error) throw error;
 }
+export { recordRecallAttempt } from "./api.evidence";
+export type { RecordRecallAttemptInput } from "./api.evidence";
+
+

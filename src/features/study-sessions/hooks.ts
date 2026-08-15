@@ -99,3 +99,13 @@ export function useDeleteStudySession() {
     onSuccess: invalidate,
   });
 }
+
+export function useRecordRecallAttempt() {
+  const invalidate = useInvalidateStudySessionLists();
+  return useMutation({
+    mutationFn: (input: api.RecordRecallAttemptInput) => api.recordRecallAttempt(input),
+    onSuccess: invalidate,
+  });
+}
+
+
