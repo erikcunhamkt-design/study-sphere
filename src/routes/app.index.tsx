@@ -118,7 +118,7 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
   const { data: prefs } = usePreferences();
-  const { priority, data, isLoading, dueFlashcards, dueConcepts, hasActivity } = useDashboardState();
+  const { priority, data, isLoading, dueFlashcards, dueConcepts, hasActivity, reviewSemantic } = useDashboardState();
   const deleteSession = useDeleteStudySession();
   const navigate = useNavigate();
   
@@ -238,11 +238,23 @@ function DashboardPage() {
           />
         )}
 
+        {priority === "test_memory" && (
+          <NextStepAction
+            title="PRÓXIMO PASSO"
+            subtitle="Sua memória ainda não foi avaliada"
+            description="O próximo passo é descobrir o que realmente ficou. Você já estudou, mas ainda não testou o que consegue recuperar."
+            ctaText="Testar memória"
+            to="/app/estudar"
+            search={{}}
+            icon={Sparkles}
+          />
+        )}
+
         {priority === "maintenance" && (
           <NextStepAction
             title="TUDO EM DIA"
-            subtitle="Continue avançando"
-            description="Nenhuma revisão pendente. Escolha seu próximo passo de aprendizagem."
+            subtitle="Nenhuma revisão prevista"
+            description="Você está em dia com suas revisões. Continue estudando para expandir seu conhecimento."
             ctaText="Continuar estudando"
             to="/app/meus-estudos/$areaId/cursos/$courseId"
             params={{ 
@@ -257,10 +269,10 @@ function DashboardPage() {
       {/* 2. SEU DIA & 3. SEU DOMÍNIO */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
         <div className="md:col-span-3">
-          <DayProgress current={studyMinutes} goal={studyGoal} reviews={reviewsCount} />
+          <DayProgress current={studyMinutes} goal={studyGoal} reviews={reviewsCount} state={reviewSemantic} />
         </div>
         <div className="md:col-span-2">
-          <MasteryCard />
+          <MasteryCard state={reviewSemantic} />
         </div>
       </div>
 

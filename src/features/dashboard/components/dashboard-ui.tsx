@@ -95,7 +95,7 @@ export function NextStepAction({
   );
 }
 
-export function DayProgress({ current, goal, reviews }: { current: number; goal: number; reviews: number }) {
+export function DayProgress({ current, goal, reviews, state }: { current: number; goal: number; reviews: number; state?: any }) {
   const percent = Math.min(Math.round((current / goal) * 100), 100);
   
   return (
@@ -111,7 +111,7 @@ export function DayProgress({ current, goal, reviews }: { current: number; goal:
         <div className="text-left sm:text-right space-y-1">
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Revisões</p>
           <p className={cn("text-xl font-black tracking-tight", reviews > 0 ? "text-primary/90" : "text-emerald-500/60")}>
-            {reviews > 0 ? `${reviews} ${reviews === 1 ? 'revisão' : 'revisões'}` : "Tudo em dia"}
+            {reviews > 0 ? `${reviews} ${reviews === 1 ? 'revisão' : 'revisões'}` : (state === "new_user" ? "Inicie sua memória" : "Tudo em dia")}
           </p>
         </div>
       </div>
@@ -135,7 +135,7 @@ export function SectionHeader({ title }: { title: string }) {
   );
 }
 
-export function MasteryCard({ percent, trend }: { percent?: number; trend?: number }) {
+export function MasteryCard({ percent, trend, state }: { percent?: number; trend?: number; state?: any }) {
   return (
     <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center">
       <div className="flex items-center justify-between mb-4">
@@ -148,7 +148,11 @@ export function MasteryCard({ percent, trend }: { percent?: number; trend?: numb
           <div className="space-y-1">
             <p className="text-lg font-black tracking-tight text-foreground leading-snug">Seu nível ainda está sendo construído.</p>
             <p className="text-[11px] text-muted-foreground/40 leading-relaxed font-medium max-w-[90%]">
-              O Dominus identificará seus pontos fortes e lacunas conforme você estudar e responder questões.
+              {state === "new_user" 
+                ? "Sua jornada está começando. Adicione conteúdo e comece a estudar para gerar os primeiros dados de memória." 
+                : state === "no_recovery"
+                  ? "Você já tem estudos registrados! Agora realize sessões de recuperação para identificar seu nível de domínio."
+                  : "O Dominus identificará seus pontos fortes e lacunas conforme você estudar e responder questões."}
             </p>
           </div>
           <div className="pt-1">

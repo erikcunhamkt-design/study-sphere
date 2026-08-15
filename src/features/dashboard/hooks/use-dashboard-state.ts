@@ -7,11 +7,14 @@ import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
 import { calculateCourseProgress } from "@/features/studies/utils";
 import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
 import { useDueReviews } from "@/features/study-sessions/hooks.due";
+import { useReviewSemanticState } from "@/features/study-sessions/hooks.semantic";
 import { isProductionEligible } from "@/lib/eligibility";
+
+
 
 export function useDashboardState() {
   const { data: dueFlashcards, isLoading: loadingDue } = useDueFlashcards();
-  const { data: dueConcepts, isLoading: loadingDueConcepts } = useDueReviews(50);
+  const { state: reviewSemantic, dueReviews: dueConcepts, isLoading: loadingDueConcepts } = useReviewSemanticState();
   const { data: inProgressSessions, isLoading: loadingProgress } = useInProgressStudySessions();
   const { data: courses, isLoading: loadingCourses } = useAllCourses();
   const { data: allLessons, isLoading: loadingLessons } = useAllLessons();
@@ -115,6 +118,20 @@ export function useDashboardState() {
       };
     }
 
+    // New: Semantic onboarding/maintenance logic for review
+    if (reviewSemantic === "new_user" && !hasActivity) {
+      return {
+        priority: "onboarding" as const,
+        data: {}
+      };
+    }
+
+    if (reviewSemantic === "no_recovery") {
+      return {
+        priority: "test_memory" as const,
+        data: {}
+      };
+    }
 
     // 3. Prioridade: Recomendação (Cursos em andamento)
     const activeCourses = (courses ?? []).filter((c) => !c.is_archived);
@@ -156,7 +173,7 @@ export function useDashboardState() {
 
     // 5. Prioridade: Onboarding (Sem conteúdo)
     return { priority: "onboarding" as const, data: {} };
-  }, [isLoading, dueFlashcards, dueConcepts, inProgressSessions, courses, allLessons, areas, modules, hasActivity]);
+  }, [isLoading, dueFlashcards, dueConcepts, inProgressSessions, courses, allLessons, areas, modules, hasActivity, reviewSemantic]);
 
-  return { ...state, isLoading, dueFlashcards, dueConcepts, courses, allLessons, modules, hasActivity };
+  return { ...state, isLoading, dueFlashcards, dueConcepts, courses, allLessons, modules, hasActivity, reviewSemantic };
 }
