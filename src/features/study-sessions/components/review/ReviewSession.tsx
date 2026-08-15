@@ -272,7 +272,7 @@ export function ReviewSession({ concepts, onDone }: ReviewSessionProps) {
                 <div className="space-y-4">
                   <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500/60">Gabarito esperado</span>
                   <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-[2.5rem] p-8 text-foreground/80 font-medium leading-relaxed text-lg italic">
-                    {currentItem.question.expected_answer || "Reforce este conceito com base na sua lembrança."}
+                    {currentItem?.question.expected_answer || "Reforce este conceito com base na sua lembrança."}
                   </div>
                 </div>
                 
