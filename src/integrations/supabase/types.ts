@@ -482,6 +482,9 @@ export type Database = {
           created_at: string
           id: string
           lesson_id: string
+          published_at: string | null
+          published_content: Json | null
+          published_version: number | null
           schema_version: number
           updated_at: string
           user_id: string
@@ -492,6 +495,9 @@ export type Database = {
           created_at?: string
           id?: string
           lesson_id: string
+          published_at?: string | null
+          published_content?: Json | null
+          published_version?: number | null
           schema_version?: number
           updated_at?: string
           user_id: string
@@ -502,6 +508,9 @@ export type Database = {
           created_at?: string
           id?: string
           lesson_id?: string
+          published_at?: string | null
+          published_content?: Json | null
+          published_version?: number | null
           schema_version?: number
           updated_at?: string
           user_id?: string
@@ -1030,6 +1039,7 @@ export type Database = {
         Args: { p_document_id: string }
         Returns: undefined
       }
+      publish_lesson_document: { Args: { p_lesson_id: string }; Returns: Json }
       reorder_course_modules: {
         Args: { p_course_id: string; p_ids: string[] }
         Returns: undefined
