@@ -1,13 +1,16 @@
 import { Brain, Clock, Target, Activity, ArrowRight, LineChart, AlertCircle, TrendingUp, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
 import { usePerformanceDashboard } from "../hooks/use-performance-dashboard";
+import { ConceptDetailDialog } from "./ConceptDetailDialog";
 import { cn } from "@/lib/utils";
 
 export function PerformanceDashboard() {
   const { data, isLoading } = usePerformanceDashboard();
+  const [selectedConcept, setSelectedConcept] = useState<any>(null);
 
   if (isLoading) {
     return (
@@ -64,8 +67,8 @@ export function PerformanceDashboard() {
         {[
           { label: "Conceitos Estudados", value: data.summary.totalConcepts, color: "text-foreground" },
           { label: "Memórias Avaliadas", value: data.summary.evaluatedMemories, color: "text-primary" },
-          { label: "Revisões Devidas", value: data.summary.dueReviews, color: "text-orange-500" },
-          { label: "Revisões em Dia", value: data.summary.inDayReviews, color: "text-emerald-500" },
+          { label: "Prontos para recuperação", value: data.summary.dueReviews, color: "text-orange-500" },
+          { label: "Conceitos em Dia", value: data.summary.inDayReviews, color: "text-emerald-500" },
         ].map((stat, i) => (
           <Card key={i} className="bg-surface/30 border-border/10 rounded-[2rem]">
             <CardContent className="pt-6">
@@ -85,7 +88,11 @@ export function PerformanceDashboard() {
           </header>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.attentionNeeded.map((concept) => (
-              <Card key={concept.id} className="bg-surface/40 border-orange-500/20 rounded-[2.5rem] relative overflow-hidden group">
+              <Card 
+                key={concept.id} 
+                className="bg-surface/40 border-orange-500/20 rounded-[2.5rem] relative overflow-hidden group cursor-pointer hover:bg-surface/60 transition-colors"
+                onClick={() => setSelectedConcept(concept)}
+              >
                 <CardContent className="pt-8 space-y-4">
                   <div className="space-y-1">
                     <h4 className="text-xl font-black text-foreground">{(concept as any).concept?.title}</h4>
@@ -115,7 +122,11 @@ export function PerformanceDashboard() {
         </header>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {data.concepts.map((ms) => (
-            <Card key={ms.id} className="bg-surface/20 border-border/10 rounded-[2rem] hover:bg-surface/30 transition-colors group cursor-pointer">
+            <Card 
+              key={ms.id} 
+              className="bg-surface/20 border-border/10 rounded-[2rem] hover:bg-surface/30 transition-colors group cursor-pointer"
+              onClick={() => setSelectedConcept(ms)}
+            >
               <CardContent className="pt-6 space-y-3">
                 <h4 className="text-sm font-bold text-foreground truncate">{(ms as any).concept?.title}</h4>
                 <div className="space-y-2">
@@ -177,7 +188,7 @@ export function PerformanceDashboard() {
               <p className="text-2xl font-black text-foreground">{data.studyProgress.startedConcepts}</p>
             </div>
             <div className="space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Consolidados</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Estáveis</span>
               <p className="text-2xl font-black text-foreground">{data.studyProgress.completedConcepts}</p>
             </div>
           </CardContent>
@@ -188,7 +199,7 @@ export function PerformanceDashboard() {
       <section className="space-y-6">
         <header className="flex items-center gap-2">
           <LineChart className="w-4 h-4 text-muted-foreground/40" />
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Últimas Recuperações</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Histórico de Recuperações</h3>
         </header>
         <div className="space-y-3">
           {data.evidences.map((ev) => (
@@ -220,6 +231,12 @@ export function PerformanceDashboard() {
           ))}
         </div>
       </section>
+
+      <ConceptDetailDialog 
+        concept={selectedConcept}
+        open={!!selectedConcept}
+        onOpenChange={(open) => !open && setSelectedConcept(null)}
+      />
     </div>
   );
 }
