@@ -13,7 +13,8 @@ export function useDomainModel() {
       if (!user) throw new Error("Não autenticado");
 
       // 1. Fetch Hierarchy: Areas -> Courses -> Lessons -> Concepts
-      const { data: areas, error: areasError } = await supabase
+      // PostgREST hierarchy fetch
+      const { data: rawAreas, error: areasError } = await supabase
         .from("study_areas")
         .select(`
           id,
@@ -33,6 +34,8 @@ export function useDomainModel() {
         .eq("is_archived", false);
 
       if (areasError) throw areasError;
+      
+      const areas = (rawAreas as any[]) || [];
 
       // 2. Fetch all memory states for the user to join in memory
       const { data: memoryStates, error: msError } = await supabase
@@ -43,15 +46,17 @@ export function useDomainModel() {
 
       if (msError) throw msError;
 
-      const msMap = new Map(memoryStates.map(ms => [ms.concept_id, ms]));
+      const msMap = new Map((memoryStates || []).map(ms => [ms.concept_id, ms]));
       const now = new Date();
 
       // 3. Process each area
       const domainMap = areas.map(area => {
         const allConcepts: any[] = [];
-        area.courses.forEach(course => {
-          course.lessons.forEach(lesson => {
-            lesson.concepts.forEach(concept => {
+        
+        // Safely traverse the hierarchy
+        (area.courses || []).forEach((course: any) => {
+          (course.lessons || []).forEach((lesson: any) => {
+            (lesson.concepts || []).forEach((concept: any) => {
               allConcepts.push({
                 ...concept,
                 memory: msMap.get(concept.id)
@@ -60,7 +65,7 @@ export function useDomainModel() {
           });
         });
 
-        const evaluated = allConcepts.filter(c => c.memory && c.memory.reps > 0);
+        const evaluated = allConcepts.filter(c => c.memory && (c.memory.reps || 0) > 0);
         const attention = allConcepts.filter(c => {
           if (!c.memory) return false;
           const isDue = c.memory.due ? new Date(c.memory.due) <= now : false;
@@ -68,7 +73,11 @@ export function useDomainModel() {
           return isDue || isFailing;
         });
 
-        const hasMismatch = evaluated.some(c => c.memory.last_confidence >= 3 && (c.memory.last_result === 'incorrect' || c.memory.last_result === 'partial'));
+        const hasMismatch = evaluated.some(c => 
+          (c.memory.last_confidence || 0) >= 3 && 
+          (c.memory.last_result === 'incorrect' || c.memory.last_result === 'partial')
+        );
+        
         const totalStability = evaluated.reduce((sum, c) => sum + (c.memory.stability || 0), 0);
         const avgStability = evaluated.length > 0 ? totalStability / evaluated.length : 0;
 
