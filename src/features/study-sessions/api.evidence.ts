@@ -68,9 +68,13 @@ export async function getMemoryState(conceptId: string): Promise<MemoryState | n
     id: data.id,
     userId: data.user_id,
     conceptId: data.concept_id,
-    strength: data.strength,
-    stability: data.stability,
-    difficulty: data.difficulty,
+    stability: data.stability || 0,
+    difficulty: data.difficulty || 0,
+    due: data.due || new Date().toISOString(),
+    lastReview: data.last_review || null,
+    reps: data.reps || 0,
+    lapses: data.lapses || 0,
+    state: data.state || 0,
     lastRecalledAt: data.last_recalled_at,
     lastResult: data.last_result as RecallResult | null,
     lastConfidence: data.last_confidence,
@@ -79,6 +83,7 @@ export async function getMemoryState(conceptId: string): Promise<MemoryState | n
     failedRecalls: data.failed_recalls,
     updatedAt: data.updated_at
   };
+
 }
 
 export async function applyEvidenceToMemoryState(conceptId: string, evidenceId: string): Promise<string> {
