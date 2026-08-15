@@ -89,7 +89,7 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P1: REVIEW_DUE ---
-    const dueConcepts = dashboard?.concepts?.filter(c => c.isDue && !c.is_archived) || [];
+    const dueConcepts = dashboard?.concepts?.filter(c => c.isDue && !(c as any).is_archived) || [];
     const dueCount = dueConcepts.length;
     
     if (dueCount > 0) {
@@ -123,7 +123,7 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P2: REINFORCE (Attention Needed) ---
-    const attentionList = dashboard?.attentionNeeded?.filter(a => isProductionEligible(a.concept) && !a.concept.is_archived) || [];
+    const attentionList = dashboard?.attentionNeeded?.filter(a => isProductionEligible(a.concept as any) && !(a.concept as any).is_archived) || [];
     const attention = attentionList[0];
     
     if (attention) {
