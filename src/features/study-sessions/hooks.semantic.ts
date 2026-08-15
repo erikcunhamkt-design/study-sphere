@@ -45,22 +45,22 @@ export function useReviewSemanticState() {
 
   const isLoading = isLoadingDue || isLoadingStats;
 
-  if (isLoading) return { state: "loading" as ReviewSemanticState, dueReviews: [] };
+  if (isLoading) return { state: "loading" as ReviewSemanticState, dueReviews: [], isLoading: true };
 
   if (dueReviews && dueReviews.length > 0) {
-    return { state: "due" as ReviewSemanticState, dueReviews };
+    return { state: "due" as ReviewSemanticState, dueReviews, isLoading: false };
   }
 
   // Usuário Novo: Sem estudo e sem memória
   if ((stats?.sessionsCount || 0) === 0 && (stats?.memoryStatesCount || 0) === 0) {
-    return { state: "new_user" as ReviewSemanticState, dueReviews: [] };
+    return { state: "new_user" as ReviewSemanticState, dueReviews: [], isLoading: false };
   }
 
   // Estudou, mas não recuperou (Sem evidências ou sem estados de memória derivados)
   if ((stats?.evidencesCount || 0) === 0 || (stats?.memoryStatesCount || 0) === 0) {
-    return { state: "no_recovery" as ReviewSemanticState, dueReviews: [] };
+    return { state: "no_recovery" as ReviewSemanticState, dueReviews: [], isLoading: false };
   }
 
   // Memória existe, nada devido
-  return { state: "no_due" as ReviewSemanticState, dueReviews: [] };
+  return { state: "no_due" as ReviewSemanticState, dueReviews: [], isLoading: false };
 }
