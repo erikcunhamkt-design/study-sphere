@@ -88,7 +88,7 @@ export function PerformanceDashboard() {
               <Card key={concept.id} className="bg-surface/40 border-orange-500/20 rounded-[2.5rem] relative overflow-hidden group">
                 <CardContent className="pt-8 space-y-4">
                   <div className="space-y-1">
-                    <h4 className="text-xl font-black text-foreground">{concept.concept?.title}</h4>
+                    <h4 className="text-xl font-black text-foreground">{(concept as any).concept?.title}</h4>
                     <p className="text-xs text-muted-foreground/60 leading-relaxed">
                       {concept.hasMismatch 
                         ? "Sua confiança esteve acima da sua recuperação recente."
@@ -117,7 +117,7 @@ export function PerformanceDashboard() {
           {data.concepts.map((ms) => (
             <Card key={ms.id} className="bg-surface/20 border-border/10 rounded-[2rem] hover:bg-surface/30 transition-colors group cursor-pointer">
               <CardContent className="pt-6 space-y-3">
-                <h4 className="text-sm font-bold text-foreground truncate">{ms.concept?.title}</h4>
+                <h4 className="text-sm font-bold text-foreground truncate">{(ms as any).concept?.title}</h4>
                 <div className="space-y-2">
                   <Badge variant="secondary" className={cn("text-[8px] font-bold uppercase tracking-widest rounded-full border-none px-2", ms.humanState.color)}>
                     {ms.humanState.label}
