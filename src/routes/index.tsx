@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { Brain, ArrowRight, Sparkles, BookOpen, Layers, Target, Clock, RefreshCcw, CheckCircle2 } from 'lucide-react'
+import { Brain, ArrowRight, Sparkles, BookOpen, Layers, Target, Clock, RefreshCcw, CheckCircle2, Play } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { MarketingHeader } from '@/components/marketing/MarketingHeader'
 import { cn } from '@/lib/utils'
