@@ -298,7 +298,7 @@ function EstudarPage() {
         </section>
       )}
 
-      {/* 4. MEUS ESTUDOS (TODOS OS CURSOS) */}
+      {/* 4. MEUS ESTUDOS (CATÁLOGO COMPACTO) */}
       {allCourses && allCourses.length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
@@ -306,24 +306,50 @@ function EstudarPage() {
             <span className="h-px flex-1 mx-6 bg-border/20" />
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="space-y-3">
             {allCourses.map((course: any) => (
               <button
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
                 className={cn(
-                  "group relative overflow-hidden rounded-2xl border border-border/20 bg-surface/10 p-4 text-left transition-all hover:border-primary/10 hover:bg-surface/20",
+                  "group flex items-center justify-between w-full p-4 rounded-2xl border border-border/20 bg-surface/10 text-left transition-all hover:border-primary/20 hover:bg-surface/20",
                   selectedContent?.id === course.id && "border-primary/30 bg-surface/30"
                 )}
               >
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold tracking-tight text-foreground/70 group-hover:text-foreground transition-colors truncate">
-                    {course.name}
-                  </h4>
-                  <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">
-                    <span>{course.status === 'not_started' ? 'Não iniciado' : `${course.progress?.percent || 0}%`}</span>
-                    {selectedContent?.id === course.id && <Zap className="h-2 w-2 text-primary fill-primary" />}
+                <div className="flex items-center gap-4 flex-1">
+                  <div className={cn(
+                    "w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground/40 group-hover:text-primary transition-colors",
+                    selectedContent?.id === course.id ? "bg-primary/10 text-primary" : "bg-surface/30"
+                  )}>
+                    <BookOpen className="h-4 w-4" />
                   </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+                      {course.name}
+                    </h4>
+                    <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">
+                      <span>{course.status === 'not_started' ? 'Não iniciado' : `${course.progress?.percent || 0}% Concluído`}</span>
+                      {course.last_activity_at && (
+                        <>
+                          <span className="w-1 h-1 rounded-full bg-border/40" />
+                          <span>Último estudo: {new Date(course.last_activity_at).toLocaleDateString()}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-all",
+                  selectedContent?.id === course.id 
+                    ? "bg-primary/20 text-primary" 
+                    : "opacity-0 group-hover:opacity-100 text-muted-foreground/40 hover:text-primary"
+                )}>
+                  {selectedContent?.id === course.id ? (
+                    <>Selecionado <Zap className="h-3 w-3 fill-primary" /></>
+                  ) : (
+                    <>Estudar <ChevronRight className="h-3 w-3" /></>
+                  )}
                 </div>
               </button>
             ))}
