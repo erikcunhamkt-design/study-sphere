@@ -22,7 +22,7 @@ import { useCourse } from "@/features/studies/hooks/use-courses";
 import { useLessonDocument } from "@/features/lesson-editor/hooks";
 import { formatSeconds } from "../format";
 import { cn } from "@/lib/utils";
-import type { StudySessionRow, RecuperacaoDetails } from "../types";
+import type { StudySessionRow, RecuperacaoDetails, RecallResult } from "../types";
 
 interface RecuperacaoSessionProps {
   lessonId: string;
