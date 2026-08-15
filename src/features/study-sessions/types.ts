@@ -34,6 +34,8 @@ export interface LivreDetails {
   nota?: string;
   anotacoes?: string;
   courseId?: string;
+  lessonId?: string;
+  publishedVersion?: number | null;
   blocksCount?: number;
   blocksViewed?: number;
   progressPercent?: number;
@@ -59,6 +61,7 @@ export interface StudySessionRow {
   ended_at: string | null;
   duration_seconds: number | null;
   details: StudySessionDetails;
+  published_version: number | null;
   created_at: string;
   updated_at: string;
 }
