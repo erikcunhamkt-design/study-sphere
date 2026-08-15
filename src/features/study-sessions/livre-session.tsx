@@ -412,8 +412,6 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   <ul className="space-y-3">
                     {method === "aprender" ? (
                       ['Conecte com o que já sabe', 'Identifique termos novos', 'Não tente decorar tudo agora'].map((tip, i) => (
-
-                      ['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
                         <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
                           <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
                           {tip}
