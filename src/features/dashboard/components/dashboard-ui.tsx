@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { useDomainModel } from "@/features/performance/hooks/use-domain-model";
-import { useDomainModel } from "@/features/performance/hooks/use-domain-model";
 
 export function NextStepAction({
   title,
@@ -142,16 +141,15 @@ export function MasteryCard({ state }: { state?: any }) {
 
   if (isLoading) {
     return (
-      <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 h-full flex items-center justify-center">
+      <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 h-[180px] flex items-center justify-center">
         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
       </div>
     );
   }
 
-  // Se não houver áreas ou domínios
   if (!domains || domains.length === 0) {
     return (
-      <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center h-full">
+      <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center h-[180px]">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Mapa de Domínio</h3>
           <Brain className="h-3.5 w-3.5 text-muted-foreground/10 group-hover:text-primary/20 transition-colors" />
@@ -160,7 +158,7 @@ export function MasteryCard({ state }: { state?: any }) {
           <div className="space-y-1">
             <p className="text-lg font-black tracking-tight text-foreground leading-snug">Seu mapa está começando.</p>
             <p className="text-[11px] text-muted-foreground/40 leading-relaxed font-medium max-w-[90%]">
-              Sua jornada está começando. Adicione conteúdo e comece a estudar para gerar os primeiros dados de memória.
+              Adicione conteúdo e comece a estudar para gerar os primeiros dados de memória.
             </p>
           </div>
           <div className="pt-1">
@@ -173,11 +171,10 @@ export function MasteryCard({ state }: { state?: any }) {
     );
   }
 
-  // Pegar as 2 áreas com maior domínio ou mais recentes (aqui pegamos as primeiras 2 para simplicidade no cockpit)
   const topDomains = domains.slice(0, 2);
 
   return (
-    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center h-full">
+    <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-6 shadow-sm hover:border-primary/10 transition-all group flex flex-col justify-center h-[180px]">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Mapa de Domínio</h3>
         <Link to="/app/desempenho" className="text-[9px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors">
@@ -197,7 +194,7 @@ export function MasteryCard({ state }: { state?: any }) {
             <div className="flex items-center gap-2">
               <div className="flex-1 h-1 bg-surface/40 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-primary/40 rounded-full" 
+                  className="h-full bg-primary/40 rounded-full transition-all duration-500" 
                   style={{ width: `${(domain.metrics.evaluatedConcepts / Math.max(domain.metrics.totalConcepts, 1)) * 100}%` }}
                 />
               </div>
