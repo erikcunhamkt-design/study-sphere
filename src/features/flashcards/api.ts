@@ -4,7 +4,7 @@ import type { FlashcardContent, FlashcardRating } from "./schema";
 import type { FlashcardReviewRow, FlashcardRow, SubmitFlashcardReviewResult } from "./types";
 
 const FLASHCARD_COLUMNS =
-  "id, user_id, lesson_id, deck_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, created_at, updated_at";
+  "id, user_id, lesson_id, deck_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, is_test_data, created_at, updated_at";
 
 export async function fetchFlashcards(userId: string): Promise<FlashcardRow[]> {
   const { data, error } = await supabase

@@ -3,7 +3,7 @@ import type { Json } from "@/integrations/supabase/types";
 import type { StudyMethod, StudySessionDetails, StudySessionRow } from "./types";
 
 const STUDY_SESSION_COLUMNS =
-  "id, user_id, lesson_id, method, is_free_session, started_at, ended_at, duration_seconds, details, published_version, created_at, updated_at";
+  "id, user_id, lesson_id, method, is_free_session, started_at, ended_at, duration_seconds, details, published_version, is_test_data, created_at, updated_at";
 
 export async function fetchInProgressStudySessions(userId: string): Promise<StudySessionRow[]> {
   const { data, error } = await supabase

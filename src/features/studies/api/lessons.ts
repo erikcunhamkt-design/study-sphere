@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { CreateLessonInput, Lesson, UpdateLessonInput } from "../types";
 
 const COLUMNS =
-  "id, user_id, course_id, module_id, title, description, position, is_completed, completed_at, is_archived, created_at, updated_at";
+  "id, user_id, course_id, module_id, title, description, position, is_completed, completed_at, is_archived, is_test_data, created_at, updated_at";
 
 export async function fetchLessonsByModule(userId: string, moduleId: string): Promise<Lesson[]> {
   const { data, error } = await supabase
