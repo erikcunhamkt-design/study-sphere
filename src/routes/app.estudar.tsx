@@ -121,10 +121,8 @@ function EstudarPage() {
 
   // Renderização da Sessão Ativa
   if (activeMethod) {
-    const label = STUDY_METHOD_LABELS[activeMethod];
     return (
-      <div className="space-y-6">
-        <PageHeader title={label} />
+      <div className="max-w-7xl mx-auto space-y-6">
         {activeMethod === "pomodoro" ? (
           <PomodoroSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "feynman" ? (
