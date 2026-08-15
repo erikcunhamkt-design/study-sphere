@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
 import { usePerformanceDashboard } from "../hooks/use-performance-dashboard";
 import { ConceptDetailDialog } from "./ConceptDetailDialog";
+import { DomainMasteryMap } from "./DomainMasteryMap";
 import { cn } from "@/lib/utils";
 
 export function PerformanceDashboard() {
@@ -111,6 +112,9 @@ export function PerformanceDashboard() {
           </div>
         </section>
       )}
+
+      {/* Regra 29: Meus Domínios */}
+      <DomainMasteryMap />
 
       {/* Regra 8 e 9: Seus Conceitos */}
       <section className="space-y-6">
