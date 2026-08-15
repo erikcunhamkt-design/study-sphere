@@ -55,6 +55,7 @@ export function initialDetailsForMethod(method: StudyMethod): StudySessionDetail
     case "cornell":
       return { notas: "", pistas: "", resumo: "" };
     case "livre":
+    case "aprender":
       return {};
     case "recordacao_ativa":
       return {};
