@@ -10,7 +10,7 @@ import { useDueReviews } from "@/features/study-sessions/hooks.due";
 import { useReviewSemanticState } from "@/features/study-sessions/hooks.semantic";
 import { isProductionEligible } from "@/lib/eligibility";
 
-import { useReviewSemanticState } from "@/features/study-sessions/hooks.semantic";
+
 
 export function useDashboardState() {
   const { data: dueFlashcards, isLoading: loadingDue } = useDueFlashcards();
