@@ -202,7 +202,7 @@ export function PerformanceDashboard() {
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">{ev.concept?.title}</p>
+                  <p className="text-sm font-bold text-foreground">{(ev as any).concept?.title}</p>
                   <p className="text-[9px] text-muted-foreground/40 font-bold uppercase tracking-widest">
                     {new Date(ev.attempted_at).toLocaleDateString()}
                   </p>
