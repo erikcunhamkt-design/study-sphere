@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Calendar, Clock, BarChart3, Brain, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { RecallResult } from "@/features/study-sessions/types";
-import { HUMAN_STATES, type MemoryHumanState } from "../utils/memory-interpretation";
+import { HUMAN_STATES, type MemoryHumanState, mapToHumanState } from "../utils/memory-interpretation";
 
 interface ConceptDetailDialogProps {
   concept: any;
@@ -16,7 +16,14 @@ interface ConceptDetailDialogProps {
 export function ConceptDetailDialog({ concept, open, onOpenChange }: ConceptDetailDialogProps) {
   if (!concept) return null;
 
-  const humanState = concept.humanState;
+  const humanState = concept.humanState || (concept.memory ? mapToHumanState({
+    reps: concept.memory.reps || 0,
+    stability: concept.memory.stability || 0,
+    difficulty: concept.memory.difficulty || 0,
+    lastResult: concept.memory.last_result as any,
+    lapses: concept.memory.lapses || 0,
+    isDue: concept.memory.due ? new Date(concept.memory.due) <= new Date() : false
+  }) : HUMAN_STATES.novo);
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
