@@ -264,8 +264,8 @@ function EstudarPage() {
         </section>
       )}
 
-      {/* 3. CONTINUE (CURSOS EM ANDAMENTO) */}
-      {(priority === "recommendation" || priority === "resume" || priority === "start") && data.courses && data.courses.filter((c: any) => c.status === "in_progress" && c.id !== selectedContent?.id).length > 0 && (
+      {/* 3. CONTINUE (SESSÕES EM ANDAMENTO - APENAS SE HOUVER) */}
+      {!selectedContent && priority !== "resume" && data.courses && data.courses.filter((c: any) => c.status === "in_progress").length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
@@ -273,7 +273,7 @@ function EstudarPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.courses.filter((c: any) => c.status === "in_progress" && c.id !== selectedContent?.id).slice(0, 3).map((course: any) => (
+            {data.courses.filter((c: any) => c.status === "in_progress").slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
