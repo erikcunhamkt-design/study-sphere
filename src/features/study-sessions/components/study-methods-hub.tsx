@@ -43,7 +43,7 @@ const METHODS: MethodOption[] = [
     id: "feynman",
     title: "Feynman",
     displayName: "Explicar conceito",
-    description: "Explique o conceito com suas próprias palavras para verificar se entendeu.",
+    description: "Explique o conceito com suas próprias palavras para verificar se realmente entendeu.",
     recommendation: "Você já teve contato suficiente com o conteúdo. Agora tente explicar para consolidar o entendimento.",
     icon: Brain,
     category: "aprendizagem"
@@ -51,7 +51,7 @@ const METHODS: MethodOption[] = [
   {
     id: "cornell",
     title: "Cornell",
-    displayName: "Anotar e Organizar",
+    displayName: "Anotar e organizar",
     description: "Estruture suas anotações com pistas e resumos.",
     icon: BookOpen,
     category: "aprendizagem"
@@ -60,7 +60,7 @@ const METHODS: MethodOption[] = [
     id: "blurting",
     title: "Blurting",
     displayName: "Recuperar o que lembra",
-    description: "Escreva tudo o que você lembra sem consultar o material.",
+    description: "Escreva tudo o que lembra sem consultar o material.",
     recommendation: "Você já teve contato com este conteúdo. Agora tente lembrar sem consultar o material.",
     icon: Zap,
     category: "recuperacao"
@@ -68,8 +68,8 @@ const METHODS: MethodOption[] = [
   {
     id: "recordacao_ativa",
     title: "Flashcards",
-    displayName: "Testar Memória",
-    description: "Teste sua memória com perguntas e respostas.",
+    displayName: "Testar memória",
+    description: "Responda perguntas e compare com a resposta.",
     recommendation: "Você já estudou este conteúdo. Agora teste o que consegue lembrar através de flashcards.",
     icon: Layers,
     category: "recuperacao"
@@ -78,7 +78,7 @@ const METHODS: MethodOption[] = [
     id: "pomodoro",
     title: "Pomodoro",
     displayName: "Pomodoro",
-    description: "Gestão de tempo: foco profundo com intervalos.",
+    description: "Estude em blocos de tempo com intervalos.",
     icon: Clock,
     category: "tempo"
   },

@@ -1,4 +1,4 @@
-// NÃO CORRIJA OU REMOVA `sfsd`.
+// Landing Page do DominusApp — Do estudo ao domínio.
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
 import { Button } from '@/components/ui/button'
