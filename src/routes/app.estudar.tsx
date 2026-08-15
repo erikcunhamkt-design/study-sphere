@@ -333,63 +333,8 @@ function EstudarPage() {
         </section>
       )}
 
-        
-        <div className="grid grid-cols-1 gap-3">
-          {allCourses.filter(c => !c.is_archived).length > 0 ? (
-            allCourses.filter(c => !c.is_archived).map((course) => (
-              <div 
-                key={course.id}
-                onClick={() => handleContentSelect(course)}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border border-border/40 bg-surface/10 hover:bg-surface/20 transition-all group text-left cursor-pointer active:scale-[0.99]"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-xl bg-surface/40 flex items-center justify-center text-muted-foreground/40 group-hover:bg-primary/10 group-hover:text-primary transition-all">
-                    <BookOpen className="h-5 w-5" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold tracking-tight text-foreground">{course.name}</h4>
-                    <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-wider">
-                      {COURSE_STATUS_LABELS[course.status as keyof typeof COURSE_STATUS_LABELS]}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-8 mt-4 sm:mt-0">
-                  <div className="hidden md:block w-32 space-y-1.5">
-                    <div className="flex justify-between text-[8px] font-black uppercase tracking-tighter text-muted-foreground/20">
-                      <span>Domínio</span>
-                      <span>--</span>
-                    </div>
-                    <div className="h-1 w-full bg-surface/40 rounded-full overflow-hidden">
-                       <div className="h-full bg-emerald-500/20 w-0" />
-                    </div>
-                  </div>
-                  
-                  <Button variant="ghost" size="sm" className="h-9 px-4 rounded-full text-muted-foreground/40 group-hover:text-primary font-black uppercase text-[10px] tracking-widest transition-colors">
-                    {course.status === 'not_started' ? 'Começar →' : 'Continuar →'}
-                  </Button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="py-20 text-center rounded-[2rem] border border-dashed border-border/40 bg-surface/5 space-y-4">
-              <div className="mx-auto w-12 h-12 rounded-xl bg-surface/10 flex items-center justify-center text-muted-foreground/20">
-                <BookOpen className="h-6 w-6" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-lg font-bold text-foreground">Adicione seu primeiro conteúdo</p>
-                <p className="text-sm text-muted-foreground/60 max-w-xs mx-auto">O Dominus precisa de algo para estudar com você.</p>
-              </div>
-              <Button 
-                onClick={() => setIsAddDialogOpen(true)}
-                variant="outline"
-                className="rounded-full border-primary/20 text-primary hover:bg-primary/10"
-              >
-                Adicionar conteúdo <Plus className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
           )}
-        </div>
+
       </section>
 
       <AddContentDialog 
