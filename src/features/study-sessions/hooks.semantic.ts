@@ -5,7 +5,7 @@ import { useDueReviews } from "./hooks.due";
 export type ReviewSemanticState = "loading" | "due" | "new_user" | "no_recovery" | "no_due";
 
 export function useReviewSemanticState() {
-  const { data: dueReviews, isLoading: isLoadingDue } = useDueReviews(50);
+  const { data: dueReviews, isLoading: isLoadingDue } = useDueReviews(100);
   
   const { data: stats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["review-semantic-stats"],
