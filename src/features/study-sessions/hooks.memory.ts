@@ -4,7 +4,8 @@ import { applyFsrsReview, rebuildMemoryState } from "@/lib/memory/engine.server"
 export function useApplyFsrsReview() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: { conceptId: string; evidenceId: string }) => applyFsrsReview(input),
+    mutationFn: (input: { conceptId: string; evidenceId: string }) => applyFsrsReview({ data: input }),
+
     onSuccess: (_, variables) => {
       void qc.invalidateQueries({ queryKey: ["memory-state", variables.conceptId] });
       void qc.invalidateQueries({ queryKey: ["due-reviews"] });
@@ -15,7 +16,7 @@ export function useApplyFsrsReview() {
 export function useRebuildMemoryState() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (conceptId: string) => rebuildMemoryState({ conceptId }),
+    mutationFn: (conceptId: string) => rebuildMemoryState({ data: { conceptId } }),
     onSuccess: (_, conceptId) => {
       void qc.invalidateQueries({ queryKey: ["memory-state", conceptId] });
       void qc.invalidateQueries({ queryKey: ["due-reviews"] });
