@@ -349,13 +349,16 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
             <div className="flex items-center gap-4">
               <div className="hidden md:flex flex-col items-end gap-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Ação recomendada</span>
-                  <span className="text-xs font-black text-primary">Compreensão</span>
+                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Material</span>
+                  <span className="text-xs font-black text-primary">
+                    {materialStats.hasReal ? `${materialStats.blocksCount} blocos` : "Vazio"}
+                  </span>
                 </div>
                 <div className="w-32 h-1 bg-surface/40 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-[30%] transition-all duration-1000" />
+                  <div className="h-full bg-primary w-full transition-all duration-1000" />
                 </div>
               </div>
+
 
               <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/5 transition-all">
                 Sair da sessão
