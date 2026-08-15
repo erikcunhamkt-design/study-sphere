@@ -1,5 +1,5 @@
 /**
- * STUDY METHODS HUB — ETAPA 1 FINALIZADA (CONGELADA)
+ * STUDY METHODS HUB — LIMPEZA FINAL APROVADA
  * 
  * Componente estratégico para seleção de métodos de estudo.
  * Prioriza a recomendação do Dominus e agrupa alternativas por categorias.
