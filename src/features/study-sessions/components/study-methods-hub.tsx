@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { 
   Zap, 
   Brain, 
@@ -98,6 +98,8 @@ interface StudyMethodsHubProps {
 }
 
 export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: StudyMethodsHubProps) {
+  const [showAll, setShowAll] = useState(false);
+
   const categories = [
     { id: "recuperacao", label: "Recuperação", icon: Zap },
     { id: "aprendizagem", label: "Elaboração / Compreensão", icon: BookOpen },
@@ -161,59 +163,72 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
         </div>
       )}
 
-      <div className="space-y-12">
-        <div className="flex items-center gap-3">
-          <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
-            Outras formas de estudar
-          </h3>
-          <div className="h-px flex-1 bg-border/20" />
+      <div className="space-y-8">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
+              Outras formas de estudar
+            </h3>
+            <div className="h-px w-20 bg-border/20" />
+          </div>
+          
+          {!showAll && (
+            <button 
+              onClick={() => setShowAll(true)}
+              className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors flex items-center gap-1"
+            >
+              Ver todas <ChevronRight className="h-3 w-3" />
+            </button>
+          )}
         </div>
 
-        <div className="space-y-12">
-          {categories
-            .filter(cat => METHODS.some(m => m.category === cat.id && m.id !== recommendedMethodId))
-            .map((cat) => (
-            <div key={cat.id} className="space-y-6">
-              <div className="flex items-center gap-2 px-2">
-                <cat.icon className="h-3 w-3 text-muted-foreground/30" />
-                <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/30">
-                  {cat.label}
-                </h4>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {METHODS.filter(m => m.category === cat.id && m.id !== recommendedMethodId).map((method) => (
-                  <button
-                    key={method.id}
-                    onClick={() => onSelectMethod(method.id)}
-                    className="group relative flex flex-col p-5 rounded-[1.5rem] border border-border/20 bg-surface/10 text-left transition-all hover:border-primary/10 hover:bg-surface/20 active:scale-[0.98]"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-surface/30 border border-border/5 flex items-center justify-center text-muted-foreground/40 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-                        <method.icon className="h-5 w-5" />
+        {showAll && (
+          <div className="space-y-12 animate-in fade-in slide-in-from-top-2 duration-500">
+            {categories
+              .filter(cat => METHODS.some(m => m.category === cat.id && m.id !== recommendedMethodId))
+              .map((cat) => (
+              <div key={cat.id} className="space-y-6">
+                <div className="flex items-center gap-2 px-2">
+                  <cat.icon className="h-3 w-3 text-muted-foreground/30" />
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/30">
+                    {cat.label}
+                  </h4>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {METHODS.filter(m => m.category === cat.id && m.id !== recommendedMethodId).map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => onSelectMethod(method.id)}
+                      className="group relative flex flex-col p-5 rounded-[1.5rem] border border-border/20 bg-surface/10 text-left transition-all hover:border-primary/10 hover:bg-surface/20 active:scale-[0.98]"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-surface/30 border border-border/5 flex items-center justify-center text-muted-foreground/40 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+                          <method.icon className="h-5 w-5" />
+                        </div>
+                        <ChevronRight className="h-3 w-3 text-muted-foreground/5 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                       </div>
-                      <ChevronRight className="h-3 w-3 text-muted-foreground/5 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="text-base font-black tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
-                        {method.displayName}
-                      </h4>
-                      <p className="text-[13px] text-muted-foreground/40 leading-snug font-medium">
-                        {method.description}
-                      </p>
-                      <div className="pt-1">
-                        <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/10 group-hover:text-primary/30 transition-colors">
-                          Técnica: {method.title}
-                        </span>
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-base font-black tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+                          {method.displayName}
+                        </h4>
+                        <p className="text-[13px] text-muted-foreground/40 leading-snug font-medium">
+                          {method.description}
+                        </p>
+                        <div className="pt-1">
+                          <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/10 group-hover:text-primary/30 transition-colors">
+                            Técnica: {method.title}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
