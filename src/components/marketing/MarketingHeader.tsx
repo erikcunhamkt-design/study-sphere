@@ -2,13 +2,20 @@ import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 import { Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { AppBrand } from '@/components/layout/app-brand'
 
 export function MarketingHeader() {
   const { user } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  const showAuthLinks = isHydrated && user;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40">
@@ -24,7 +31,7 @@ export function MarketingHeader() {
           <a href="#metodo" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-colors">Aprendizagem</a>
           
           <div className="flex items-center gap-4 ml-4">
-            {user ? (
+            {showAuthLinks ? (
               <Button asChild className="h-10 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/10">
                 <Link to="/app">MEU COCKPIT</Link>
               </Button>
@@ -57,7 +64,7 @@ export function MarketingHeader() {
         <a href="#como-funciona" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setIsMenuOpen(false)}>Como funciona</a>
         <a href="#metodo" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setIsMenuOpen(false)}>Aprendizagem</a>
         <hr className="border-border/40" />
-        {user ? (
+        {showAuthLinks ? (
           <Button asChild className="h-12 w-full rounded-full bg-primary text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/10">
             <Link to="/app" onClick={() => setIsMenuOpen(false)}>MEU COCKPIT</Link>
           </Button>
