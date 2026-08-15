@@ -21,14 +21,14 @@ O Domain Model agrega os estados de memória individual dos conceitos em uma int
 - **Copy**: "O Dominus já possui algumas evidências, mas ainda precisa de mais recuperações para formar uma visão confiável."
 
 ### EM DESENVOLVIMENTO (Developing)
-- **Gatilho**: `coverage >= 0.3` E (`attention_concepts > 0` OU `fragile_concepts > 20%` OU `has_mismatch == true`).
+- **Gatilho**: `coverage >= 0.3` E (`attention_concepts > 0` OU `has_mismatch == true`).
 - **Significado**: Existe cobertura razoável, mas há falhas recentes, lacunas ou desalinhamento metacognitivo.
 - **Copy**: "Você já possui evidências relevantes, mas alguns conceitos ainda precisam de atenção."
 
 ### CONSISTENTE (Consistent)
 - **Gatilho**: `coverage >= 0.6` AND `attention_concepts == 0` AND `avg_stability >= 10 days`.
 - **Significado**: A maioria dos conceitos avaliados está estável e sem falhas recentes.
-- **Nota**: Pode haver conceitos devidos (due), pois "due" não significa "esquecido", mas sim "pronto para recuperação".
+- **Nota**: Pode haver conceitos devidos (due), pois "due" não significa "esquecido", mas sim "pronto para recuperar".
 - **Copy**: "A maior parte dos conceitos relevantes apresenta histórico consistente."
 
 ### FORTE (Strong)
