@@ -82,7 +82,7 @@ function RevisarPage() {
              </p>
            </div>
            <Button asChild className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-xs italic transition-all shadow-[0_0_20px_-5px_rgba(217,0,110,0.3)]">
-             <Link to="/app/biblioteca">Começar estudo <ArrowRight className="ml-2 w-4 h-4" /></Link>
+             <Link to="/app/biblioteca" search={{ tab: 'materials' }}>Começar estudo <ArrowRight className="ml-2 w-4 h-4" /></Link>
            </Button>
         </div>
       ) : state === "no_recovery" ? (
