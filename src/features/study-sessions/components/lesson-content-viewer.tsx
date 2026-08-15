@@ -24,24 +24,16 @@ interface LessonContentViewerProps {
 function getRealContent(content: LessonDocument | undefined) {
   if (!content || !Array.isArray(content)) return [];
 
+  // Na Fase 07.1, não filtramos mais placeholders por string.
+  // Apenas garantimos que o BlockNote não receba blocos inválidos.
   return content.filter((block: any) => {
-    // 1. Remover parágrafos vazios ou apenas com espaços
+    // 1. Remover parágrafos vazios ou apenas com espaços que não agregam valor
     if (block.type === "paragraph" && (!block.content || block.content.length === 0)) {
       return false;
     }
-    if (block.type === "paragraph" && block.content?.length === 1 && block.content[0].text?.trim() === "") {
-      return false;
-    }
-
-    // 2. Remover placeholders de QA clássicos ("Conteúdo de [tipo]")
-    // Estes IDs "qa33-*" são gerados pelo seed de QA.
-    if (block.id?.startsWith("qa33-")) {
-      const contentArray = block.content;
-      const text = Array.isArray(contentArray) ? contentArray[0]?.text || "" : "";
-      if (text.toLowerCase().includes("conteúdo de")) return false;
-      if (text.toLowerCase().includes("qa fase")) return false;
-      if (block.type === "image" && !block.props?.url) return false;
-    }
+    
+    // 2. Garantir que imagens tenham URL
+    if (block.type === "image" && !block.props?.url) return false;
 
     return true;
   });
@@ -78,7 +70,8 @@ function ViewerInner({ blocks, lessonId }: { blocks: any[]; lessonId: string }) 
 export function LessonContentViewer({ lessonId, onMaterialLoad, canEdit }: LessonContentViewerProps) {
   const { data: doc, isLoading, isError } = useLessonDocument(lessonId);
 
-  const realContent = useMemo(() => getRealContent(doc?.content), [doc?.content]);
+  // O estudante consome published_content, não o rascunho (content)
+  const realContent = useMemo(() => getRealContent(doc?.published_content as LessonDocument), [doc?.published_content]);
   const hasContent = realContent.length > 0;
 
   useEffect(() => {

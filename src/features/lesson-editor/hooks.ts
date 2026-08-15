@@ -98,3 +98,17 @@ export function useRestoreLessonDocumentVersion(lessonId: string) {
       ]),
   });
 }
+
+export function usePublishLessonDocument(lessonId: string) {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.publishLessonDocument(lessonId),
+    onSuccess: (result) => {
+      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) });
+      qc.invalidateQueries({
+        queryKey: lessonDocumentVersionsKey(user?.id, result.document_id),
+      });
+    },
+  });
+}

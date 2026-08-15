@@ -27,7 +27,7 @@ import { validateLessonDocument, type LessonDocument } from "./document-schema";
 import { deleteDraft, getDraft } from "./drafts-db";
 import { FlashcardBridgeContext } from "./flashcard-bridge";
 import { HistoryPanel } from "./history-panel";
-import { useLessonDocument, useSaveLessonDocument } from "./hooks";
+import { useLessonDocument, useSaveLessonDocument, usePublishLessonDocument } from "./hooks";
 import { createMediaUploader, MediaValidationError, resolveMediaUrl } from "./media-upload";
 import { lessonEditorSchema } from "./schema";
 import { getLessonEditorSlashMenuItems } from "./slash-menu-items";
@@ -290,7 +290,10 @@ function LessonEditorLoaded({
             </span>
           ) : null}
         </div>
-        <HistoryPanel lessonId={lessonId} documentId={doc?.id} onRestored={onRequestReload} />
+        <div className="flex items-center gap-2">
+          <PublishButton lessonId={lessonId} doc={doc} />
+          <HistoryPanel lessonId={lessonId} documentId={doc?.id} onRestored={onRequestReload} />
+        </div>
       </div>
 
       {localDraft ? (
@@ -416,4 +419,45 @@ function LessonQuestionList({ lessonId }: { lessonId: string }) {
   if (lessonQuestions.length === 0) return <p className="text-xs text-muted-foreground text-center py-8">Nenhuma questão para esta aula.</p>;
 
   return <QuestionList questions={lessonQuestions} />;
+}
+
+function PublishButton({ lessonId, doc }: { lessonId: string; doc: LessonDocumentRow | null | undefined }) {
+  const publish = usePublishLessonDocument(lessonId);
+  
+  const isUpToDate = doc && doc.published_version === doc.version;
+  const hasContent = doc && doc.content && doc.content.length > 0;
+
+  const handlePublish = async () => {
+    try {
+      await publish.mutateAsync();
+      toast.success("Conteúdo publicado com sucesso! Estudantes já podem acessá-lo.");
+    } catch (err) {
+      console.error("[lessonEditor] falha ao publicar", err);
+      toast.error("Não foi possível publicar o conteúdo.");
+    }
+  };
+
+  if (!doc) return null;
+
+  return (
+    <Button 
+      size="sm" 
+      variant={isUpToDate ? "outline" : "default"}
+      disabled={publish.isPending || isUpToDate || !hasContent}
+      onClick={handlePublish}
+      className={cn(
+        "h-8 px-3 text-[10px] font-black uppercase tracking-widest transition-all",
+        !isUpToDate && hasContent && "bg-primary hover:bg-primary/90 text-white shadow-[0_0_15px_-3px_rgba(217,0,110,0.4)]"
+      )}
+    >
+      {publish.isPending ? (
+        <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+      ) : isUpToDate ? (
+        <CheckCircle2 className="h-3 w-3 mr-1.5 text-emerald-500" />
+      ) : (
+        <Zap className="h-3 w-3 mr-1.5" />
+      )}
+      {isUpToDate ? "Publicado" : "Publicar"}
+    </Button>
+  );
 }
