@@ -64,8 +64,8 @@ export function PerformanceDashboard() {
         {[
           { label: "Conceitos Estudados", value: data.summary.totalConcepts, color: "text-foreground" },
           { label: "Memórias Avaliadas", value: data.summary.evaluatedMemories, color: "text-primary" },
-          { label: "Revisões Devidas", value: data.summary.dueReviews, color: "text-orange-500" },
-          { label: "Revisões em Dia", value: data.summary.inDayReviews, color: "text-emerald-500" },
+          { label: "Prontos para recuperação", value: data.summary.dueReviews, color: "text-orange-500" },
+          { label: "Conceitos em Dia", value: data.summary.inDayReviews, color: "text-emerald-500" },
         ].map((stat, i) => (
           <Card key={i} className="bg-surface/30 border-border/10 rounded-[2rem]">
             <CardContent className="pt-6">
@@ -188,7 +188,7 @@ export function PerformanceDashboard() {
       <section className="space-y-6">
         <header className="flex items-center gap-2">
           <LineChart className="w-4 h-4 text-muted-foreground/40" />
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Últimas Recuperações</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Histórico de Recuperações</h3>
         </header>
         <div className="space-y-3">
           {data.evidences.map((ev) => (
