@@ -84,11 +84,19 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     });
 
     try {
+      // Registrar qual versão estava publicada no início da sessão (Gate 1 - Etapa 8)
+      const currentPublishedVersion = lessonDoc?.published_version;
+      
       const created = await createSession.mutateAsync({
         method: method,
         lessonId: lessonId,
         isFreeSession: !lessonId,
-        details: { ...initialDetailsForMethod(method), courseId: initialCourseId },
+        details: { 
+          ...initialDetailsForMethod(method), 
+          courseId: initialCourseId,
+          publishedVersion: currentPublishedVersion 
+        },
+        publishedVersion: currentPublishedVersion,
       });
       console.log("[study-sessions] Sessão criada com sucesso:", created.id);
       setSession(created);

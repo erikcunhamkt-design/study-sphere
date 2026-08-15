@@ -3,7 +3,7 @@ import type { Json } from "@/integrations/supabase/types";
 import type { StudyMethod, StudySessionDetails, StudySessionRow } from "./types";
 
 const STUDY_SESSION_COLUMNS =
-  "id, user_id, lesson_id, method, is_free_session, started_at, ended_at, duration_seconds, details, created_at, updated_at";
+  "id, user_id, lesson_id, method, is_free_session, started_at, ended_at, duration_seconds, details, published_version, created_at, updated_at";
 
 export async function fetchInProgressStudySessions(userId: string): Promise<StudySessionRow[]> {
   const { data, error } = await supabase
@@ -51,6 +51,7 @@ export interface CreateStudySessionInput {
   lessonId: string | null;
   isFreeSession?: boolean;
   details: StudySessionDetails;
+  publishedVersion?: number | null;
 }
 
 export async function createStudySession(
@@ -65,6 +66,7 @@ export async function createStudySession(
       lesson_id: input.lessonId,
       is_free_session: input.isFreeSession ?? false,
       details: input.details as unknown as Json,
+      published_version: input.publishedVersion,
     })
     .select(STUDY_SESSION_COLUMNS)
     .single();
