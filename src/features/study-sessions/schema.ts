@@ -1,6 +1,9 @@
 import { z } from "zod";
-
-import { STUDY_METHOD_VALUES, type StudyMethod, type StudySessionDetails } from "./types";
+import { 
+  STUDY_METHOD_VALUES, 
+  type StudyMethod, 
+  type StudySessionDetails 
+} from "./types";
 
 export const studyMethodSchema = z.enum(STUDY_METHOD_VALUES);
 
@@ -43,7 +46,11 @@ export const livreDetailsSchema = z.object({
   nota: freeText(20000).optional(),
 });
 
-/** Forma inicial gravada no INSERT — recordacao_ativa nunca chega aqui (não cria sessão, ver hub). */
+export const aprenderDetailsSchema = z.object({
+  nota: freeText(20000).optional(),
+});
+
+/** Forma inicial gravada no INSERT — flashcards nunca chega aqui (não cria sessão, ver hub). */
 export function initialDetailsForMethod(method: StudyMethod): StudySessionDetails {
   switch (method) {
     case "pomodoro":
@@ -57,7 +64,11 @@ export function initialDetailsForMethod(method: StudyMethod): StudySessionDetail
     case "livre":
     case "aprender":
       return {};
-    case "recordacao_ativa":
+    case "flashcards":
+    case "exame":
+      return {};
+    default:
       return {};
   }
 }
+

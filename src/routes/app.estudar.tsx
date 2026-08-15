@@ -51,7 +51,7 @@ export const Route = createFileRoute("/app/estudar")({
       ? (search.mode as "review" | "training")
       : undefined;
     
-    const method = typeof search.method === "string" && ["pomodoro", "feynman", "blurting", "cornell", "recordacao_ativa", "livre", "aprender"].includes(search.method)
+    const method = typeof search.method === "string" && ["pomodoro", "feynman", "blurting", "cornell", "flashcards", "exame", "livre", "aprender"].includes(search.method)
       ? (search.method as StudyMethod)
       : undefined;
 
@@ -121,10 +121,8 @@ function EstudarPage() {
 
   // Renderização da Sessão Ativa
   if (activeMethod) {
-    const label = STUDY_METHOD_LABELS[activeMethod];
     return (
-      <div className="space-y-6">
-        <PageHeader title={label} />
+      <div className="max-w-7xl mx-auto space-y-6">
         {activeMethod === "pomodoro" ? (
           <PomodoroSession resumingSession={resumingSession} onDone={backToHub} plannedId={plannedId} />
         ) : activeMethod === "feynman" ? (
@@ -141,6 +139,7 @@ function EstudarPage() {
       </div>
     );
   }
+
 
   if (isLoading) {
     return (

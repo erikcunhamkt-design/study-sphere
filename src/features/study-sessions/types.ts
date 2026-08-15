@@ -1,11 +1,12 @@
 export const STUDY_METHOD_VALUES = [
   "pomodoro",
   "feynman",
-  "recordacao_ativa",
   "blurting",
   "cornell",
   "livre",
   "aprender",
+  "flashcards",
+  "exame",
 ] as const;
 
 export type StudyMethod = (typeof STUDY_METHOD_VALUES)[number];
@@ -30,6 +31,7 @@ export interface CornellDetails {
 
 export interface LivreDetails {
   nota?: string;
+  anotacoes?: string;
 }
 
 export type StudySessionDetails =

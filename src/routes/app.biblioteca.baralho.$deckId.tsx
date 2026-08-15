@@ -116,7 +116,7 @@ function DeckDetailPage() {
             className="gap-2 text-muted-foreground hover:text-foreground"
             onClick={() => navigate({ 
               to: "/app/estudar", 
-              search: { method: "recordacao_ativa", deckId, mode: "review" } 
+              search: { method: "flashcards", deckId, mode: "review" } 
             })}
           >
             <RotateCcw className="h-4 w-4" /> Estudar este baralho
