@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Course, CreateCourseInput, UpdateCourseInput } from "../types";
 
 const COLUMNS =
-  "id, user_id, study_area_id, name, description, status, position, is_favorite, is_archived, created_at, updated_at";
+  "id, user_id, study_area_id, name, description, status, position, is_favorite, is_archived, is_test_data, created_at, updated_at";
 
 // Segundo/terceiro critério (created_at, id) garantem ordem determinística
 // mesmo quando duas linhas têm a mesma position (ex.: uma arquivada com
@@ -14,6 +14,7 @@ export async function fetchCoursesByArea(userId: string, areaId: string): Promis
     .select(COLUMNS)
     .eq("user_id", userId)
     .eq("study_area_id", areaId)
+    .eq("is_test_data", false)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true })
     .order("id", { ascending: true });
@@ -27,6 +28,7 @@ export async function fetchAllCourses(userId: string): Promise<Course[]> {
     .from("courses")
     .select(COLUMNS)
     .eq("user_id", userId)
+    .eq("is_test_data", false)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true })
     .order("id", { ascending: true });

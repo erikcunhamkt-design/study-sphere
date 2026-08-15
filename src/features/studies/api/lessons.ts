@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { CreateLessonInput, Lesson, UpdateLessonInput } from "../types";
 
 const COLUMNS =
-  "id, user_id, course_id, module_id, title, description, position, is_completed, completed_at, is_archived, created_at, updated_at";
+  "id, user_id, course_id, module_id, title, description, position, is_completed, completed_at, is_archived, is_test_data, created_at, updated_at";
 
 export async function fetchLessonsByModule(userId: string, moduleId: string): Promise<Lesson[]> {
   const { data, error } = await supabase
@@ -10,6 +10,7 @@ export async function fetchLessonsByModule(userId: string, moduleId: string): Pr
     .select(COLUMNS)
     .eq("user_id", userId)
     .eq("module_id", moduleId)
+    .eq("is_test_data", false)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true })
     .order("id", { ascending: true });
@@ -24,6 +25,7 @@ export async function fetchLessonsByCourse(userId: string, courseId: string): Pr
     .select(COLUMNS)
     .eq("user_id", userId)
     .eq("course_id", courseId)
+    .eq("is_test_data", false)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true })
     .order("id", { ascending: true });
@@ -33,7 +35,7 @@ export async function fetchLessonsByCourse(userId: string, courseId: string): Pr
 
 /** Todas as aulas do usuário (qualquer curso/módulo) — usado para contagens agregadas (ex.: exclusão de área). */
 export async function fetchAllLessons(userId: string): Promise<Lesson[]> {
-  const { data, error } = await supabase.from("lessons").select(COLUMNS).eq("user_id", userId);
+  const { data, error } = await supabase.from("lessons").select(COLUMNS).eq("user_id", userId).eq("is_test_data", false);
   if (error) throw error;
   return (data ?? []) as Lesson[];
 }

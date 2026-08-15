@@ -23,6 +23,7 @@ export type Database = {
           confidence_source: string
           created_at: string
           id: string
+          is_test_data: boolean | null
           lesson_id: string | null
           published_version: number | null
           question_id: string | null
@@ -40,6 +41,7 @@ export type Database = {
           confidence_source?: string
           created_at?: string
           id?: string
+          is_test_data?: boolean | null
           lesson_id?: string | null
           published_version?: number | null
           question_id?: string | null
@@ -57,6 +59,7 @@ export type Database = {
           confidence_source?: string
           created_at?: string
           id?: string
+          is_test_data?: boolean | null
           lesson_id?: string | null
           published_version?: number | null
           question_id?: string | null
@@ -103,6 +106,7 @@ export type Database = {
           description: string | null
           id: string
           is_archived: boolean
+          is_test_data: boolean | null
           lesson_id: string | null
           title: string
           updated_at: string
@@ -113,6 +117,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           lesson_id?: string | null
           title: string
           updated_at?: string
@@ -123,6 +128,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           lesson_id?: string | null
           title?: string
           updated_at?: string
@@ -152,6 +158,7 @@ export type Database = {
           description: string | null
           id: string
           is_archived: boolean
+          is_test_data: boolean | null
           name: string
           position: number
           updated_at: string
@@ -163,6 +170,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           name: string
           position: number
           updated_at?: string
@@ -174,6 +182,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           name?: string
           position?: number
           updated_at?: string
@@ -203,6 +212,7 @@ export type Database = {
           id: string
           is_archived: boolean
           is_favorite: boolean
+          is_test_data: boolean | null
           name: string
           position: number
           status: string
@@ -216,6 +226,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_favorite?: boolean
+          is_test_data?: boolean | null
           name: string
           position: number
           status?: string
@@ -229,6 +240,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_favorite?: boolean
+          is_test_data?: boolean | null
           name?: string
           position?: number
           status?: string
@@ -259,6 +271,7 @@ export type Database = {
           created_at: string
           id: string
           is_archived: boolean
+          is_test_data: boolean | null
           name: string
           position: number
           updated_at: string
@@ -269,6 +282,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           name: string
           position?: number
           updated_at?: string
@@ -279,6 +293,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           name?: string
           position?: number
           updated_at?: string
@@ -489,6 +504,7 @@ export type Database = {
           id: string
           interval_days: number
           is_archived: boolean
+          is_test_data: boolean | null
           lapses: number
           learning_step: number
           lesson_id: string | null
@@ -509,6 +525,7 @@ export type Database = {
           id?: string
           interval_days?: number
           is_archived?: boolean
+          is_test_data?: boolean | null
           lapses?: number
           learning_step?: number
           lesson_id?: string | null
@@ -529,6 +546,7 @@ export type Database = {
           id?: string
           interval_days?: number
           is_archived?: boolean
+          is_test_data?: boolean | null
           lapses?: number
           learning_step?: number
           lesson_id?: string | null
@@ -683,6 +701,7 @@ export type Database = {
           id: string
           is_archived: boolean
           is_completed: boolean
+          is_test_data: boolean | null
           module_id: string
           position: number
           title: string
@@ -697,6 +716,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_completed?: boolean
+          is_test_data?: boolean | null
           module_id: string
           position: number
           title: string
@@ -711,6 +731,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_completed?: boolean
+          is_test_data?: boolean | null
           module_id?: string
           position?: number
           title?: string
@@ -745,6 +766,7 @@ export type Database = {
           elapsed_days: number | null
           failed_recalls: number
           id: string
+          is_test_data: boolean | null
           lapses: number | null
           last_confidence: number | null
           last_recalled_at: string | null
@@ -769,6 +791,7 @@ export type Database = {
           elapsed_days?: number | null
           failed_recalls?: number
           id?: string
+          is_test_data?: boolean | null
           lapses?: number | null
           last_confidence?: number | null
           last_recalled_at?: string | null
@@ -793,6 +816,7 @@ export type Database = {
           elapsed_days?: number | null
           failed_recalls?: number
           id?: string
+          is_test_data?: boolean | null
           lapses?: number | null
           last_confidence?: number | null
           last_recalled_at?: string | null
@@ -830,6 +854,7 @@ export type Database = {
           created_at: string
           estimated_minutes: number | null
           id: string
+          is_test_data: boolean | null
           scheduled_date: string
           status: string
           study_area_id: string | null
@@ -843,6 +868,7 @@ export type Database = {
           created_at?: string
           estimated_minutes?: number | null
           id?: string
+          is_test_data?: boolean | null
           scheduled_date: string
           status?: string
           study_area_id?: string | null
@@ -856,6 +882,7 @@ export type Database = {
           created_at?: string
           estimated_minutes?: number | null
           id?: string
+          is_test_data?: boolean | null
           scheduled_date?: string
           status?: string
           study_area_id?: string | null
@@ -989,6 +1016,7 @@ export type Database = {
           expected_answer: string | null
           id: string
           is_archived: boolean
+          is_test_data: boolean | null
           lesson_id: string | null
           options: Json
           statement: string
@@ -1004,6 +1032,7 @@ export type Database = {
           expected_answer?: string | null
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           lesson_id?: string | null
           options?: Json
           statement: string
@@ -1019,6 +1048,7 @@ export type Database = {
           expected_answer?: string | null
           id?: string
           is_archived?: boolean
+          is_test_data?: boolean | null
           lesson_id?: string | null
           options?: Json
           statement?: string
@@ -1152,6 +1182,7 @@ export type Database = {
           ended_at: string | null
           id: string
           is_free_session: boolean | null
+          is_test_data: boolean | null
           lesson_id: string | null
           method: string
           published_version: number | null
@@ -1166,6 +1197,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_free_session?: boolean | null
+          is_test_data?: boolean | null
           lesson_id?: string | null
           method: string
           published_version?: number | null
@@ -1180,6 +1212,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_free_session?: boolean | null
+          is_test_data?: boolean | null
           lesson_id?: string | null
           method?: string
           published_version?: number | null

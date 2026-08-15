@@ -11,6 +11,7 @@ export function useDueReviews(limit = 20) {
           *,
           concept:concepts (*)
         `)
+        .eq("is_test_data", false)
         .lte("due", new Date().toISOString())
         .order("due", { ascending: true })
         .limit(limit);

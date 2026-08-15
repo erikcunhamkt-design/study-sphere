@@ -3,7 +3,7 @@ import type { Json } from "@/integrations/supabase/types";
 import type { StudyMethod, StudySessionDetails, StudySessionRow } from "./types";
 
 const STUDY_SESSION_COLUMNS =
-  "id, user_id, lesson_id, method, is_free_session, started_at, ended_at, duration_seconds, details, published_version, created_at, updated_at";
+  "id, user_id, lesson_id, method, is_free_session, started_at, ended_at, duration_seconds, details, published_version, is_test_data, created_at, updated_at";
 
 export async function fetchInProgressStudySessions(userId: string): Promise<StudySessionRow[]> {
   const { data, error } = await supabase
@@ -11,6 +11,7 @@ export async function fetchInProgressStudySessions(userId: string): Promise<Stud
     .select(STUDY_SESSION_COLUMNS)
     .eq("user_id", userId)
     .is("ended_at", null)
+    .eq("is_test_data", false)
     .order("started_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as StudySessionRow[];
@@ -25,6 +26,7 @@ export async function fetchRecentStudySessions(
     .select(STUDY_SESSION_COLUMNS)
     .eq("user_id", userId)
     .not("ended_at", "is", null)
+    .eq("is_test_data", false)
     .order("started_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
@@ -41,7 +43,8 @@ export async function fetchStudySessionSecondsSince(
     .select("duration_seconds")
     .eq("user_id", userId)
     .not("ended_at", "is", null)
-    .gte("started_at", sinceIso);
+    .gte("started_at", sinceIso)
+    .eq("is_test_data", false);
   if (error) throw error;
   return (data ?? []).reduce((sum, row) => sum + (row.duration_seconds ?? 0), 0);
 }

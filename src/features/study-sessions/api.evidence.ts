@@ -56,7 +56,7 @@ export async function getMemoryState(conceptId: string): Promise<MemoryState | n
 
   const { data, error } = await supabase
     .from("memory_states")
-    .select("*")
+    .select("*, concept:concepts(*)")
     .eq("user_id", user.id)
     .eq("concept_id", conceptId)
     .maybeSingle();

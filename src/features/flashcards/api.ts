@@ -4,13 +4,14 @@ import type { FlashcardContent, FlashcardRating } from "./schema";
 import type { FlashcardReviewRow, FlashcardRow, SubmitFlashcardReviewResult } from "./types";
 
 const FLASHCARD_COLUMNS =
-  "id, user_id, lesson_id, deck_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, created_at, updated_at";
+  "id, user_id, lesson_id, deck_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, is_test_data, created_at, updated_at";
 
 export async function fetchFlashcards(userId: string): Promise<FlashcardRow[]> {
   const { data, error } = await supabase
     .from("flashcards")
     .select(FLASHCARD_COLUMNS)
     .eq("user_id", userId)
+    .eq("is_test_data", false)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as FlashcardRow[];
@@ -24,6 +25,7 @@ export async function fetchDueFlashcards(userId: string): Promise<FlashcardRow[]
     .select(FLASHCARD_COLUMNS)
     .eq("user_id", userId)
     .eq("is_archived", false)
+    .eq("is_test_data", false)
     .or(`state.eq.novo,due_at.lte.${nowIso}`)
     .order("due_at", { ascending: true, nullsFirst: true });
   if (error) throw error;
@@ -37,6 +39,7 @@ export async function fetchFlashcardsByDeck(userId: string, deckId: string): Pro
     .eq("user_id", userId)
     .eq("deck_id", deckId)
     .eq("is_archived", false)
+    .eq("is_test_data", false)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as FlashcardRow[];
@@ -51,6 +54,7 @@ export async function fetchDueFlashcardsByDeck(userId: string, deckId: string): 
     .eq("user_id", userId)
     .eq("deck_id", deckId)
     .eq("is_archived", false)
+    .eq("is_test_data", false)
     .or(`state.eq.novo,due_at.lte.${nowIso}`)
     .order("due_at", { ascending: true, nullsFirst: true });
   if (error) throw error;

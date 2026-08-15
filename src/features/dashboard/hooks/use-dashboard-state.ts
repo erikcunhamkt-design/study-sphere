@@ -7,6 +7,7 @@ import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
 import { calculateCourseProgress } from "@/features/studies/utils";
 import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
 import { useDueReviews } from "@/features/study-sessions/hooks.due";
+import { isProductionEligible } from "@/lib/eligibility";
 
 export function useDashboardState() {
   const { data: dueFlashcards, isLoading: loadingDue } = useDueFlashcards();
@@ -41,10 +42,8 @@ export function useDashboardState() {
       const validSessions = inProgressSessions.filter(s => {
         if (s.ended_at) return false;
 
-        // Isolar dados de auditoria/teste da Home do usuário real
-        const title = (s as any).planned_title || (s.details as any)?.title || "";
-        // Refinamento agressivo: filtrar padrões comuns de teste e a string de auditoria observada
-        if (/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(title)) return false;
+        // Isolar dados de teste através da flag estrutural
+        if (!isProductionEligible(s)) return false;
 
         // Abandono por tempo (ex: 4 horas de inatividade)
         const lastUpdate = new Date(s.updated_at).getTime();
@@ -54,7 +53,7 @@ export function useDashboardState() {
         // Sessão de conteúdo real
         if (s.lesson_id) {
           const lesson = allLessons?.find(l => l.id === s.lesson_id);
-          if (lesson && /audit|test|fixture|teste|abc|sdfsd|asdad/i.test(lesson.title)) return false;
+          if (lesson && !isProductionEligible(lesson)) return false;
           return !!lesson;
         }
         
@@ -120,8 +119,7 @@ export function useDashboardState() {
     // 3. Prioridade: Recomendação (Cursos em andamento)
     const activeCourses = (courses ?? []).filter((c) => !c.is_archived);
     const inProgressCourses = activeCourses.filter((c) => 
-      c.status === "in_progress" && 
-      !/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(c.name)
+      c.status === "in_progress" && isProductionEligible(c)
     );
 
     if (inProgressCourses.length > 0) {
@@ -138,8 +136,7 @@ export function useDashboardState() {
 
     // 4. Prioridade: Primeiro Estudo (Possui conteúdo mas nada em andamento)
     const validCourses = (activeCourses ?? []).filter(c => 
-      c.name.trim().length > 2 && 
-      !/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(c.name)
+      c.name.trim().length > 2 && isProductionEligible(c)
     );
 
     if (validCourses.length > 0) {
