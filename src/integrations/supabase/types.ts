@@ -94,6 +94,54 @@ export type Database = {
           },
         ]
       }
+      concepts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_archived: boolean
+          lesson_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          lesson_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          lesson_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concepts_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concepts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_modules: {
         Row: {
           course_id: string
@@ -429,6 +477,7 @@ export type Database = {
       flashcards: {
         Row: {
           back: Json
+          concept_id: string | null
           created_at: string
           deck_id: string | null
           due_at: string | null
@@ -448,6 +497,7 @@ export type Database = {
         }
         Insert: {
           back: Json
+          concept_id?: string | null
           created_at?: string
           deck_id?: string | null
           due_at?: string | null
@@ -467,6 +517,7 @@ export type Database = {
         }
         Update: {
           back?: Json
+          concept_id?: string | null
           created_at?: string
           deck_id?: string | null
           due_at?: string | null
@@ -485,6 +536,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "flashcards_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "flashcards_deck_fkey"
             columns: ["deck_id", "user_id"]
@@ -666,6 +724,69 @@ export type Database = {
           },
           {
             foreignKeyName: "lessons_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_states: {
+        Row: {
+          attempt_count: number
+          concept_id: string
+          difficulty: number
+          failed_recalls: number
+          id: string
+          last_confidence: number | null
+          last_recalled_at: string | null
+          last_result: Database["public"]["Enums"]["recall_result"] | null
+          stability: number
+          strength: number
+          successful_recalls: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempt_count?: number
+          concept_id: string
+          difficulty?: number
+          failed_recalls?: number
+          id?: string
+          last_confidence?: number | null
+          last_recalled_at?: string | null
+          last_result?: Database["public"]["Enums"]["recall_result"] | null
+          stability?: number
+          strength?: number
+          successful_recalls?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempt_count?: number
+          concept_id?: string
+          difficulty?: number
+          failed_recalls?: number
+          id?: string
+          last_confidence?: number | null
+          last_recalled_at?: string | null
+          last_result?: Database["public"]["Enums"]["recall_result"] | null
+          stability?: number
+          strength?: number
+          successful_recalls?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_states_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memory_states_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1111,6 +1232,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_evidence_to_memory_state: {
+        Args: { p_concept_id: string; p_evidence_id: string }
+        Returns: string
+      }
       checkpoint_lesson_document: {
         Args: { p_lesson_id: string }
         Returns: Json
