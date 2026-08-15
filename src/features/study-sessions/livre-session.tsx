@@ -127,6 +127,9 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     }
   }, [initialLessonId, initialCourseId, isLoadingLessons, courseLessons, session, optimisticStart, resumingSession]);
 
+  const { data: lessonDoc } = useLessonDocument(effectiveLessonId || "");
+  const hasMaterial = lessonDoc?.content && Array.isArray(lessonDoc.content) && lessonDoc.content.length > 0;
+
   // Se o lessonId foi setado via efeito de curso, inicia a sessão assim que o estado estabilizar
   useEffect(() => {
     if (lessonId && !session && !optimisticStart && !resumingSession) {
@@ -139,13 +142,27 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }, [lessonId]);
 
   async function handleFinish() {
+    if (!session) return;
+    
+    // Regra de conclusão: Se for o método 'aprender', precisa ter material
+    if (method === "aprender" && !hasMaterial) {
+      toast.error("Esta sessão não possui material. Adicione o conteúdo para concluir o aprendizado.");
+      return;
+    }
+
+    // Condição mínima: pelo menos 10 segundos
+    if (elapsed < 10) {
+      toast.error("Contato muito curto. Dedique um pouco mais de tempo à compreensão.");
+      return;
+    }
+
     const details: LivreDetails = nota.trim() ? { nota: nota.trim() } : {};
     try {
       await finishSession.mutateAsync(details);
-      toast.success("Sessão concluída");
+      toast.success(method === "aprender" ? "Primeiro contato concluído!" : "Sessão concluída");
       setIsFinished(true);
     } catch (err) {
-      console.error("[study-sessions] falha ao concluir sessão livre", err);
+      console.error("[study-sessions] falha ao concluir sessão", err);
       toast.error("Não foi possível concluir a sessão");
     }
   }
