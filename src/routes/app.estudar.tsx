@@ -333,9 +333,6 @@ function EstudarPage() {
         </section>
       )}
 
-          )}
-
-      </section>
 
       <AddContentDialog 
         open={isAddDialogOpen} 
