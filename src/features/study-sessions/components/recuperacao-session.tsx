@@ -40,11 +40,11 @@ const CONFIDENCE_MAP: Record<ConfidenceLevel, number> = {
   facil: 4,
 };
 
-const RESULT_MAP: Record<ConfidenceLevel, string> = {
-  nenhum: "incorrect",
-  dificil: "partial",
-  lembrei: "correct",
-  facil: "correct",
+const RESULT_MAP: Record<ConfidenceLevel, RecallResult> = {
+  nenhum: "self_reported_incorrect",
+  dificil: "self_reported_partial",
+  lembrei: "self_reported_correct",
+  facil: "self_reported_correct",
 };
 
 
@@ -206,7 +206,9 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
   }
 
   if (isFinished) {
-    const recoveredCount = attempts.filter(a => a.result === "correct").length;
+    const recoveredCount = attempts.filter(a => a.result === "correct" || a.result === "self_reported_correct").length;
+    const partialCount = attempts.filter(a => a.result === "partial" || a.result === "self_reported_partial").length;
+    const incorrectCount = attempts.filter(a => a.result === "incorrect" || a.result === "self_reported_incorrect").length;
     
     return (
       <div className="max-w-2xl mx-auto text-center space-y-12 py-10 animate-in fade-in duration-700">
@@ -221,19 +223,26 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
           <div className="space-y-4">
             <h2 className="text-4xl font-black tracking-tight text-foreground uppercase italic">Recuperação Concluída</h2>
             <p className="text-muted-foreground font-medium max-w-md mx-auto leading-relaxed">
-              Você testou sua memória sobre este conteúdo. A evidência gerada ajudará o Dominus a planejar sua próxima revisão.
+              Você testou sua memória sobre este conteúdo. A interface diferencia o que você acha que sabe do que foi validado objetivamente.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-surface/30 border border-border/10 rounded-[2rem] p-6 text-left space-y-1">
-            <span className="text-[9px] font-black uppercase tracking-widest text-primary/60">Conceitos Testados</span>
-            <p className="text-2xl font-black text-foreground">{lessonQuestions.length}</p>
+            <span className="text-[9px] font-black uppercase tracking-widest text-primary/60">Autoavaliados</span>
+            <p className="text-2xl font-black text-foreground">{recoveredCount}</p>
+            <p className="text-[8px] text-muted-foreground uppercase font-bold">Corretos</p>
           </div>
           <div className="bg-surface/30 border border-border/10 rounded-[2rem] p-6 text-left space-y-1">
-            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500/60">Recuperados</span>
-            <p className="text-2xl font-black text-foreground">{recoveredCount}</p>
+            <span className="text-[9px] font-black uppercase tracking-widest text-orange-500/60">Dificuldade</span>
+            <p className="text-2xl font-black text-foreground">{partialCount}</p>
+            <p className="text-[8px] text-muted-foreground uppercase font-bold">Parciais</p>
+          </div>
+          <div className="bg-surface/30 border border-border/10 rounded-[2rem] p-6 text-left space-y-1">
+            <span className="text-[9px] font-black uppercase tracking-widest text-red-500/60">Não lembrados</span>
+            <p className="text-2xl font-black text-foreground">{incorrectCount}</p>
+            <p className="text-[8px] text-muted-foreground uppercase font-bold">Erros</p>
           </div>
         </div>
 
@@ -327,7 +336,9 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
               <div className="space-y-8 pt-4 border-t border-border/10">
                 <div className="text-center space-y-2">
                   <h3 className="text-xl font-black uppercase tracking-tight italic">Como foi a recuperação?</h3>
-                  <p className="text-xs text-muted-foreground/40 font-medium italic">Seja honesto com sua memória para melhores resultados.</p>
+                  <p className="text-xs text-muted-foreground/40 font-medium italic">
+                    Você avaliou sua recuperação como correta?
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

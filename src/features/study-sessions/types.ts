@@ -43,7 +43,16 @@ export interface LivreDetails {
   completedAt?: string;
 }
 
-export type RecallResult = 'correct' | 'partial' | 'incorrect' | 'no_answer' | 'abandoned';
+export type RecallResult = 
+  | 'correct' 
+  | 'partial' 
+  | 'incorrect' 
+  | 'no_answer' 
+  | 'abandoned'
+  | 'self_reported_correct'
+  | 'self_reported_partial'
+  | 'self_reported_incorrect';
+
 export type ResultSource = 'self_assessment' | 'objective' | 'manual' | 'ai';
 
 export interface RecuperacaoDetails {
