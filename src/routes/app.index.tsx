@@ -12,13 +12,11 @@ import {
   Type
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useDashboardState } from "@/features/dashboard/hooks/use-dashboard-state";
+import { useNextBestAction } from "@/features/next-action/hooks/use-next-best-action";
 import { 
   NextStepAction, 
   DayProgress, 
   MasteryCard, 
-  SectionHeader, 
-  SimpleEmptyState 
 } from "@/features/dashboard/components/dashboard-ui";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -118,7 +116,7 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
   const { data: prefs } = usePreferences();
-  const { priority, data, isLoading, dueFlashcards, dueConcepts, hasActivity, reviewSemantic } = useDashboardState();
+  const { primary: action, isLoading, dashboard, reviewSemantic, hasActivity } = useNextBestAction() as any;
   const deleteSession = useDeleteStudySession();
   const navigate = useNavigate();
   
@@ -132,7 +130,7 @@ function DashboardPage() {
 
   const studyMinutes = Math.round((todaySeconds ?? 0) / 60);
   const studyGoal = prefs?.daily_study_goal_minutes ?? 60;
-  const reviewsCount = (dueFlashcards?.length ?? 0) + (dueConcepts?.length ?? 0);
+  const reviewsCount = dashboard?.summary?.dueReviews || 0;
 
   if (isLoading) {
     return (
@@ -160,110 +158,54 @@ function DashboardPage() {
 
       {/* 1. HERO — AÇÃO PRINCIPAL */}
       <div className="w-full">
-        {priority === "resume" && (
-          <NextStepAction
-            title="RETOMAR"
-            subtitle={data.displayTitle}
-            context={data.displayContext}
-            description={
-              data.displaySecondary 
-                ? `${data.displaySecondary}. Continue de onde parou.`
-                : data.isFree
-                  ? "Continue sua sessão de estudo livre."
-                  : "Retome sua sessão para registrar seu progresso."
+        <NextStepAction
+          title={action.title.toUpperCase()}
+          subtitle={action.description}
+          description={action.reason}
+          ctaText={action.cta}
+          to={
+            action.type === 'resume' ? "/app/estudar" :
+            action.type === 'review' ? "/app/revisar" :
+            action.type === 'test_memory' ? "/app/estudar" :
+            action.type === 'reinforce' ? "/app/desempenho" :
+            action.type === 'continue' || action.type === 'first_study' ? "/app/meus-estudos/$areaId/cursos/$courseId" :
+            undefined
+          }
+          search={
+            action.type === 'resume' ? { 
+              method: action.metadata?.session?.method,
+              lessonId: action.metadata?.session?.lesson_id 
+            } : 
+            action.type === 'test_memory' ? {} :
+            undefined
+          }
+          params={
+            (action.type === 'continue' || action.type === 'first_study') ? {
+              areaId: action.metadata?.course?.study_area_id || action.metadata?.study_area_id,
+              courseId: action.targetId
+            } : undefined
+          }
+          onClick={action.type === 'add_content' ? () => setAddContentOpen(true) : undefined}
+          icon={
+            action.type === 'resume' ? Play :
+            action.type === 'review' ? Layers :
+            action.type === 'reinforce' ? Target :
+            action.type === 'test_memory' ? Sparkles :
+            action.type === 'continue' ? Target :
+            action.type === 'first_study' ? BookOpen :
+            action.type === 'add_content' ? Sparkles :
+            ListChecks
+          }
+          onSecondaryAction={action.type === 'resume' && action.metadata?.session?.is_free_session ? async () => {
+            try {
+              await deleteSession.mutateAsync(action.targetId!);
+              toast.success("Sessão encerrada");
+            } catch (err) {
+              toast.error("Erro ao encerrar sessão");
             }
-            ctaText="Continuar agora"
-            to="/app/estudar"
-            search={{ 
-              method: data.session.method,
-              lessonId: data.session.lesson_id 
-            }}
-            icon={Play}
-            onSecondaryAction={data.isFree ? async () => {
-              try {
-                await deleteSession.mutateAsync(data.session.id);
-                toast.success("Sessão encerrada");
-              } catch (err) {
-                toast.error("Erro ao encerrar sessão");
-              }
-            } : undefined}
-            secondaryActionLabel={data.isFree ? "Encerrar sessão" : undefined}
-          />
-        )}
-
-        {priority === "review" && (
-          <NextStepAction
-            title="SUA PRÓXIMA AÇÃO"
-            subtitle="Revisar agora"
-            description={`Você tem ${reviewsCount} ${reviewsCount === 1 ? 'revisão pendente' : 'revisões pendentes'}. Recupere esses conceitos antes de avançar.`}
-            ctaText="Começar revisão"
-            to="/app/revisar"
-            estimatedMinutes={data.estimatedMinutes}
-            icon={Layers}
-          />
-        )}
-
-        {priority === "recommendation" && (
-          <NextStepAction
-            title="PRÓXIMA RECOMENDAÇÃO"
-            subtitle={`Continuar ${data.course.name}`}
-            description={`Você já concluiu ${data.progress.percent}% deste curso. Vamos para a próxima etapa?`}
-            ctaText="Estudar agora"
-            to="/app/meus-estudos/$areaId/cursos/$courseId"
-            params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
-            icon={Target}
-          />
-        )}
-
-        {priority === "start_study" && (
-          <NextStepAction
-            title="PRÓXIMO PASSO"
-            subtitle="Escolha seu primeiro estudo"
-            description="Você já possui conteúdo disponível. Escolha por onde começar."
-            ctaText="Começar estudo"
-            to="/app/meus-estudos/$areaId/cursos/$courseId"
-            params={{ areaId: data.course.study_area_id, courseId: data.course.id }}
-            icon={BookOpen}
-          />
-        )}
-        
-        {priority === "onboarding" && (
-          <NextStepAction
-            title="COMECE SUA JORNADA"
-            subtitle="Comece seu primeiro estudo"
-            description="Adicione um conteúdo e dê início à sua primeira sessão."
-            ctaText="Adicionar conteúdo"
-            onClick={() => setAddContentOpen(true)}
-            icon={Sparkles}
-          />
-        )}
-
-        {priority === "test_memory" && (
-          <NextStepAction
-            title="PRÓXIMO PASSO"
-            subtitle="Sua memória ainda não foi avaliada"
-            description="O próximo passo é descobrir o que realmente ficou. Você já estudou, mas ainda não testou o que consegue recuperar."
-            ctaText="Testar memória"
-            to="/app/estudar"
-            search={{}}
-            icon={Sparkles}
-          />
-        )}
-
-        {priority === "maintenance" && (
-          <NextStepAction
-            title="TUDO EM DIA"
-            subtitle="Nenhuma revisão prevista"
-            description="Você está em dia com suas revisões. Continue estudando para expandir seu conhecimento."
-            ctaText="Continuar estudando"
-            to="/app/meus-estudos/$areaId/cursos/$courseId"
-            params={{ 
-              areaId: data.course?.study_area_id, 
-              courseId: data.course?.id 
-            }}
-            icon={ListChecks}
-          />
-        )}
+          } : undefined}
+          secondaryActionLabel={action.type === 'resume' && action.metadata?.session?.is_free_session ? "Encerrar sessão" : undefined}
+        />
       </div>
 
       {/* 2. SEU DIA & 3. SEU DOMÍNIO */}
