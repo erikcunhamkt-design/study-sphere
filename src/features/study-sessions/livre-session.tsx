@@ -297,8 +297,8 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   setLessonId(newId);
                   setShowLessonSwitcher(false);
                   toast.success("Foco alterado");
-                  // Nota: isso não encerra a sessão atual no banco, apenas muda o lessonId para persistências futuras ou a UI.
-                  // Em uma implementação mais robusta, poderíamos atualizar a sessão no banco aqui.
+                  // Se a sessão já foi criada no banco, idealmente faríamos um UPDATE aqui.
+                  // Mas para o MVP de UX, apenas mudar o lessonId local já reflete na UI e em futuras persistências de detalhes.
                 }} 
                />
             </div>
