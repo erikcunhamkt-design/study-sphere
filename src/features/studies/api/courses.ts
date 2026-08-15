@@ -14,6 +14,7 @@ export async function fetchCoursesByArea(userId: string, areaId: string): Promis
     .select(COLUMNS)
     .eq("user_id", userId)
     .eq("study_area_id", areaId)
+    .eq("is_test_data", false)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true })
     .order("id", { ascending: true });
