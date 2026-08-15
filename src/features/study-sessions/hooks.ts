@@ -2,7 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@/hooks/use-auth";
 import * as api from "./api";
+import { supabase } from "@/integrations/supabase/client";
+import { useApplyFsrsReview } from "./hooks.memory";
 import { linkSessionAndComplete } from "@/features/planned-studies/api";
+
 import type { StudySessionDetails } from "./types";
 
 export function inProgressStudySessionsKey(userId: string | undefined) {
@@ -103,15 +106,38 @@ export function useDeleteStudySession() {
 export function useRecordRecallAttempt() {
   const invalidate = useInvalidateStudySessionLists();
   const qc = useQueryClient();
+  const applyFsrs = useApplyFsrsReview();
+
   return useMutation({
-    mutationFn: (input: api.RecordRecallAttemptInput) => api.recordRecallAttempt(input),
+    mutationFn: async (input: api.RecordRecallAttemptInput) => {
+      const evidenceId = await api.recordRecallAttempt(input);
+      // Automatically apply FSRS review if we have a concept
+      if (input.sessionId) {
+        // We need the conceptId. In our architecture, the RPC record_recall_attempt 
+        // finds the conceptId from the questionId. 
+        // For FSRS, we'll fetch the evidence to get the concept_id it was linked to.
+        const { data: evidence } = await supabase
+          .from("cognitive_evidences")
+          .select("concept_id")
+          .eq("id", evidenceId)
+          .single();
+        
+        if (evidence?.concept_id) {
+          await applyFsrs.mutateAsync({ 
+            conceptId: evidence.concept_id, 
+            evidenceId 
+          });
+        }
+      }
+      return evidenceId;
+    },
     onSuccess: (evidenceId, variables) => {
       invalidate();
-      // Invalida especificamente o estado de memória se houver conceito
       void qc.invalidateQueries({ queryKey: ["memory-state"] });
     },
   });
 }
+
 
 export function useMemoryState(conceptId: string | undefined) {
   return useQuery({

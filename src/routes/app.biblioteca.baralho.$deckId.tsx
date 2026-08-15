@@ -65,9 +65,10 @@ function DeckDetailPage() {
     
     try {
       await setFlashcardsDeck.mutateAsync({ 
-        flashcardIds: selectedIds, 
+        ids: selectedIds, 
         deckId 
       });
+
       toast.success(`${selectedIds.length} cartões adicionados ao baralho`);
       setAddDialogOpen(false);
       setSelectedIds([]);

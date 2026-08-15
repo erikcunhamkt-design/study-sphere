@@ -1,137 +1,131 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-import { useAuth } from "@/hooks/use-auth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import * as api from "./api";
 import type { FlashcardRating } from "./schema";
 
-export function flashcardsKey(userId: string | undefined) {
-  return ["flashcards", userId] as const;
-}
-
-export function dueFlashcardsKey(userId: string | undefined) {
-  return ["flashcards-due", userId] as const;
-}
-
-export function flashcardReviewsKey(userId: string | undefined, sinceIso: string | undefined) {
-  return ["flashcard-reviews", userId, sinceIso] as const;
-}
-
 export function useFlashcards() {
-  const { user } = useAuth();
   return useQuery({
-    enabled: !!user,
-    queryKey: flashcardsKey(user?.id),
-    queryFn: () => api.fetchFlashcards(user!.id),
+    queryKey: ["flashcards", "list"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      return api.fetchFlashcards(user.id);
+    },
   });
 }
 
-export function useDueFlashcards() {
-  const { user } = useAuth();
+export function useDueFlashcards(limit = 50) {
   return useQuery({
-    enabled: !!user,
-    queryKey: dueFlashcardsKey(user?.id),
-    queryFn: () => api.fetchDueFlashcards(user!.id),
+    queryKey: ["flashcards", "due", limit],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      return api.fetchDueFlashcards(user.id);
+    },
   });
 }
 
-export function useFlashcardsByDeck(deckId: string | undefined) {
-  const { user } = useAuth();
+export function useDueFlashcardsByDeck(deckId?: string, limit = 50) {
   return useQuery({
-    enabled: !!user && !!deckId,
-    queryKey: [...flashcardsKey(user?.id), deckId],
-    queryFn: () => api.fetchFlashcardsByDeck(user!.id, deckId!),
+    queryKey: ["flashcards", "due", deckId, limit],
+    enabled: !!deckId,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !deckId) return [];
+      return api.fetchDueFlashcardsByDeck(user.id, deckId);
+    },
   });
 }
 
-export function useDueFlashcardsByDeck(deckId: string | undefined) {
-  const { user } = useAuth();
+export function useFlashcardsByDeck(deckId?: string) {
   return useQuery({
-    enabled: !!user && !!deckId,
-    queryKey: [...dueFlashcardsKey(user?.id), deckId],
-    queryFn: () => api.fetchDueFlashcardsByDeck(user!.id, deckId!),
+    queryKey: ["flashcards", "deck", deckId],
+    enabled: !!deckId,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !deckId) return [];
+      return api.fetchFlashcardsByDeck(user.id, deckId);
+    },
   });
-}
-
-/** `sinceIso` fixo por render (não `new Date()` direto) evita invalidar/refazer a query a cada rerender. */
-
-export function useFlashcardReviews(sinceIso: string | undefined) {
-  const { user } = useAuth();
-  return useQuery({
-    enabled: !!user && !!sinceIso,
-    queryKey: flashcardReviewsKey(user?.id, sinceIso),
-    queryFn: () => api.fetchFlashcardReviews(user!.id, sinceIso!),
-  });
-}
-
-function useInvalidateFlashcardLists() {
-  const { user } = useAuth();
-  const qc = useQueryClient();
-  return () => {
-    void qc.invalidateQueries({ queryKey: flashcardsKey(user?.id) });
-    void qc.invalidateQueries({ queryKey: dueFlashcardsKey(user?.id) });
-  };
 }
 
 export function useCreateFlashcard() {
-  const { user } = useAuth();
-  const invalidate = useInvalidateFlashcardLists();
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: api.CreateFlashcardInput) => api.createFlashcard(user!.id, input),
-    onSuccess: invalidate,
+    mutationFn: async (input: api.CreateFlashcardInput) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Unauthorized");
+      return api.createFlashcard(user.id, input);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["flashcards"] });
+    },
   });
 }
 
-export function useUpdateFlashcardContent(flashcardId: string) {
-  const invalidate = useInvalidateFlashcardLists();
+export function useUpdateFlashcardContent() {
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: api.UpdateFlashcardContentInput) =>
-      api.updateFlashcardContent(flashcardId, input),
-    onSuccess: invalidate,
-  });
-}
-
-export function useSetFlashcardArchived(flashcardId: string) {
-  const invalidate = useInvalidateFlashcardLists();
-  return useMutation({
-    mutationFn: (isArchived: boolean) => api.setFlashcardArchived(flashcardId, isArchived),
-    onSuccess: invalidate,
+    mutationFn: (variables: { id: string; data: api.UpdateFlashcardContentInput }) =>
+      api.updateFlashcardContent(variables.id, variables.data),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["flashcards"] });
+    },
   });
 }
 
 export function useDeleteFlashcard() {
-  const invalidate = useInvalidateFlashcardLists();
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: (flashcardId: string) => api.deleteFlashcard(flashcardId),
-    onSuccess: invalidate,
+    mutationFn: (id: string) => api.deleteFlashcard(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["flashcards"] });
+    },
   });
 }
 
-export function useSubmitFlashcardReview() {
-  const { user } = useAuth();
+export function useSetFlashcardArchived() {
   const qc = useQueryClient();
-  const invalidateLists = useInvalidateFlashcardLists();
   return useMutation({
-    mutationFn: ({ flashcardId, rating }: { flashcardId: string; rating: FlashcardRating }) =>
-      api.submitFlashcardReview(flashcardId, rating),
+    mutationFn: (variables: { id: string; isArchived: boolean }) =>
+      api.setFlashcardArchived(variables.id, variables.isArchived),
     onSuccess: () => {
-      invalidateLists();
-      // Prefixo parcial: invalida qualquer janela de métricas em cache
-      // (["flashcard-reviews", userId, sinceIso]), não só uma sinceIso específica.
-      void qc.invalidateQueries({ queryKey: ["flashcard-reviews", user?.id] });
+      void qc.invalidateQueries({ queryKey: ["flashcards"] });
     },
   });
 }
 
 export function useSetFlashcardsDeck() {
-  const { user } = useAuth();
   const qc = useQueryClient();
-  const invalidateLists = useInvalidateFlashcardLists();
   return useMutation({
-    mutationFn: ({ flashcardIds, deckId }: { flashcardIds: string[]; deckId: string | null }) =>
-      api.setFlashcardsDeck(flashcardIds, deckId),
+    mutationFn: (variables: { ids: string[]; deckId: string | null }) =>
+      api.setFlashcardsDeck(variables.ids, variables.deckId),
     onSuccess: () => {
-      invalidateLists();
-      void qc.invalidateQueries({ queryKey: ["decks", user?.id] });
+      void qc.invalidateQueries({ queryKey: ["flashcards"] });
+    },
+  });
+}
+
+export function useSubmitFlashcardReview() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: { flashcardId: string; rating: FlashcardRating }) =>
+      api.submitFlashcardReview(variables.flashcardId, variables.rating),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["flashcards"] });
+      void qc.invalidateQueries({ queryKey: ["memory-state"] });
+      void qc.invalidateQueries({ queryKey: ["due-reviews"] });
+    },
+  });
+}
+
+export function useFlashcardReviews(sinceIso: string) {
+  return useQuery({
+    queryKey: ["flashcards", "reviews", sinceIso],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      return api.fetchFlashcardReviews(user.id, sinceIso);
     },
   });
 }

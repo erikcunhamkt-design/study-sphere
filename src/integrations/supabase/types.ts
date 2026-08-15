@@ -19,6 +19,7 @@ export type Database = {
           attempted_at: string
           concept_id: string | null
           confidence: number
+          confidence_mismatch: boolean | null
           confidence_source: string
           created_at: string
           id: string
@@ -35,6 +36,7 @@ export type Database = {
           attempted_at?: string
           concept_id?: string | null
           confidence: number
+          confidence_mismatch?: boolean | null
           confidence_source?: string
           created_at?: string
           id?: string
@@ -51,6 +53,7 @@ export type Database = {
           attempted_at?: string
           concept_id?: string | null
           confidence?: number
+          confidence_mismatch?: boolean | null
           confidence_source?: string
           created_at?: string
           id?: string
@@ -733,45 +736,72 @@ export type Database = {
       }
       memory_states: {
         Row: {
+          algorithm_name: string | null
+          algorithm_version: string | null
           attempt_count: number
           concept_id: string
           difficulty: number
+          due: string | null
+          elapsed_days: number | null
           failed_recalls: number
           id: string
+          lapses: number | null
           last_confidence: number | null
           last_recalled_at: string | null
           last_result: Database["public"]["Enums"]["recall_result"] | null
+          last_review: string | null
+          reps: number | null
+          scheduled_days: number | null
           stability: number
+          state: number | null
           strength: number
           successful_recalls: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          algorithm_name?: string | null
+          algorithm_version?: string | null
           attempt_count?: number
           concept_id: string
           difficulty?: number
+          due?: string | null
+          elapsed_days?: number | null
           failed_recalls?: number
           id?: string
+          lapses?: number | null
           last_confidence?: number | null
           last_recalled_at?: string | null
           last_result?: Database["public"]["Enums"]["recall_result"] | null
+          last_review?: string | null
+          reps?: number | null
+          scheduled_days?: number | null
           stability?: number
+          state?: number | null
           strength?: number
           successful_recalls?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          algorithm_name?: string | null
+          algorithm_version?: string | null
           attempt_count?: number
           concept_id?: string
           difficulty?: number
+          due?: string | null
+          elapsed_days?: number | null
           failed_recalls?: number
           id?: string
+          lapses?: number | null
           last_confidence?: number | null
           last_recalled_at?: string | null
           last_result?: Database["public"]["Enums"]["recall_result"] | null
+          last_review?: string | null
+          reps?: number | null
+          scheduled_days?: number | null
           stability?: number
+          state?: number | null
           strength?: number
           successful_recalls?: number
           updated_at?: string
@@ -1254,6 +1284,10 @@ export type Database = {
         Returns: undefined
       }
       publish_lesson_document: { Args: { p_lesson_id: string }; Returns: Json }
+      rebuild_memory_state_from_history: {
+        Args: { p_concept_id: string; p_user_id: string }
+        Returns: string
+      }
       record_recall_attempt: {
         Args: {
           p_confidence: number

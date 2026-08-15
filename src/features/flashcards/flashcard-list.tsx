@@ -75,7 +75,7 @@ function FlashcardRowItem({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const setArchived = useSetFlashcardArchived(card.id);
+  const setArchived = useSetFlashcardArchived();
   const { data: lessons } = useAllLessons();
   const lesson = card.lesson_id ? lessons?.find((l) => l.id === card.lesson_id) : null;
 
@@ -83,7 +83,7 @@ function FlashcardRowItem({
 
   async function handleToggleArchive() {
     try {
-      await setArchived.mutateAsync(!card.is_archived);
+      await setArchived.mutateAsync({ id: card.id, isArchived: !card.is_archived });
       toast.success(card.is_archived ? "Cartão reativado" : "Cartão arquivado");
     } catch (err) {
       console.error("[flashcards] falha ao arquivar/reativar", err);

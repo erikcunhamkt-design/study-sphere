@@ -77,7 +77,8 @@ export function FlashcardFormDialog({
   const activeDecks = (decks ?? []).filter((d) => !d.is_archived);
 
   const createFlashcard = useCreateFlashcard();
-  const updateFlashcard = useUpdateFlashcardContent(flashcard?.id ?? "");
+  const updateFlashcard = useUpdateFlashcardContent();
+
   const isPending = createFlashcard.isPending || updateFlashcard.isPending;
 
   useEffect(() => {
@@ -125,11 +126,15 @@ export function FlashcardFormDialog({
     try {
       if (isEditing && flashcard) {
         await updateFlashcard.mutateAsync({
-          lessonId: parsed.data.lessonId,
-          deckId: (parsed.data as any).deckId,
-          front: parsed.data.front,
-          back: parsed.data.back,
+          id: flashcard.id,
+          data: {
+            lessonId: parsed.data.lessonId,
+            deckId: (parsed.data as any).deckId,
+            front: parsed.data.front,
+            back: parsed.data.back,
+          },
         });
+
         toast.success("Cartão atualizado");
       } else {
         await createFlashcard.mutateAsync({

@@ -6,9 +6,11 @@ import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import { useStudyAreas } from "@/features/studies/hooks/use-study-areas";
 import { calculateCourseProgress } from "@/features/studies/utils";
 import { useAllCourseModules } from "@/features/studies/hooks/use-course-modules";
+import { useDueReviews } from "@/features/study-sessions/hooks.due";
 
 export function useDashboardState() {
   const { data: dueFlashcards, isLoading: loadingDue } = useDueFlashcards();
+  const { data: dueConcepts, isLoading: loadingDueConcepts } = useDueReviews(50);
   const { data: inProgressSessions, isLoading: loadingProgress } = useInProgressStudySessions();
   const { data: courses, isLoading: loadingCourses } = useAllCourses();
   const { data: allLessons, isLoading: loadingLessons } = useAllLessons();
@@ -16,14 +18,17 @@ export function useDashboardState() {
   const { data: modules, isLoading: loadingModules } = useAllCourseModules();
   const { data: recentSessions, isLoading: loadingRecent } = useRecentStudySessions(1);
 
+
   const isLoading =
     loadingDue ||
+    loadingDueConcepts ||
     loadingProgress ||
     loadingCourses ||
     loadingLessons ||
     loadingAreas ||
     loadingModules ||
     loadingRecent;
+
 
   const hasActivity = (recentSessions?.length ?? 0) > 0;
   
@@ -89,19 +94,21 @@ export function useDashboardState() {
       }
     }
 
-    // 2. Prioridade: Revisão Urgente
-    if (dueFlashcards && dueFlashcards.length > 0) {
-      // Estimativa: 4 min a cada 1 pendente (exemplo heurístico sugerido "8 min para 2")
-      const estimatedMinutes = Math.max(dueFlashcards.length * 4, 1);
+    // 2. Prioridade: Revisão Urgente (Flashcards + Conceitos FSRS)
+    const totalDue = (dueFlashcards?.length ?? 0) + (dueConcepts?.length ?? 0);
+    if (totalDue > 0) {
+      // Estimativa baseada no volume total de revisão
+      const estimatedMinutes = Math.max(totalDue * 3, 1);
       
       return {
         priority: "review" as const,
         data: { 
-          count: dueFlashcards.length,
+          count: totalDue,
           estimatedMinutes
         },
       };
     }
+
 
     // 3. Prioridade: Recomendação (Cursos em andamento)
     const activeCourses = (courses ?? []).filter((c) => !c.is_archived);
@@ -142,7 +149,7 @@ export function useDashboardState() {
 
     // 5. Prioridade: Onboarding (Sem conteúdo)
     return { priority: "onboarding" as const, data: {} };
-  }, [isLoading, dueFlashcards, inProgressSessions, courses, allLessons, areas, modules, hasActivity]);
+  }, [isLoading, dueFlashcards, dueConcepts, inProgressSessions, courses, allLessons, areas, modules, hasActivity]);
 
-  return { ...state, isLoading, dueFlashcards, courses, allLessons, modules, hasActivity };
+  return { ...state, isLoading, dueFlashcards, dueConcepts, courses, allLessons, modules, hasActivity };
 }

@@ -50,7 +50,7 @@ export function RecordacaoAtivaHub({
   if (view === "flashcards_training" && deckAllFlashcards) {
     return (
       <ReviewSession 
-        queue={deckAllFlashcards} 
+        queue={deckAllFlashcards as any} 
         onFinish={() => onBack()} 
         isTrainingMode={true}
       />
@@ -60,11 +60,12 @@ export function RecordacaoAtivaHub({
   if (view === "flashcards" && dueFlashcards) {
     return (
       <ReviewSession 
-        queue={dueFlashcards} 
+        queue={dueFlashcards as any} 
         onFinish={() => setView("hub")} 
       />
     );
   }
+
 
   if (view === "exam_runner" && activeAttempt) {
     return (
