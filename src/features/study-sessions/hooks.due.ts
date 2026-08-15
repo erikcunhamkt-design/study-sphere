@@ -14,6 +14,7 @@ export function useDueReviews(limit = 20) {
         .eq("is_test_data", false)
         .lte("due", new Date().toISOString())
         .order("due", { ascending: true })
+        .order("difficulty", { ascending: false })
         .limit(limit);
 
       if (error) throw error;

@@ -111,20 +111,19 @@ export function useRecordRecallAttempt() {
   return useMutation({
     mutationFn: async (input: api.RecordRecallAttemptInput) => {
       const evidenceId = await api.recordRecallAttempt(input);
+      
       // Automatically apply FSRS review if we have a concept
-      if (input.sessionId) {
-        // We need the conceptId. In our architecture, the RPC record_recall_attempt 
-        // finds the conceptId from the questionId. 
-        // For FSRS, we'll fetch the evidence to get the concept_id it was linked to.
-        const { data: evidence } = await supabase
-          .from("cognitive_evidences")
+      if (input.questionId) {
+        // Encontrar o concept_id a partir da questão (no banco, mas o cliente já deve ter isso se for uma revisão ativada)
+        const { data: question } = await supabase
+          .from("questions")
           .select("concept_id")
-          .eq("id", evidenceId)
+          .eq("id", input.questionId)
           .single();
         
-        if (evidence?.concept_id) {
+        if (question?.concept_id) {
           await applyFsrs.mutateAsync({ 
-            conceptId: evidence.concept_id, 
+            conceptId: question.concept_id, 
             evidenceId 
           });
         }
@@ -134,6 +133,8 @@ export function useRecordRecallAttempt() {
     onSuccess: (evidenceId, variables) => {
       invalidate();
       void qc.invalidateQueries({ queryKey: ["memory-state"] });
+      void qc.invalidateQueries({ queryKey: ["due-reviews"] });
+      void qc.invalidateQueries({ queryKey: ["review-semantic-stats"] });
     },
   });
 }
