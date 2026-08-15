@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      cognitive_evidences: {
+        Row: {
+          attempted_at: string
+          concept_id: string | null
+          confidence: number
+          created_at: string
+          id: string
+          lesson_id: string | null
+          published_version: number | null
+          question_id: string | null
+          response_time_ms: number
+          result: Database["public"]["Enums"]["recall_result"]
+          result_source: Database["public"]["Enums"]["result_source"]
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          concept_id?: string | null
+          confidence: number
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          published_version?: number | null
+          question_id?: string | null
+          response_time_ms: number
+          result: Database["public"]["Enums"]["recall_result"]
+          result_source?: Database["public"]["Enums"]["result_source"]
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string
+          concept_id?: string | null
+          confidence?: number
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          published_version?: number | null
+          question_id?: string | null
+          response_time_ms?: number
+          result?: Database["public"]["Enums"]["recall_result"]
+          result_source?: Database["public"]["Enums"]["result_source"]
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cognitive_evidences_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cognitive_evidences_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cognitive_evidences_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cognitive_evidences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_modules: {
         Row: {
           course_id: string
@@ -751,6 +828,8 @@ export type Database = {
       }
       questions: {
         Row: {
+          concept_id: string | null
+          concept_tag: string | null
           correct_option_index: number | null
           created_at: string
           expected_answer: string | null
@@ -764,6 +843,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          concept_id?: string | null
+          concept_tag?: string | null
           correct_option_index?: number | null
           created_at?: string
           expected_answer?: string | null
@@ -777,6 +858,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          concept_id?: string | null
+          concept_tag?: string | null
           correct_option_index?: number | null
           created_at?: string
           expected_answer?: string | null
@@ -1043,6 +1126,19 @@ export type Database = {
         Returns: undefined
       }
       publish_lesson_document: { Args: { p_lesson_id: string }; Returns: Json }
+      record_recall_attempt: {
+        Args: {
+          p_confidence: number
+          p_published_version: number
+          p_question_id: string
+          p_response: string
+          p_response_time_ms: number
+          p_result: Database["public"]["Enums"]["recall_result"]
+          p_result_source: Database["public"]["Enums"]["result_source"]
+          p_session_id: string
+        }
+        Returns: string
+      }
       reorder_course_modules: {
         Args: { p_course_id: string; p_ids: string[] }
         Returns: undefined
@@ -1084,7 +1180,13 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      recall_result:
+        | "correct"
+        | "partial"
+        | "incorrect"
+        | "no_answer"
+        | "abandoned"
+      result_source: "self_assessment" | "objective" | "manual" | "ai"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1211,6 +1313,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      recall_result: [
+        "correct",
+        "partial",
+        "incorrect",
+        "no_answer",
+        "abandoned",
+      ],
+      result_source: ["self_assessment", "objective", "manual", "ai"],
+    },
   },
 } as const
