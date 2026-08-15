@@ -118,7 +118,7 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { user } = useAuth();
   const { data: prefs } = usePreferences();
-  const { priority, data, isLoading, dueFlashcards, dueConcepts, hasActivity } = useDashboardState();
+  const { priority, data, isLoading, dueFlashcards, dueConcepts, hasActivity, reviewSemantic } = useDashboardState();
   const deleteSession = useDeleteStudySession();
   const navigate = useNavigate();
   
