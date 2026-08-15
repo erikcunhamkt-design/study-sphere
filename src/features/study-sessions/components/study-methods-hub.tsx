@@ -84,6 +84,7 @@ const METHODS: MethodOption[] = [
     icon: Clock,
     category: "tempo"
   }
+];
 
 interface StudyMethodsHubProps {
   onSelectMethod: (method: StudyMethod) => void;
