@@ -11,7 +11,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const bundled = await bundle({
   entryPoint: path.resolve(__dirname, "../src/index.ts"),
-  webpackOverride: (config) => config,
+  webpackOverride: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": path.resolve(__dirname, "../src"),
+    };
+    return config;
+  },
 });
 
 const browser = await openBrowser("chrome", {
@@ -29,7 +35,7 @@ try {
     puppeteerInstance: browser,
   });
 
-  console.log("Starting render...");
+  console.log("Starting render for DominusApp promo...");
 
   await renderMedia({
     composition,
@@ -39,11 +45,12 @@ try {
     puppeteerInstance: browser,
     muted: true,
     concurrency: 1,
+    verbose: true,
   });
 
   console.log("Render complete: /mnt/documents/dominus-promo.mp4");
 } catch (e) {
-  console.error("Render failed:", e);
+  console.error("Render failed with error:", e);
 } finally {
   await browser.close({ silent: false });
 }
