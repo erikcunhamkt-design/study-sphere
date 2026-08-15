@@ -10,6 +10,7 @@ export const STUDY_METHOD_LABELS: Record<StudyMethod, string> = {
   aprender: "Aprender primeiro",
   exame: "Simulado",
   recordacao_ativa: "Recordação Ativa",
+  recuperacao: "Recuperação Ativa",
 };
 
 export const STUDY_METHOD_DESCRIPTIONS: Record<StudyMethod, string> = {
@@ -22,4 +23,5 @@ export const STUDY_METHOD_DESCRIPTIONS: Record<StudyMethod, string> = {
   aprender: "Primeiro compreenda o material; depois o Dominus poderá testar o que você realmente reteve.",
   exame: "Avalie seu conhecimento com questões simuladas.",
   recordacao_ativa: "Pratique a recuperação ativa para fortalecer a memória.",
+  recuperacao: "Teste o que você realmente consegue recuperar sem consultar o material.",
 };
