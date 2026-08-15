@@ -44,7 +44,8 @@ export function useDashboardState() {
         if (s.ended_at) return false;
 
         // Isolar dados de auditoria/teste da Home do usuário real
-        const title = (s as any).planned_title || s.details?.title || "";
+        // planned_title é injetado pelo Supabase em algumas queries ou via mock, detalhes podem ter títulos contextuais
+        const title = (s as any).planned_title || (s.details as any)?.title || "";
         if (/audit|test|fixture/i.test(title)) return false;
 
         // Abandono por tempo (ex: 4 horas de inatividade)
