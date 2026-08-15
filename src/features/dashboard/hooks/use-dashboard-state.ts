@@ -104,7 +104,7 @@ export function useDashboardState() {
     const totalDue = (dueFlashcards?.length ?? 0) + (dueConcepts?.length ?? 0);
     if (totalDue > 0) {
       // Estimativa baseada no volume total de revisão
-      const estimatedMinutes = Math.max(totalDue * 3, 1);
+      const estimatedMinutes = Math.max(totalDue * 2, 5);
       
       return {
         priority: "review" as const,
