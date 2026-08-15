@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2, BookOpen, Clock, ChevronRight } from "lucide-react";
 
@@ -19,14 +19,15 @@ interface LivreSessionProps {
   onDone: () => void;
   plannedId?: string;
   method?: StudyMethod;
+  initialLessonId?: string;
 }
 
 /** Fallback estável para useElapsedSeconds antes de a sessão existir — nunca exibido (o timer só aparece depois do INSERT). */
 const NO_SESSION_ISO = new Date(0).toISOString();
 
-export function LivreSession({ resumingSession, onDone, plannedId, method = "livre" }: LivreSessionProps) {
+export function LivreSession({ resumingSession, onDone, plannedId, method = "livre", initialLessonId }: LivreSessionProps) {
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
-  const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? null);
+  const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? initialLessonId ?? null);
   const [nota, setNota] = useState("");
   const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const [isFinished, setIsFinished] = useState(false);
@@ -52,7 +53,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     try {
       const created = await createSession.mutateAsync({
         method: method,
-        lessonId,
+        lessonId: lessonId,
         isFreeSession: !lessonId,
         details: initialDetailsForMethod(method),
       });
@@ -63,6 +64,12 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
       toast.error("Não foi possível iniciar a sessão");
     }
   }
+
+  useEffect(() => {
+    if (initialLessonId && !session && !optimisticStart && !resumingSession) {
+      handleStart();
+    }
+  }, [initialLessonId]);
 
   async function handleFinish() {
     const details: LivreDetails = nota.trim() ? { nota: nota.trim() } : {};
@@ -159,13 +166,24 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   }
 
   return (
-    <div className="max-w-6xl mx-auto animate-in fade-in duration-700">
+    <div className="max-w-6xl mx-auto animate-in fade-in duration-700 pb-20">
       <div className="group relative overflow-hidden rounded-[2.5rem] border border-primary/20 bg-surface/30 p-8 md:p-12 transition-all">
         <div className="absolute -right-20 -top-20 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
         
         <div className="relative z-10 space-y-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/10 pb-8">
-            <div className="space-y-2">
+            <div className="space-y-2 text-left">
+              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30 mb-2">
+                <span>DominusApp</span>
+                <ChevronRight className="h-3 w-3" />
+                <span>Estudar</span>
+                {session?.lesson_id && (
+                  <>
+                    <ChevronRight className="h-3 w-3" />
+                    <span className="text-primary/60">Aprendizagem</span>
+                  </>
+                )}
+              </div>
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
                   {method === "aprender" ? (
@@ -182,12 +200,24 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
               </h2>
             </div>
             
-            <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/5 transition-all">
-              Sair sem salvar
-            </Button>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex flex-col items-end gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Progresso da sessão</span>
+                  <span className="text-xs font-black text-primary">20%</span>
+                </div>
+                <div className="w-32 h-1 bg-surface/40 rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[20%] transition-all duration-1000" />
+                </div>
+              </div>
+
+              <Button variant="ghost" size="sm" onClick={onDone} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/5 transition-all">
+                Sair da sessão
+              </Button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left">
             <div className="lg:col-span-8 space-y-6">
               <div className="space-y-4">
                 <Label htmlFor="livre-nota" className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 ml-1">
@@ -206,7 +236,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
             
             <div className="lg:col-span-4 space-y-10">
               <div className="rounded-3xl border border-border/20 bg-surface/20 p-8 space-y-6">
-                <div className="space-y-2">
+                <div className="space-y-2 text-left">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Contexto</h4>
                   <p className="text-sm font-bold text-foreground/70 leading-relaxed">
                     Esta é sua fase de <strong>primeiro contato</strong>. O objetivo é a compreensão profunda, não a memorização imediata.
@@ -217,7 +247,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Dicas Dominus</h4>
                   <ul className="space-y-3">
                     {['Conecte com o que já sabe', 'Identifique termos novos', 'Não se preocupe em decorar'].map((tip, i) => (
-                      <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium">
+                      <li key={i} className="flex items-start gap-3 text-xs text-muted-foreground/60 font-medium text-left">
                         <div className="mt-1.5 w-1 h-1 rounded-full bg-primary/40 shrink-0" />
                         {tip}
                       </li>
