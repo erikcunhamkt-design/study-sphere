@@ -95,11 +95,6 @@ const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
   path: '/biblioteca',
   getParentRoute: () => AppRoute,
 } as any)
-const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
-  id: '/biblioteca',
-  path: '/biblioteca',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppMeusEstudosIndexRoute = AppMeusEstudosIndexRouteImport.update({
   id: '/meus-estudos/',
   path: '/meus-estudos/',
@@ -379,13 +374,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBibliotecaRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/biblioteca': {
-      id: '/app/biblioteca'
-      path: '/biblioteca'
-      fullPath: '/app/biblioteca'
-      preLoaderRoute: typeof AppBibliotecaRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/meus-estudos/': {
       id: '/app/meus-estudos/'
       path: '/meus-estudos'
@@ -451,7 +439,6 @@ const AppBibliotecaRouteWithChildren = AppBibliotecaRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppBibliotecaRoute: typeof AppBibliotecaRoute
   AppBibliotecaRoute: typeof AppBibliotecaRouteWithChildren
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
   AppDesempenhoRoute: typeof AppDesempenhoRoute
@@ -468,7 +455,6 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppBibliotecaRoute: AppBibliotecaRoute,
   AppBibliotecaRoute: AppBibliotecaRouteWithChildren,
   AppConfiguracoesRoute: AppConfiguracoesRoute,
   AppDesempenhoRoute: AppDesempenhoRoute,
