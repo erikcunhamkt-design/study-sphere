@@ -43,6 +43,10 @@ export function useDashboardState() {
         // Ignorar sessões finalizadas (redundância de segurança)
         if (s.ended_at) return false;
 
+        // Isolar dados de auditoria/teste da Home do usuário real
+        const title = (s as any).planned_title || s.details?.title || "";
+        if (/audit|test|fixture/i.test(title)) return false;
+
         // Abandono por tempo (ex: 4 horas de inatividade)
         const lastUpdate = new Date(s.updated_at).getTime();
         const fourHours = 4 * 60 * 60 * 1000;
