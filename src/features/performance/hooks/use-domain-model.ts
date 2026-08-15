@@ -66,11 +66,14 @@ export function useDomainModel() {
         });
 
         const evaluated = allConcepts.filter(c => c.memory && (c.memory.reps || 0) > 0);
+        
+        // Regra de Atenção: falhas recentes ou desalinhamento metacognitivo
+        // Importante: "due" gera alerta visual, mas não é falha cognitiva por si só
         const attention = allConcepts.filter(c => {
           if (!c.memory) return false;
-          const isDue = c.memory.due ? new Date(c.memory.due) <= now : false;
           const isFailing = c.memory.last_result === 'incorrect' || c.memory.last_result === 'partial';
-          return isDue || isFailing;
+          const hasMismatch = (c.memory.last_confidence || 0) >= 3 && isFailing;
+          return isFailing || hasMismatch;
         });
 
         const hasMismatch = evaluated.some(c => 

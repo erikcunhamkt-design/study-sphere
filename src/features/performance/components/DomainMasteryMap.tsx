@@ -71,26 +71,32 @@ export function DomainMasteryMap() {
                 </div>
               )}
 
-              <div className="pt-2">
-                <div className="flex flex-wrap gap-2">
-                  {domain.concepts.slice(0, 5).map(c => (
-                    <button
-                      key={c.id}
-                      onClick={() => setSelectedConcept(c)}
-                      className={cn(
-                        "w-2 h-2 rounded-full transition-all hover:scale-150",
-                        !c.memory || c.memory.reps === 0 ? "bg-muted/20" : 
-                        c.memory.last_result === 'incorrect' ? "bg-red-500/40" :
-                        "bg-primary/40"
-                      )}
-                      title={c.title}
-                    />
-                  ))}
-                  {domain.concepts.length > 5 && (
-                    <span className="text-[8px] font-bold text-muted-foreground/20 self-center">
-                      +{domain.concepts.length - 5}
-                    </span>
-                  )}
+              <div className="pt-2 space-y-4">
+                <div className="space-y-2">
+                  <h5 className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/30">Visão Geral do Domínio</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {domain.concepts.map(c => (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelectedConcept(c)}
+                        className={cn(
+                          "w-2 h-2 rounded-full transition-all hover:scale-150 ring-offset-background hover:ring-2 hover:ring-primary/20",
+                          !c.memory || c.memory.reps === 0 ? "bg-muted/20" : 
+                          c.memory.last_result === 'incorrect' ? "bg-red-500/40" :
+                          c.memory.last_result === 'partial' ? "bg-orange-500/40" :
+                          "bg-primary/40"
+                        )}
+                        title={c.title}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-[1.5rem] bg-surface/50 border border-border/5 space-y-2">
+                  <h5 className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">Por que este estado?</h5>
+                  <p className="text-[11px] text-foreground/80 leading-relaxed font-medium">
+                    {domain.mastery.description}
+                  </p>
                 </div>
               </div>
             </CardContent>
