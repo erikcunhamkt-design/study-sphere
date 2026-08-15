@@ -92,11 +92,38 @@ export function DomainMasteryMap() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-[1.5rem] bg-surface/50 border border-border/5 space-y-2">
+                <div className="p-4 rounded-[1.5rem] bg-surface/50 border border-border/5 space-y-3">
                   <h5 className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">Por que este estado?</h5>
-                  <p className="text-[11px] text-foreground/80 leading-relaxed font-medium">
-                    {domain.mastery.description}
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-foreground font-bold leading-relaxed">
+                      {domain.mastery.description}
+                    </p>
+                    <div className="space-y-1 pt-1 border-t border-border/5">
+                      <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
+                        • {domain.metrics.evaluatedConcepts} de {domain.metrics.totalConcepts} conceitos avaliados ({( (domain.metrics.evaluatedConcepts / Math.max(domain.metrics.totalConcepts, 1)) * 100 ).toFixed(0)}%).
+                      </p>
+                      {domain.metrics.attentionConcepts > 0 && (
+                        <p className="text-[10px] text-orange-500/80 leading-relaxed font-bold">
+                          • {domain.metrics.attentionConcepts} conceito(s) com dificuldades recentes.
+                        </p>
+                      )}
+                      {domain.metrics.dueConcepts > 0 && (
+                        <p className="text-[10px] text-orange-500/60 leading-relaxed">
+                          • {domain.metrics.dueConcepts} revisão(ões) aguardando.
+                        </p>
+                      )}
+                      {domain.metrics.hasMismatch && (
+                        <p className="text-[10px] text-orange-500/80 leading-relaxed font-bold">
+                          • Alerta de excesso de confiança detectado.
+                        </p>
+                      )}
+                      {domain.metrics.avgStability > 0 && (
+                        <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
+                          • Estabilidade média: {domain.metrics.avgStability.toFixed(1)} dias.
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
