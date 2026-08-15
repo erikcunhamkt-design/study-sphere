@@ -36,10 +36,10 @@ export function ReviewSession({ concepts, onDone }: ReviewSessionProps) {
     if (!allQuestions || !concepts) return [];
     
     return concepts.map(c => {
-      const questions = allQuestions.filter(q => q.concept_id === c.concept_id && !q.is_archived);
+      if (!allQuestions) return null;
+      const questions = allQuestions.filter(q => (q as any).concept_id === c.concept_id && !q.is_archived);
       if (questions.length === 0) return null;
       
-      // Prioridade: Pergunta Livre > Múltipla Escolha (Regra 11)
       const bestQuestion = questions[0]; 
       return {
         concept: c.concept,
@@ -47,7 +47,7 @@ export function ReviewSession({ concepts, onDone }: ReviewSessionProps) {
         question: bestQuestion,
         memoryState: c
       };
-    }).filter(Boolean);
+    }).filter(Boolean) as any[];
   }, [concepts, allQuestions]);
 
   const currentItem = reviewQueue[currentIndex];
@@ -220,7 +220,7 @@ export function ReviewSession({ concepts, onDone }: ReviewSessionProps) {
             <div className="flex items-center gap-2">
                <span className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">Recuperação ativa</span>
                <span className="w-1 h-1 rounded-full bg-primary/30" />
-               <span className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">{currentItem.concept?.title || 'Conceito'}</span>
+               <span className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">{currentItem?.concept?.title || 'Conceito'}</span>
             </div>
           </div>
         </div>
@@ -244,7 +244,7 @@ export function ReviewSession({ concepts, onDone }: ReviewSessionProps) {
                <span className="text-[8px] font-black uppercase tracking-widest text-primary">Pergunta</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground leading-tight italic">
-              {currentItem.question.statement}
+              {currentItem?.question.statement}
             </h2>
             <p className="text-[10px] font-bold text-muted-foreground/20 uppercase tracking-[0.2em] italic">O que você lembra sobre isso?</p>
           </div>
