@@ -24,15 +24,18 @@ export function formatReason(type: NextActionType, context: any): string {
     case 'resume':
       return `Você parou em "${context.title}" há ${context.timeAgo}.`;
     case 'review':
-      return `${context.count} conceito${context.count > 1 ? 's estão' : ' está'} pronto para recuperação.`;
+      const delayText = context.delayDays > 0 ? ` (atraso de ${context.delayDays} dia${context.delayDays > 1 ? 's' : ''})` : '';
+      return `${context.count} conceito${context.count > 1 ? 's estão' : ' está'} pronto para recuperação${delayText}.`;
     case 'reinforce':
-      return `Este conceito teve dificuldades nas últimas recuperações.`;
+      return context.hasMismatch 
+        ? `Detectamos uma possível falha de percepção neste conceito.`
+        : `Este conceito teve dificuldades nas últimas recuperações.`;
     case 'test_memory':
-      return `Você estudou novos conceitos, mas sua memória ainda não foi avaliada.`;
+      return `Você concluiu o primeiro contato, mas ainda não testou o que reteve.`;
     case 'first_study':
-      return `Você ainda não iniciou seu primeiro conteúdo.`;
+      return `Você ainda não iniciou seu primeiro estudo em "${context.title}".`;
     case 'continue':
-      return `Você está progredindo bem em "${context.title}".`;
+      return `Você está progredindo em "${context.title}".`;
     case 'explore':
       return `Você completou seus objetivos imediatos. Que tal algo novo?`;
     case 'add_content':
