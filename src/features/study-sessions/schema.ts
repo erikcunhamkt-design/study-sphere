@@ -1,6 +1,9 @@
 import { z } from "zod";
-
-import { STUDY_METHOD_VALUES, type StudyMethod, type StudySessionDetails } from "./types";
+import { 
+  STUDY_METHOD_VALUES, 
+  type StudyMethod, 
+  type StudySessionDetails 
+} from "./types";
 
 export const studyMethodSchema = z.enum(STUDY_METHOD_VALUES);
 
@@ -40,6 +43,10 @@ export const cornellDetailsSchema = z.object({
 });
 
 export const livreDetailsSchema = z.object({
+  nota: freeText(20000).optional(),
+});
+
+export const aprenderDetailsSchema = z.object({
   nota: freeText(20000).optional(),
 });
 
