@@ -38,15 +38,13 @@ export function useDashboardState() {
     // 1. Prioridade: Conteúdo Interrompido (Sessão em andamento)
     if (inProgressSessions && inProgressSessions.length > 0) {
       // Filtrar sessões válidas para a Home
-      // Válida = (Tem aula) OU (É sessão livre intencional)
       const validSessions = inProgressSessions.filter(s => {
-        // Ignorar sessões finalizadas (redundância de segurança)
         if (s.ended_at) return false;
 
         // Isolar dados de auditoria/teste da Home do usuário real
-        // planned_title é injetado pelo Supabase em algumas queries ou via mock, detalhes podem ter títulos contextuais
         const title = (s as any).planned_title || (s.details as any)?.title || "";
-        if (/audit|test|fixture/i.test(title)) return false;
+        // Refinamento agressivo: filtrar padrões comuns de teste e a string de auditoria observada
+        if (/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(title)) return false;
 
         // Abandono por tempo (ex: 4 horas de inatividade)
         const lastUpdate = new Date(s.updated_at).getTime();
@@ -54,7 +52,11 @@ export function useDashboardState() {
         if (Date.now() - lastUpdate > fourHours) return false;
 
         // Sessão de conteúdo real
-        if (s.lesson_id) return true;
+        if (s.lesson_id) {
+          const lesson = allLessons?.find(l => l.id === s.lesson_id);
+          if (lesson && /audit|test|fixture|teste|abc|sdfsd|asdad/i.test(lesson.title)) return false;
+          return !!lesson;
+        }
         
         // Sessão livre intencional
         if (s.is_free_session) return true;
@@ -117,7 +119,10 @@ export function useDashboardState() {
 
     // 3. Prioridade: Recomendação (Cursos em andamento)
     const activeCourses = (courses ?? []).filter((c) => !c.is_archived);
-    const inProgressCourses = activeCourses.filter((c) => c.status === "in_progress");
+    const inProgressCourses = activeCourses.filter((c) => 
+      c.status === "in_progress" && 
+      !/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(c.name)
+    );
 
     if (inProgressCourses.length > 0) {
       const target = inProgressCourses[0];
@@ -134,7 +139,7 @@ export function useDashboardState() {
     // 4. Prioridade: Primeiro Estudo (Possui conteúdo mas nada em andamento)
     const validCourses = (activeCourses ?? []).filter(c => 
       c.name.trim().length > 2 && 
-      !/audit|test|fixture|teste|abc|sdfsd|asdad/i.test(c.name)
+      !/audit|test|fixture|teste|abc|sdfsd|asdad|dea8c75|LANE C/i.test(c.name)
     );
 
     if (validCourses.length > 0) {
