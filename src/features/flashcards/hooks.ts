@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import * as api from "./api";
 import type { FlashcardRating } from "./schema";
+import type { UpdateFlashcardContentInput, CreateFlashcardInput } from "./api";
 
 export function useFlashcards() {
   return useQuery({
@@ -52,7 +53,7 @@ export function useFlashcardsByDeck(deckId?: string) {
 export function useCreateFlashcard() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: api.CreateFlashcardInput) => {
+    mutationFn: async (input: CreateFlashcardInput) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Unauthorized");
       return api.createFlashcard(user.id, input);
@@ -66,7 +67,7 @@ export function useCreateFlashcard() {
 export function useUpdateFlashcardContent() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (variables: { id: string; data: api.UpdateFlashcardContentInput }) =>
+    mutationFn: (variables: { id: string; data: UpdateFlashcardContentInput }) =>
       api.updateFlashcardContent(variables.id, variables.data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["flashcards"] });
@@ -129,4 +130,3 @@ export function useFlashcardReviews(sinceIso: string) {
     },
   });
 }
-
