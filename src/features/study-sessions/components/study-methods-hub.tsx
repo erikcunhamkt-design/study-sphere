@@ -130,18 +130,19 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
 
   const recommendedMethod = METHODS.find(m => m.id === recommendedMethodId);
 
+  const hasAlternatives = useMemo(() => {
+    return METHODS.some(m => m.id !== recommendedMethodId);
+  }, [recommendedMethodId]);
+
   return (
     <div className={cn("space-y-16", className)}>
       {recommendedMethod && (
         <div className="space-y-8">
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-            </div>
-            <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-primary">
+            <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
               Dominus Recomenda
             </h3>
-            <div className="h-px flex-1 ml-2 bg-gradient-to-r from-primary/30 to-transparent" />
+            <div className="h-px flex-1 ml-2 bg-border/20" />
           </div>
 
           <button
@@ -169,74 +170,75 @@ export function StudyMethodsHub({ onSelectMethod, selectedContent, className }: 
         </div>
       )}
 
-      <div className="space-y-8">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
-              Outras formas de estudar
-            </h3>
-            <div className="h-px w-20 bg-border/20" />
+      {hasAlternatives && (
+        <div className="space-y-8">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
+                Outras formas de estudar
+              </h3>
+              <div className="h-px w-20 bg-border/20" />
+            </div>
+            
+            {!showAll && (
+              <button 
+                onClick={() => setShowAll(true)}
+                className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors flex items-center gap-1"
+              >
+                Ver todas <ChevronRight className="h-3 w-3" />
+              </button>
+            )}
           </div>
-          
-          {!showAll && METHODS.some(m => m.category !== recommendedMethod?.category && m.id !== recommendedMethodId) && (
-            <button 
-              onClick={() => setShowAll(true)}
-              className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors flex items-center gap-1"
-            >
-              Ver todas <ChevronRight className="h-3 w-3" />
-            </button>
+
+          {showAll && (
+            <div className="space-y-12 animate-in fade-in slide-in-from-top-2 duration-500">
+              {categories
+                .filter(cat => METHODS.some(m => m.category === cat.id && m.id !== recommendedMethodId))
+                .map((cat) => (
+                <div key={cat.id} className="space-y-6">
+                  <div className="flex items-center gap-2 px-2">
+                    <cat.icon className="h-3 w-3 text-muted-foreground/30" />
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/30">
+                      {cat.label}
+                    </h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {METHODS.filter(m => m.category === cat.id && m.id !== recommendedMethodId).map((method) => (
+                      <button
+                        key={method.id}
+                        onClick={() => onSelectMethod(method.id)}
+                        className="group relative flex flex-col p-5 rounded-[1.5rem] border border-border/20 bg-surface/10 text-left transition-all hover:border-primary/10 hover:bg-surface/20 active:scale-[0.98]"
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="w-10 h-10 rounded-xl bg-surface/30 border border-border/5 flex items-center justify-center text-muted-foreground/40 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+                            <method.icon className="h-5 w-5" />
+                          </div>
+                          <ChevronRight className="h-3 w-3 text-muted-foreground/5 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <h4 className="text-base font-black tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+                            {method.displayName}
+                          </h4>
+                          <p className="text-[13px] text-muted-foreground/40 leading-snug font-medium">
+                            {method.description}
+                          </p>
+                          <div className="pt-1">
+                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/10 group-hover:text-primary/30 transition-colors">
+                              Técnica: {method.title}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
-
         </div>
-
-        {showAll && (
-          <div className="space-y-12 animate-in fade-in slide-in-from-top-2 duration-500">
-            {categories
-              .filter(cat => METHODS.some(m => m.category === cat.id && m.id !== recommendedMethodId))
-              .map((cat) => (
-              <div key={cat.id} className="space-y-6">
-                <div className="flex items-center gap-2 px-2">
-                  <cat.icon className="h-3 w-3 text-muted-foreground/30" />
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/30">
-                    {cat.label}
-                  </h4>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {METHODS.filter(m => m.category === cat.id && m.id !== recommendedMethodId).map((method) => (
-                    <button
-                      key={method.id}
-                      onClick={() => onSelectMethod(method.id)}
-                      className="group relative flex flex-col p-5 rounded-[1.5rem] border border-border/20 bg-surface/10 text-left transition-all hover:border-primary/10 hover:bg-surface/20 active:scale-[0.98]"
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-surface/30 border border-border/5 flex items-center justify-center text-muted-foreground/40 group-hover:text-primary group-hover:bg-primary/5 transition-all">
-                          <method.icon className="h-5 w-5" />
-                        </div>
-                        <ChevronRight className="h-3 w-3 text-muted-foreground/5 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h4 className="text-base font-black tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
-                          {method.displayName}
-                        </h4>
-                        <p className="text-[13px] text-muted-foreground/40 leading-snug font-medium">
-                          {method.description}
-                        </p>
-                        <div className="pt-1">
-                          <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/10 group-hover:text-primary/30 transition-colors">
-                            Técnica: {method.title}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
