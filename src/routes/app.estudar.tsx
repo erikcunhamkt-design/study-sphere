@@ -1,11 +1,11 @@
 /**
- * ESTUDAR — ETAPA 1 FINALIZADA (CONGELADA)
+ * ESTUDAR — LIMPEZA FINAL APROVADA
  * 
  * Este arquivo define o Cockpit de Estudos do DominusApp.
- * A lógica de recomendação baseia-se no estado do aprendizado:
- * - NOVO -> Aprender primeiro
- * - EM ANDAMENTO -> Recuperação Ativa
- * - CONCLUÍDO -> Manutenção (Flashcards)
+ * A interface é state-driven e segue a hierarquia:
+ * 1. Contexto (Próximo Passo)
+ * 2. Recomendação Dominus (Ação Única)
+ * 3. Catálogo (Meus Estudos)
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { 
@@ -254,13 +254,9 @@ function EstudarPage() {
       {/* 2. COMO ESTUDAR (CONTEXTUAL) */}
       {selectedContent && (
         <section ref={methodsHubRef} id="metodos-selecao" className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="space-y-3">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Dominus Recomenda</h3>
-          </div>
-          
           <StudyMethodsHub onSelectMethod={setActiveMethod} selectedContent={selectedContent} />
 
-          <div className="flex justify-center pt-8">
+          <div className="flex justify-center pt-8 border-t border-border/10">
             <Button variant="ghost" onClick={() => setSelectedContent(null)} className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 hover:text-foreground">
               Escolher outro conteúdo
             </Button>
@@ -268,8 +264,8 @@ function EstudarPage() {
         </section>
       )}
 
-      {/* 3. CONTINUE (CURSOS EM ANDAMENTO) */}
-      {(priority === "recommendation" || priority === "resume" || priority === "start") && data.courses && data.courses.filter((c: any) => c.status === "in_progress" && c.id !== selectedContent?.id).length > 0 && (
+      {/* 3. CONTINUE (SESSÕES EM ANDAMENTO - APENAS SE HOUVER) */}
+      {!selectedContent && priority !== "resume" && data.courses && data.courses.filter((c: any) => c.status === "in_progress").length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
@@ -277,7 +273,7 @@ function EstudarPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.courses.filter((c: any) => c.status === "in_progress" && c.id !== selectedContent?.id).slice(0, 3).map((course: any) => (
+            {data.courses.filter((c: any) => c.status === "in_progress").slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
@@ -302,7 +298,7 @@ function EstudarPage() {
         </section>
       )}
 
-      {/* 4. MEUS ESTUDOS (TODOS OS CURSOS) */}
+      {/* 4. MEUS ESTUDOS (CATÁLOGO COMPACTO) */}
       {allCourses && allCourses.length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
@@ -310,24 +306,50 @@ function EstudarPage() {
             <span className="h-px flex-1 mx-6 bg-border/20" />
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="space-y-3">
             {allCourses.map((course: any) => (
               <button
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
                 className={cn(
-                  "group relative overflow-hidden rounded-2xl border border-border/20 bg-surface/10 p-4 text-left transition-all hover:border-primary/10 hover:bg-surface/20",
+                  "group flex items-center justify-between w-full p-4 rounded-2xl border border-border/20 bg-surface/10 text-left transition-all hover:border-primary/20 hover:bg-surface/20",
                   selectedContent?.id === course.id && "border-primary/30 bg-surface/30"
                 )}
               >
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold tracking-tight text-foreground/70 group-hover:text-foreground transition-colors truncate">
-                    {course.name}
-                  </h4>
-                  <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">
-                    <span>{course.status === 'not_started' ? 'Não iniciado' : `${course.progress?.percent || 0}%`}</span>
-                    {selectedContent?.id === course.id && <Zap className="h-2 w-2 text-primary fill-primary" />}
+                <div className="flex items-center gap-4 flex-1">
+                  <div className={cn(
+                    "w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground/40 group-hover:text-primary transition-colors",
+                    selectedContent?.id === course.id ? "bg-primary/10 text-primary" : "bg-surface/30"
+                  )}>
+                    <BookOpen className="h-4 w-4" />
                   </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+                      {course.name}
+                    </h4>
+                    <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">
+                      <span>{course.status === 'not_started' ? 'Não iniciado' : `${course.progress?.percent || 0}% Concluído`}</span>
+                      {course.last_activity_at && (
+                        <>
+                          <span className="w-1 h-1 rounded-full bg-border/40" />
+                          <span>Último estudo: {new Date(course.last_activity_at).toLocaleDateString()}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-all",
+                  selectedContent?.id === course.id 
+                    ? "bg-primary/20 text-primary" 
+                    : "opacity-0 group-hover:opacity-100 text-muted-foreground/40 hover:text-primary"
+                )}>
+                  {selectedContent?.id === course.id ? (
+                    <>Selecionado <Zap className="h-3 w-3 fill-primary" /></>
+                  ) : (
+                    <>Estudar <ChevronRight className="h-3 w-3" /></>
+                  )}
                 </div>
               </button>
             ))}
