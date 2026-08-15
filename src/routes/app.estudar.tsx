@@ -7,7 +7,7 @@
  * 2. Recomendação Dominus (Ação Única)
  * 3. Catálogo (Meus Estudos)
  */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { 
   ArrowRight, 
   Brain, 
