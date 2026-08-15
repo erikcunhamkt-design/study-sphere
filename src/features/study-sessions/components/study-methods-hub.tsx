@@ -1,3 +1,9 @@
+/**
+ * STUDY METHODS HUB — ETAPA 1 FINALIZADA (CONGELADA)
+ * 
+ * Componente estratégico para seleção de métodos de estudo.
+ * Prioriza a recomendação do Dominus e agrupa alternativas por categorias.
+ */
 import { useMemo, useState } from "react";
 import { 
   Zap, 
