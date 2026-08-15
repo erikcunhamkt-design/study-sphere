@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { mapToHumanState, checkMetacognitiveMismatch } from "../utils/memory-interpretation";
 import type { RecallResult } from "@/features/study-sessions/types";
-import { startOfDayIso } from "@/lib/date-utils";
+import { startOfDayIso } from "@/lib/timezone";
 
 export function usePerformanceDashboard() {
   const { user } = useAuth();
@@ -53,7 +53,7 @@ export function usePerformanceDashboard() {
       // Process memory states
       const now = new Date();
       const interpretedConcepts = (memoryStates || []).map(ms => {
-        const isDue = new Date(ms.due) <= now;
+        const isDue = ms.due ? new Date(ms.due) <= now : false;
         const humanState = mapToHumanState({
           reps: ms.reps || 0,
           stability: ms.stability || 0,
@@ -77,9 +77,9 @@ export function usePerformanceDashboard() {
       // Aggregate Summary
       const summary = {
         totalConcepts: interpretedConcepts.length,
-        evaluatedMemories: interpretedConcepts.filter(c => c.reps > 0).length,
+        evaluatedMemories: interpretedConcepts.filter(c => (c.reps || 0) > 0).length,
         dueReviews: interpretedConcepts.filter(c => c.isDue).length,
-        inDayReviews: interpretedConcepts.filter(c => c.reps > 0 && !c.isDue).length,
+        inDayReviews: interpretedConcepts.filter(c => (c.reps || 0) > 0 && !c.isDue).length,
       };
 
       // Attention Section
@@ -104,9 +104,9 @@ export function usePerformanceDashboard() {
       const next7Days = startOfDayIso(next7DaysLimit);
 
       const futureReviews = {
-        today: interpretedConcepts.filter(c => c.due <= today).length,
-        tomorrow: interpretedConcepts.filter(c => c.due > today && c.due <= tomorrow).length,
-        next7Days: interpretedConcepts.filter(c => c.due > today && c.due <= next7Days).length,
+        today: interpretedConcepts.filter(c => c.due && c.due <= today).length,
+        tomorrow: interpretedConcepts.filter(c => c.due && c.due > today && c.due <= tomorrow).length,
+        next7Days: interpretedConcepts.filter(c => c.due && c.due > today && c.due <= next7Days).length,
       };
 
       // Study Progress
@@ -115,8 +115,7 @@ export function usePerformanceDashboard() {
         totalTimeMinutes: Math.floor(totalTimeSeconds / 60),
         completedSessions: sessions.length,
         startedConcepts: interpretedConcepts.length,
-        // Assuming completed if stability is high or reps > 5 for now as a simple proxy
-        completedConcepts: interpretedConcepts.filter(c => c.stability > 10).length,
+        completedConcepts: interpretedConcepts.filter(c => (c.stability || 0) > 10).length,
       };
 
       return {
@@ -127,7 +126,7 @@ export function usePerformanceDashboard() {
         futureReviews,
         studyProgress,
         hasData: interpretedConcepts.length > 0 || sessions.length > 0,
-        hasEvaluations: interpretedConcepts.some(c => c.reps > 0)
+        hasEvaluations: interpretedConcepts.some(c => (c.reps || 0) > 0)
       };
     }
   });
