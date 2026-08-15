@@ -75,8 +75,15 @@ const METHODS: MethodOption[] = [
     description: "Gestão de tempo: foco profundo com intervalos.",
     icon: Clock,
     category: "tempo"
+  },
+  {
+    id: "livre",
+    title: "Livre",
+    displayName: "Sessão Livre",
+    description: "Estudo flexível sem método pré-definido.",
+    icon: Clock,
+    category: "tempo"
   }
-  // Simulados removidos temporariamente por falta de infra de questões se não houver
 ];
 
 interface StudyMethodsHubProps {
