@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
-import { Brain, ArrowRight, Clock, CheckCircle2, Sparkles, BookOpen } from "lucide-react"
+import { Brain, ArrowRight, Clock, CheckCircle2, Sparkles, BookOpen, RefreshCcw } from "lucide-react"
 import { useState } from "react"
 import { ReviewSession } from "@/features/study-sessions/components/review/ReviewSession"
 import { useReviewSemanticState } from "@/features/study-sessions/hooks.semantic"
@@ -72,8 +72,8 @@ function RevisarPage() {
         </div>
       ) : state === "new_user" ? (
         <div className="py-16 text-center space-y-8 animate-in fade-in duration-700">
-           <div className="w-20 h-20 rounded-[2rem] bg-primary/5 border border-border/10 flex items-center justify-center mx-auto text-primary/40">
-             <BookOpen className="w-10 h-10" />
+           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
+             <BookOpen className="w-8 h-8" />
            </div>
            <div className="space-y-3">
              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Comece sua memória</h2>
@@ -87,8 +87,8 @@ function RevisarPage() {
         </div>
       ) : state === "no_recovery" ? (
         <div className="py-16 text-center space-y-8 animate-in fade-in duration-700">
-           <div className="w-20 h-20 rounded-[2rem] bg-magenta-500/5 border border-magenta-500/10 flex items-center justify-center mx-auto text-magenta-500/40">
-             <Sparkles className="w-10 h-10" />
+           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
+             <RefreshCcw className="w-8 h-8" />
            </div>
            <div className="space-y-3">
              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Sua memória ainda não foi avaliada</h2>
@@ -102,8 +102,8 @@ function RevisarPage() {
         </div>
       ) : (
         <div className="py-16 text-center space-y-8 animate-in fade-in duration-700">
-           <div className="w-20 h-20 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-center mx-auto text-emerald-500/40">
-             <CheckCircle2 className="w-10 h-10" />
+           <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto text-emerald-500">
+             <CheckCircle2 className="w-8 h-8" />
            </div>
            <div className="space-y-3">
              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground uppercase">Tudo em dia</h2>
