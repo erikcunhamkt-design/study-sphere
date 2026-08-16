@@ -33,9 +33,7 @@ export const Route = createFileRoute('/')({
 
 function LandingPage() {
   const { user, loading } = useAuth()
-  const [mounted, setMounted] = import.meta.env.SSR 
-    ? [false, () => {}] 
-    : React.useState(false)
+  const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
     setMounted(true)
