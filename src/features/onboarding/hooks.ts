@@ -4,17 +4,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-preferences";
 import { isOnboardingDone, maxState } from "./types";
+import { useUserLifecycle } from "./use-user-lifecycle";
 import type { OnboardingEvent, OnboardingState } from "./types";
 
 export function useOnboarding() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const { data: profile, isLoading } = useProfile();
+  const { data: profile, isLoading: loadingProfile } = useProfile();
+  const { hasRealActivity, isLoading: loadingLifecycle } = useUserLifecycle();
+  const isLoading = loadingProfile || loadingLifecycle;
 
   const rawState = ((profile as any)?.onboarding_state as OnboardingState) ?? "new_user";
   // Usuários antigos (anteriores a esta experiência) não devem ser reintroduzidos.
-  const state: OnboardingState =
-    rawState === "new_user" && profile?.onboarding_completed ? "skipped" : rawState;
+  // Precedência: atividade real do usuário vence qualquer flag de perfil.
+  const state: OnboardingState = hasRealActivity
+    ? "skipped"
+    : rawState === "new_user" && profile?.onboarding_completed
+      ? "skipped"
+      : rawState;
 
   const track = useMutation({
     mutationFn: async (input: { event: OnboardingEvent; metadata?: Record<string, unknown> }) => {
