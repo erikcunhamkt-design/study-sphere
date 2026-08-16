@@ -38,7 +38,7 @@ export function useProfile() {
       if (!user) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, avatar_url, timezone, onboarding_completed")
+        .select("id, full_name, avatar_url, timezone, onboarding_completed, onboarding_state, onboarding_started_at, first_cycle_completed_at")
         .eq("id", user.id)
         .maybeSingle();
       if (error) throw error;
