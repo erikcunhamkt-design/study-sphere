@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowRight, CalendarClock, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,14 @@ interface FirstCycleCompleteProps {
  * sem termos técnicos (nada de FSRS, estabilidade ou dificuldade).
  */
 export function FirstCycleComplete({ nextDue, onFinish }: FirstCycleCompleteProps) {
+  const [finishing, setFinishing] = useState(false);
   const when = formatNextDue(nextDue);
 
   return (
-    <div className="max-w-xl mx-auto space-y-8 py-10 text-center">
+    <section
+      aria-labelledby="primeiro-ciclo-titulo"
+      className="max-w-xl mx-auto space-y-8 py-10 text-center"
+    >
       <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
         <CheckCircle2 className="h-6 w-6" />
       </div>
@@ -26,8 +31,8 @@ export function FirstCycleComplete({ nextDue, onFinish }: FirstCycleCompleteProp
         <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
           Primeira evidência registrada
         </p>
-        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-          Você acabou de completar seu primeiro ciclo.
+        <h2 id="primeiro-ciclo-titulo" className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
+          Você acabou de criar sua primeira memória.
         </h2>
         <p className="text-sm md:text-base text-muted-foreground font-medium leading-relaxed">
           Estudar cria contato. Tentar lembrar cria memória. A partir de agora o Dominus organiza
@@ -39,7 +44,7 @@ export function FirstCycleComplete({ nextDue, onFinish }: FirstCycleCompleteProp
         <CalendarClock className="h-4 w-4 text-primary mt-0.5 shrink-0" />
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
-            Próxima recuperação
+            Próxima recuperação prevista
           </p>
           <p className="text-sm text-foreground font-bold">
             {when
@@ -50,11 +55,16 @@ export function FirstCycleComplete({ nextDue, onFinish }: FirstCycleCompleteProp
       </div>
 
       <Button
-        onClick={onFinish}
+        onClick={() => {
+          if (finishing) return;
+          setFinishing(true);
+          onFinish();
+        }}
+        disabled={finishing}
         className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-black"
       >
         Voltar para meu espaço <ArrowRight className="ml-2 h-4 w-4" />
       </Button>
-    </div>
+    </section>
   );
 }

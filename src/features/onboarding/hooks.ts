@@ -50,8 +50,13 @@ export function useOnboarding() {
     },
   });
 
-  /** Avança o estado e registra o evento correspondente numa única chamada. */
+  /**
+   * Avança o estado e registra o evento correspondente numa única chamada.
+   * Idempotente: se o estado já passou por esse ponto (reload, nova tentativa),
+   * nada é gravado — evita eventos duplicados.
+   */
   async function reach(next: OnboardingState, event?: OnboardingEvent) {
+    if (maxState(state, next) === state) return;
     try {
       await advance.mutateAsync(next);
       if (event) await track.mutateAsync({ event });
@@ -112,4 +117,16 @@ export function formatNextDue(due: string | null | undefined): string | null {
   if (days < 30) return `em ${days} dias`;
   const months = Math.round(days / 30);
   return months <= 1 ? "em cerca de 1 mês" : `em cerca de ${months} meses`;
+}
+
+/**
+ * Regra 2 da auditoria de UX: enquanto o bloco de boas-vindas está visível,
+ * a Home não deve mostrar uma segunda ação primária concorrente.
+ */
+export function useOnboardingHomeVisible() {
+  const { state, isActive } = useOnboarding();
+  return (
+    isActive &&
+    (state === "new_user" || state === "onboarding_started" || state === "has_content")
+  );
 }

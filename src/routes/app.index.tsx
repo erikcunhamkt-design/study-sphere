@@ -14,6 +14,7 @@ import {
 import { useMemo, useState } from "react";
 import { useNextBestAction } from "@/features/next-action/hooks/use-next-best-action";
 import { OnboardingHome } from "@/features/onboarding/components/onboarding-home";
+import { useOnboardingHomeVisible } from "@/features/onboarding/hooks";
 import { 
   NextStepAction, 
   DayProgress, 
@@ -127,6 +128,7 @@ function DashboardPage() {
   const { data: todaySeconds } = useStudySessionSecondsSince(sinceIso);
   
   const greeting = greetingForNow(profile?.timezone);
+  const onboardingVisible = useOnboardingHomeVisible();
   const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
 
   const studyMinutes = Math.round((todaySeconds ?? 0) / 60);
@@ -160,7 +162,8 @@ function DashboardPage() {
         <p className="text-lg md:text-xl text-muted-foreground/40 font-medium tracking-tight">O que vamos aprender hoje?</p>
       </div>
 
-      {/* 1. HERO — AÇÃO PRINCIPAL */}
+      {/* 1. HERO — AÇÃO PRINCIPAL (oculto durante o bloco de boas-vindas: uma só ação primária) */}
+      {!onboardingVisible && (
       <div className="w-full">
         <NextStepAction
           title={action.title.toUpperCase()}
@@ -211,6 +214,7 @@ function DashboardPage() {
           secondaryActionLabel={action.type === 'resume' && action.metadata?.session?.is_free_session ? "Encerrar sessão" : undefined}
         />
       </div>
+      )}
 
       {/* 2. SEU DIA & 3. SEU DOMÍNIO */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">

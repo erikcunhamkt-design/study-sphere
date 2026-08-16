@@ -50,21 +50,21 @@ export function OnboardingHome({ onAddContent }: OnboardingHomeProps) {
 
   if (state === "new_user") {
     return (
-      <section className="rounded-[2rem] border border-primary/20 bg-surface/30 p-6 md:p-8 space-y-6">
+      <section aria-labelledby="boas-vindas-titulo" className="rounded-[2rem] border border-primary/20 bg-surface/30 p-6 md:p-8 space-y-6">
         <div className="flex items-start gap-4">
-          <div className="p-3 rounded-2xl bg-primary/10 text-primary shrink-0">
+          <div className="p-3 rounded-2xl bg-primary/10 text-primary shrink-0" aria-hidden="true">
             <Brain className="h-5 w-5" />
           </div>
           <div className="space-y-2">
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/40">
               Bem-vindo ao Dominus
             </p>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-              Você não precisa apenas estudar. Precisa lembrar.
+            <h2 id="boas-vindas-titulo" className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+              Um sistema de aprendizagem e memória.
             </h2>
             <p className="text-sm md:text-base text-muted-foreground font-medium leading-relaxed max-w-xl">
-              O Dominus acompanha o que você consegue recuperar e usa isso para decidir quando
-              revisar novamente.
+              Você estuda, testa o que ficou e o Dominus decide quando revisar. Comece pelo seu
+              primeiro estudo.
             </p>
           </div>
         </div>

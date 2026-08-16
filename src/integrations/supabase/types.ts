@@ -71,6 +71,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "cognitive_evidences_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "cognitive_evidences_lesson_id_fkey"
             columns: ["lesson_id"]
             isOneToOne: false
