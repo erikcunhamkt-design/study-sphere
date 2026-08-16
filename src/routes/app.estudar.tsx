@@ -409,7 +409,7 @@ function EstudarPage() {
       )}
 
       {/* 3. CONTINUE (SESSÕES EM ANDAMENTO - APENAS SE HOUVER) */}
-      {!selectedContent && priority !== "resume" && data.courses && data.courses.filter((c: any) => c.status === "in_progress").length > 0 && (
+      {!selectedContent && priority !== "resume" && inProgressCourses.length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
