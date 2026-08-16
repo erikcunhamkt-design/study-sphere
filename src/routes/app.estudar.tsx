@@ -182,12 +182,34 @@ function EstudarPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-4">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         <p className="text-sm text-muted-foreground animate-pulse">Organizando seus estudos...</p>
       </div>
     );
   }
+
+  if (isCoursesError || hasEngineError) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-8 px-4 md:px-0">
+        <header className="space-y-3">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Estudar</h1>
+        </header>
+        <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 space-y-4">
+          <h2 className="text-2xl font-black tracking-tighter">Não foi possível carregar seus estudos</h2>
+          <p className="text-sm font-medium text-muted-foreground/60">Tente novamente.</p>
+          <Button
+            onClick={() => refetchCourses()}
+            size="lg"
+            className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold"
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-16 pb-20 px-4 md:px-0">
