@@ -11,9 +11,10 @@ export function useOnboarding() {
   const qc = useQueryClient();
   const { data: profile, isLoading } = useProfile();
 
+  const rawState = ((profile as any)?.onboarding_state as OnboardingState) ?? "new_user";
+  // Usuários antigos (anteriores a esta experiência) não devem ser reintroduzidos.
   const state: OnboardingState =
-    ((profile as any)?.onboarding_state as OnboardingState) ??
-    (profile?.onboarding_completed ? "first_cycle_completed" : "new_user");
+    rawState === "new_user" && profile?.onboarding_completed ? "skipped" : rawState;
 
   const track = useMutation({
     mutationFn: async (input: { event: OnboardingEvent; metadata?: Record<string, unknown> }) => {
