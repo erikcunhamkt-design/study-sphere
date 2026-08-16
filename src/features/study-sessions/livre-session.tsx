@@ -187,6 +187,9 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
       await finishSession.mutateAsync(details);
       toast.success(method === "aprender" ? "Primeiro contato concluído!" : "Sessão concluída");
       setIsFinished(true);
+      if (onboarding.isActive && method === "aprender") {
+        void onboarding.reach("first_contact_completed", "first_contact_completed");
+      }
     } catch (err) {
       console.error("[study-sessions] falha ao concluir sessão", err);
       toast.error("Não foi possível concluir a sessão");
