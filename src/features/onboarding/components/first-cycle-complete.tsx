@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowRight, CalendarClock, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ interface FirstCycleCompleteProps {
  * sem termos técnicos (nada de FSRS, estabilidade ou dificuldade).
  */
 export function FirstCycleComplete({ nextDue, onFinish }: FirstCycleCompleteProps) {
+  const [finishing, setFinishing] = useState(false);
   const when = formatNextDue(nextDue);
 
   return (
@@ -53,7 +55,12 @@ export function FirstCycleComplete({ nextDue, onFinish }: FirstCycleCompleteProp
       </div>
 
       <Button
-        onClick={onFinish}
+        onClick={() => {
+          if (finishing) return;
+          setFinishing(true);
+          onFinish();
+        }}
+        disabled={finishing}
         className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-black"
       >
         Voltar para meu espaço <ArrowRight className="ml-2 h-4 w-4" />
