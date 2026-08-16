@@ -339,7 +339,58 @@ function EstudarPage() {
               </Button>
             </div>
           </div>
-        ) : null}
+        ) : allCourses.length > 0 ? (
+          /* FALLBACK CONTEXTUAL: há conteúdo, nenhuma urgência (all_clear / explore / metadata ausente) */
+          <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 transition-all hover:border-primary/20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+              <div className="space-y-4">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+                  <Zap className="h-3 w-3" /> {action.type === 'all_clear' ? 'TUDO EM DIA' : 'SUA PRÓXIMA AÇÃO'}
+                </span>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tighter leading-tight max-w-xl">
+                  {action.description || "Escolha um conteúdo para estudar."}
+                </h2>
+                {action.reason && (
+                  <p className="text-sm font-medium text-muted-foreground/60">{action.reason}</p>
+                )}
+              </div>
+              <Button
+                onClick={() => {
+                  const target = inProgressCourses[0] ?? allCourses[0];
+                  handleContentSelect(target);
+                }}
+                size="lg"
+                className="h-14 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-black shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)]"
+              >
+                {inProgressCourses.length > 0 ? "Continuar estudando" : "Escolher conteúdo"}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* FALLBACK FINAL: sem conteúdo algum */
+          <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-12 text-center transition-all hover:border-primary/20">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
+            <div className="relative z-10 space-y-6">
+              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-2">
+                <Zap className="h-8 w-8 fill-primary/20" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black tracking-tighter">Comece aqui</h2>
+                <p className="text-muted-foreground/60 max-w-md mx-auto font-medium">
+                  Adicione seu primeiro conteúdo para começar a construir sua memória com o Dominus.
+                </p>
+              </div>
+              <Button
+                onClick={() => setIsAddDialogOpen(true)}
+                size="lg"
+                className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold"
+              >
+                Adicionar conteúdo <Plus className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* 2. COMO ESTUDAR (CONTEXTUAL) */}
