@@ -55,7 +55,7 @@ Conceitos que apresentam:
 ## 4. Performance e Segurança
 - **Queries**: Agregação em memória após fetch único de `memory_states` para evitar N+1.
 - **Segurança**: Filtro obrigatório por `user_id` e `is_test_data = false`. Usuários nunca acessam estados de memória de terceiros.
-- **Consistência**: O hook `useDomainModel` é a única fonte de verdade para a Home (Cockpit) e Dashboard de Desempenho.
+- **Consistência**: O hook `useDomainModel` é a única fonte de verdade para a Home e Dashboard de Desempenho.
 
 ## 5. Restrições
 1. **NÃO CRIAR DOMAIN SCORE**: Proibido exibir porcentagens 0-100 para domínio.

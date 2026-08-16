@@ -6,7 +6,7 @@ type: reference
 # Dominus Navigation: Arquitetura e Sidebar
 
 ## Diagnóstico e Visão
-A sidebar não é um simples menu; é a **arquitetura mental do Dominus**. Ela deve transformar o app de um dashboard genérico em um **cockpit de aprendizagem**.
+A sidebar não é um simples menu; é a **arquitetura mental do Dominus**. Ela deve transformar o app de um dashboard genérico em um **guia de aprendizagem**.
 
 ## Princípios de Navegação
 - **Arquitetura Lógica**: APRENDER → CONTEÚDO → ORGANIZAR → PROGRESSO.
@@ -17,7 +17,7 @@ A sidebar não é um simples menu; é a **arquitetura mental do Dominus**. Ela d
 ## Nova Arquitetura de Sidebar
 
 ### 1. PRINCIPAL
-- **Início**: Ponto de partida e cockpit.
+- **Início**: Ponto de partida e visão geral.
 
 ### 2. APRENDER (O que eu faço agora)
 - **Estudar**: Sessão de estudo, recomendações, próximo conteúdo.
