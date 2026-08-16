@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNextBestAction } from "@/features/next-action/hooks/use-next-best-action";
+import { OnboardingHome } from "@/features/onboarding/components/onboarding-home";
 import { 
   NextStepAction, 
   DayProgress, 
