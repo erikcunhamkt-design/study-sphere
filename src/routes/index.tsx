@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Brain, ArrowRight, Sparkles, BookOpen, Layers, Target, Clock, RefreshCcw, CheckCircle2, Play } from 'lucide-react'
@@ -32,8 +33,19 @@ export const Route = createFileRoute('/')({
 
 function LandingPage() {
   const { user, loading } = useAuth()
+  const [mounted, setMounted] = import.meta.env.SSR 
+    ? [false, () => {}] 
+    : React.useState(false)
 
-  if (loading) return null;
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Se estiver carregando auth ou não estiver montado no cliente, 
+  // renderizamos o estado deslogado para o SSR/Initial Hydration.
+  // Isso evita o mismatch quando o usuário já está logado no localStorage.
+  const showLoggedIn = mounted && !loading && !!user
+
 
 
 
@@ -66,8 +78,8 @@ function LandingPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-700">
               <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-black tracking-widest text-[11px] uppercase shadow-lg shadow-primary/20 group transition-all hover:scale-[1.02] active:scale-[0.98]">
-                <Link to={user ? "/app" : "/cadastro"}>
-                  {user ? "Acessar meu cockpit" : "Começar gratuitamente"}
+                <Link to={showLoggedIn ? "/app" : "/cadastro"}>
+                  {showLoggedIn ? "Acessar meu cockpit" : "Começar gratuitamente"}
                   <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -269,8 +281,8 @@ function LandingPage() {
             Comece a construir uma memória de verdade hoje mesmo.
           </p>
           <Button asChild size="lg" className="h-16 px-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-black tracking-widest text-[12px] uppercase shadow-xl shadow-primary/20 relative z-10 transition-all hover:scale-[1.05] active:scale-[0.98]">
-            <Link to={user ? "/app" : "/cadastro"}>
-              Começar gratuitamente →
+            <Link to={showLoggedIn ? "/app" : "/cadastro"}>
+              {showLoggedIn ? "Acessar cockpit →" : "Começar gratuitamente →"}
             </Link>
           </Button>
         </div>
