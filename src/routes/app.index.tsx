@@ -128,6 +128,7 @@ function DashboardPage() {
   const { data: todaySeconds } = useStudySessionSecondsSince(sinceIso);
   
   const greeting = greetingForNow(profile?.timezone);
+  const onboardingVisible = useOnboardingHomeVisible();
   const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "estudante";
 
   const studyMinutes = Math.round((todaySeconds ?? 0) / 60);
