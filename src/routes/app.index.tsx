@@ -213,6 +213,7 @@ function DashboardPage() {
           secondaryActionLabel={action.type === 'resume' && action.metadata?.session?.is_free_session ? "Encerrar sessão" : undefined}
         />
       </div>
+      )}
 
       {/* 2. SEU DIA & 3. SEU DOMÍNIO */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
