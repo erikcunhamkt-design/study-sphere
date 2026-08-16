@@ -1,7 +1,7 @@
 /**
  * ESTUDAR — LIMPEZA FINAL APROVADA
  * 
- * Este arquivo define o Cockpit de Estudos do DominusApp.
+ * Este arquivo define o Hub de Estudos do DominusApp.
  * A interface é state-driven e segue a hierarquia:
  * 1. Contexto (Próximo Passo)
  * 2. Recomendação Dominus (Ação Única)
@@ -155,7 +155,7 @@ function EstudarPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <p className="text-sm text-muted-foreground animate-pulse">Organizando cockpit...</p>
+        <p className="text-sm text-muted-foreground animate-pulse">Organizando seus estudos...</p>
       </div>
     );
   }
