@@ -6,11 +6,11 @@ type: reference
 # Dominus Intelligence: Diretrizes Estratégicas
 
 ## Visão do Produto
-O DominusApp não é apenas um gerenciador de cursos. É um **cockpit inteligente de aprendizagem**.
+O DominusApp não é apenas um gerenciador de cursos. É um **guia inteligente de aprendizagem**.
 > O Dominus sabe o que você deveria estudar, quando deveria revisar e onde estão suas maiores lacunas de conhecimento.
 
 ## Princípios de UX/UI
-- ** Cockpit vs. Dashboard**: Não mostre apenas informações; oriente a ação imediata.
+- **Ação vs. Informação**: Não mostre apenas informações; oriente a ação imediata.
 - **Hierarquia de Valor**:
   1. **AÇÃO**: O que fazer agora?
   2. **MEMÓRIA**: O que revisar?

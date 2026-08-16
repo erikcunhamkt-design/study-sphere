@@ -33,7 +33,7 @@ export function MarketingHeader() {
           <div className="flex items-center gap-4 ml-4">
             {showAuthLinks ? (
               <Button asChild className="h-10 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/10">
-                <Link to="/app">MEU COCKPIT</Link>
+                <Link to="/app">MEU ESPAÇO</Link>
               </Button>
             ) : (
               <>
@@ -66,7 +66,7 @@ export function MarketingHeader() {
         <hr className="border-border/40" />
         {showAuthLinks ? (
           <Button asChild className="h-12 w-full rounded-full bg-primary text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/10">
-            <Link to="/app" onClick={() => setIsMenuOpen(false)}>MEU COCKPIT</Link>
+            <Link to="/app" onClick={() => setIsMenuOpen(false)}>MEU ESPAÇO</Link>
           </Button>
         ) : (
           <div className="flex flex-col gap-4">

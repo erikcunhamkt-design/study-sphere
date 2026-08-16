@@ -7,8 +7,10 @@
 - RLS enabled on all tables, `service_role` never in client.
 - Timezone-aware: all date logic uses `profile.timezone` via `startOfDayIso`.
 - No IA in core study features (see DECISAO_IA.md).
+- Never use the word "cockpit" in user-facing UI, landing page, or marketing copy; use "seu espaço", "hub de estudos", or "ponto de partida" instead.
 
 ## Memories
 - [Phase 06 Plan](mem://features/phase-06-plan) — Study schedule, calendar, and planned revisions.
 - [Dominus Intelligence](mem://reference/dominus-intelligence) — Strategic vision and cognitive principles.
 - [Dominus Navigation](mem://reference/dominus-navigation) — Sidebar architecture and navigation flow.
+- [No cockpit term](mem://constraints/no-cockpit-term) — Constraint on user-facing copy.

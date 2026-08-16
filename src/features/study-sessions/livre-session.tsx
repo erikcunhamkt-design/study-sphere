@@ -122,7 +122,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
       return;
     }
 
-    // Caso 2: Temos apenas o curso (clicou em "Aprender Primeiro" no cockpit)
+    // Caso 2: Temos apenas o curso (clicou em "Aprender Primeiro" no hub de estudos)
     if (initialCourseId && !lessonId) {
       if (courseLessons && courseLessons.length > 0) {
         const firstActiveLesson = courseLessons.find(l => !l.is_archived);
@@ -268,7 +268,7 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
               onClick={onDone}
               className="text-muted-foreground font-black uppercase tracking-widest text-[11px] hover:text-foreground transition-colors"
             >
-              Voltar ao Cockpit
+              Voltar aos estudos
             </Button>
           </div>
         </div>

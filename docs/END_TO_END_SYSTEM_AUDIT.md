@@ -25,7 +25,7 @@ Este documento registra a execução do plano de auditoria sistêmica para valid
 
 ### SC-03: Primeiro Contato (Aprender)
 *   **Ação:** Executar sessão de aprendizagem completa.
-*   **Resultado Esperado:** Sessão concluída, CTA "Testar Memória" ativo no cockpit de feedback.
+*   **Resultado Esperado:** Sessão concluída, CTA "Testar Memória" ativo na tela de feedback.
 *   **Status:** VALIDADO. O componente `LivreSession` bloqueia conclusão sem material e transiciona corretamente para o hub de feedback pós-sessão.
 
 ### SC-04: Primeira Recuperação (Test Memory)
@@ -53,7 +53,7 @@ Este documento registra a execução do plano de auditoria sistêmica para valid
 ## 2. Inconsistências Encontradas & Correções
 *   **SSR Mismatch:** Corrigido guarda de hidratação na Landing Page para evitar flash de estado logado.
 *   **Schema Sync:** Identificada disparidade em nomes de colunas (`statement` vs `prompt`, `lesson_documents` vs `lesson_materials`). Código alinhado com o banco real.
-*   **UX Cockpit:** Refinamento de seletores para automação; botões de cockpit consolidados com labels fixos ("Concluir Primeiro Contato").
+*   **UX:** Refinamento de seletores para automação; botões de ação consolidados com labels fixos ("Concluir Primeiro Contato").
 *   **Next Action:** Ajustada prioridade P0 para sessões de "Aprender" não finalizadas (limite 4h).
 
 ---

@@ -79,7 +79,7 @@ function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-700">
               <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-black tracking-widest text-[11px] uppercase shadow-lg shadow-primary/20 group transition-all hover:scale-[1.02] active:scale-[0.98]">
                 <Link to={showLoggedIn ? "/app" : "/cadastro"}>
-                  {showLoggedIn ? "Acessar meu cockpit" : "Começar gratuitamente"}
+                  {showLoggedIn ? "Acessar meu espaço" : "Começar gratuitamente"}
                   <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -243,7 +243,7 @@ function LandingPage() {
                 <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="p-8 h-full flex flex-col justify-end bg-gradient-to-t from-background/90 to-transparent">
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black tracking-tight">Cockpit Inteligente</h3>
+                    <h3 className="text-xl font-black tracking-tight">Seu ponto de partida</h3>
                     <p className="text-sm text-muted-foreground font-medium">Prioridades dinâmicas que respondem "O que eu deveria fazer agora?"</p>
                   </div>
                 </div>
@@ -282,7 +282,7 @@ function LandingPage() {
           </p>
           <Button asChild size="lg" className="h-16 px-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-black tracking-widest text-[12px] uppercase shadow-xl shadow-primary/20 relative z-10 transition-all hover:scale-[1.05] active:scale-[0.98]">
             <Link to={showLoggedIn ? "/app" : "/cadastro"}>
-              {showLoggedIn ? "Acessar cockpit →" : "Começar gratuitamente →"}
+              {showLoggedIn ? "Acessar meu espaço →" : "Começar gratuitamente →"}
             </Link>
           </Button>
         </div>
