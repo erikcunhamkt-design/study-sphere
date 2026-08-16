@@ -14,6 +14,7 @@ import {
 import { useMemo, useState } from "react";
 import { useNextBestAction } from "@/features/next-action/hooks/use-next-best-action";
 import { OnboardingHome } from "@/features/onboarding/components/onboarding-home";
+import { useOnboardingHomeVisible } from "@/features/onboarding/hooks";
 import { 
   NextStepAction, 
   DayProgress, 
@@ -160,7 +161,8 @@ function DashboardPage() {
         <p className="text-lg md:text-xl text-muted-foreground/40 font-medium tracking-tight">O que vamos aprender hoje?</p>
       </div>
 
-      {/* 1. HERO — AÇÃO PRINCIPAL */}
+      {/* 1. HERO — AÇÃO PRINCIPAL (oculto durante o bloco de boas-vindas: uma só ação primária) */}
+      {!onboardingVisible && (
       <div className="w-full">
         <NextStepAction
           title={action.title.toUpperCase()}

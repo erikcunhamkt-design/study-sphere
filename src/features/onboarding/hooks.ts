@@ -118,3 +118,15 @@ export function formatNextDue(due: string | null | undefined): string | null {
   const months = Math.round(days / 30);
   return months <= 1 ? "em cerca de 1 mês" : `em cerca de ${months} meses`;
 }
+
+/**
+ * Regra 2 da auditoria de UX: enquanto o bloco de boas-vindas está visível,
+ * a Home não deve mostrar uma segunda ação primária concorrente.
+ */
+export function useOnboardingHomeVisible() {
+  const { state, isActive } = useOnboarding();
+  return (
+    isActive &&
+    (state === "new_user" || state === "onboarding_started" || state === "has_content")
+  );
+}
