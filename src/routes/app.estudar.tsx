@@ -35,6 +35,8 @@ import { RecordacaoAtivaHub } from "@/features/study-sessions/recordacao-ativa-h
 import { AddContentDialog } from "@/routes/app.index";
 import { StudyMethodsHub } from "@/features/study-sessions/components/study-methods-hub";
 import { COURSE_STATUS_LABELS } from "@/features/studies/utils";
+import { useAllCourses } from "@/features/studies/hooks/use-courses";
+import { filterProductionEligible } from "@/lib/eligibility";
 
 export const Route = createFileRoute("/app/estudar")({
   validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; courseId?: string; mode?: "review" | "training" } => {
