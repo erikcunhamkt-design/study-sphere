@@ -48,7 +48,7 @@ export function useDomainModel() {
 
       if (msError) throw msError;
 
-      const msMap = new Map(
+      const msMap = new Map<string, any>(
         safeArray<any>(memoryStates, "domain.memory_states")
           .filter((ms) => {
             if (!ms?.concept_id) {
@@ -57,12 +57,12 @@ export function useDomainModel() {
             }
             return true;
           })
-          .map((ms) => [ms.concept_id, ms]),
+          .map((ms) => [ms.concept_id, ms] as [string, any]),
       );
       const now = new Date();
 
       // 3. Process each area
-      const domainMap = areas.map(area => {
+      const domainMap = areas.map((area: any) => {
         const allConcepts: any[] = [];
         
         // Safely traverse the hierarchy (ignora elos inválidos e arquivados)
