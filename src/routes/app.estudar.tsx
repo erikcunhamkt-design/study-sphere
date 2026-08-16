@@ -417,7 +417,7 @@ function EstudarPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.courses.filter((c: any) => c.status === "in_progress").slice(0, 3).map((course: any) => (
+            {inProgressCourses.slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
