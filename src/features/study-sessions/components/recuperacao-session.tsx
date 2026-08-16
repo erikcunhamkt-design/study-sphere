@@ -23,6 +23,9 @@ import { useLessonDocument } from "@/features/lesson-editor/hooks";
 import { formatSeconds } from "../format";
 import { cn } from "@/lib/utils";
 import type { StudySessionRow, RecuperacaoDetails, RecallResult } from "../types";
+import { useOnboarding, useNextDueForQuestion } from "@/features/onboarding/hooks";
+import { FirstRecallHint } from "@/features/onboarding/components/first-recall-hint";
+import { FirstCycleComplete } from "@/features/onboarding/components/first-cycle-complete";
 
 interface RecuperacaoSessionProps {
   lessonId: string;
@@ -49,6 +52,12 @@ const RESULT_MAP: Record<ConfidenceLevel, RecallResult> = {
 
 
 export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession }: RecuperacaoSessionProps) {
+  // Primeira experiência guiada: micro-orientação + fechamento do primeiro ciclo.
+  const onboarding = useOnboarding();
+  const [firstQuestionId, setFirstQuestionId] = useState<string | undefined>(undefined);
+  const { data: nextDue } = useNextDueForQuestion(
+    onboarding.isActive ? firstQuestionId : undefined,
+  );
   const { user } = useAuth();
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession ?? null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -136,6 +145,11 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
       });
 
 
+      if (!firstQuestionId) setFirstQuestionId(currentQuestion.id);
+      if (onboarding.isActive) {
+        void onboarding.reach("first_recall_completed", "first_recall_completed");
+      }
+
       const newAttempt = {
         questionId: currentQuestion.id,
         evidenceId,
@@ -202,6 +216,18 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
           <p className="text-[9px] font-bold text-muted-foreground/20 uppercase tracking-widest">DICA: Adicione questões no editor da aula.</p>
         </div>
       </div>
+    );
+  }
+
+  if (isFinished && onboarding.isActive) {
+    return (
+      <FirstCycleComplete
+        nextDue={nextDue}
+        onFinish={() => {
+          void onboarding.reach("first_cycle_completed", "first_cycle_completed");
+          onDone();
+        }}
+      />
     );
   }
 
@@ -283,6 +309,8 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
       </div>
 
       <div className="max-w-2xl mx-auto space-y-10">
+        {onboarding.isActive && attempts.length === 0 ? <FirstRecallHint /> : null}
+
         {/* Área da Pergunta (Etapa 3) */}
         <div className="space-y-6">
           <div className="space-y-2">

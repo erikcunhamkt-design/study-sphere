@@ -37,7 +37,7 @@ import { StudyMethodsHub } from "@/features/study-sessions/components/study-meth
 import { COURSE_STATUS_LABELS } from "@/features/studies/utils";
 
 export const Route = createFileRoute("/app/estudar")({
-  validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; mode?: "review" | "training" } => {
+  validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; courseId?: string; mode?: "review" | "training" } => {
     const plannedId = typeof search.plannedId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.plannedId) 
       ? search.plannedId 
       : undefined;
@@ -54,13 +54,17 @@ export const Route = createFileRoute("/app/estudar")({
       ? (search.method as StudyMethod)
       : undefined;
 
-    return { plannedId, method, deckId, mode };
+    const courseId = typeof search.courseId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.courseId)
+      ? search.courseId
+      : undefined;
+
+    return { plannedId, method, deckId, courseId, mode };
   },
   component: EstudarPage,
 });
 
 function EstudarPage() {
-  const { plannedId, method: initialMethod, deckId, mode } = Route.useSearch();
+  const { plannedId, method: initialMethod, deckId, courseId, mode } = Route.useSearch();
   const [activeMethod, setActiveMethod] = useState<StudyMethod | null>(initialMethod ?? null);
   const [resumingSession, setResumingSession] = useState<StudySessionRow | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -69,7 +73,7 @@ function EstudarPage() {
     name: string;
     status: string;
     type: 'course' | 'lesson';
-  } | null>(null);
+  } | null>(courseId ? { id: courseId, name: "", status: "not_started", type: 'course' } : null);
   const methodsHubRef = useRef<HTMLDivElement>(null);
 
   const { primary: action, isLoading, dashboard } = useNextBestAction() as any;

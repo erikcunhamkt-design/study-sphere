@@ -17,6 +17,8 @@ import { useLessonsByCourse, useLesson } from "@/features/studies/hooks/use-less
 import { useCourse } from "@/features/studies/hooks/use-courses";
 import { useCourseModule } from "@/features/studies/hooks/use-course-modules";
 import { LessonContentViewer } from "./components/lesson-content-viewer";
+import { useOnboarding } from "@/features/onboarding/hooks";
+import { FirstStepHint, FirstNotesHint } from "@/features/onboarding/components/first-session-hints";
 import { RecuperacaoSession } from "./components/recuperacao-session";
 import { useLessonDocument } from "@/features/lesson-editor/hooks";
 
@@ -36,6 +38,9 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
   const [session, setSession] = useState<StudySessionRow | null>(resumingSession);
   const [lessonId, setLessonId] = useState<string | null>(resumingSession?.lesson_id ?? initialLessonId ?? null);
   const [nota, setNota] = useState("");
+  // Primeira experiência guiada: só aparece antes do primeiro ciclo terminar.
+  const onboarding = useOnboarding();
+  const showFirstTimeHints = onboarding.isActive && method === "aprender";
   const [optimisticStart, setOptimisticStart] = useState<string | null>(null);
   const [isFinished, setIsFinished] = useState(false);
   const [isEnteringRecall, setIsEnteringRecall] = useState(false);
@@ -182,6 +187,9 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
       await finishSession.mutateAsync(details);
       toast.success(method === "aprender" ? "Primeiro contato concluído!" : "Sessão concluída");
       setIsFinished(true);
+      if (onboarding.isActive && method === "aprender") {
+        void onboarding.reach("first_contact_completed", "first_contact_completed");
+      }
     } catch (err) {
       console.error("[study-sessions] falha ao concluir sessão", err);
       toast.error("Não foi possível concluir a sessão");
@@ -442,6 +450,8 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   )}
                 </div>
                 
+                {showFirstTimeHints ? <FirstStepHint /> : null}
+
                 <div className="min-h-[500px] rounded-[2.5rem] border border-border/10 bg-surface/20 p-8 md:p-12 shadow-sm transition-all overflow-hidden">
                   {lessonId ? (
                     <LessonContentViewer 
@@ -482,6 +492,8 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
                   <span className="text-[9px] font-medium text-muted-foreground/20 italic">Não é o conteúdo principal</span>
                 </div>
                 
+                {showFirstTimeHints ? <FirstNotesHint /> : null}
+
                 <div className="space-y-4">
                   <Label htmlFor="livre-nota" className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/30 ml-1">
                     SUAS NOTAS

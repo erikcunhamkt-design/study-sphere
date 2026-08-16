@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNextBestAction } from "@/features/next-action/hooks/use-next-best-action";
+import { OnboardingHome } from "@/features/onboarding/components/onboarding-home";
 import { 
   NextStepAction, 
   DayProgress, 
@@ -150,6 +151,9 @@ function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-10 px-6 md:px-8 py-8 md:py-12">
+      {/* Primeira experiência guiada (some sozinha após o primeiro ciclo) */}
+      <OnboardingHome onAddContent={() => setAddContentOpen(true)} />
+
       {/* Header Contextual */}
       <div className="space-y-0.5">
         <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">{greeting}, {displayName}.</h1>

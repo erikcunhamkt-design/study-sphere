@@ -848,6 +848,30 @@ export type Database = {
           },
         ]
       }
+      onboarding_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          metadata: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          metadata?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          metadata?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       planned_studies: {
         Row: {
           course_id: string | null
@@ -926,27 +950,36 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          first_cycle_completed_at: string | null
           full_name: string
           id: string
           onboarding_completed: boolean
+          onboarding_started_at: string | null
+          onboarding_state: string
           timezone: string
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          first_cycle_completed_at?: string | null
           full_name?: string
           id: string
           onboarding_completed?: boolean
+          onboarding_started_at?: string | null
+          onboarding_state?: string
           timezone?: string
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          first_cycle_completed_at?: string | null
           full_name?: string
           id?: string
           onboarding_completed?: boolean
+          onboarding_started_at?: string | null
+          onboarding_state?: string
           timezone?: string
           updated_at?: string
         }
