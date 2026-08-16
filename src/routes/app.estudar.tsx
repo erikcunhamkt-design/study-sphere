@@ -76,10 +76,33 @@ function EstudarPage() {
   } | null>(courseId ? { id: courseId, name: "", status: "not_started", type: 'course' } : null);
   const methodsHubRef = useRef<HTMLDivElement>(null);
 
-  const { primary: action, isLoading, dashboard } = useNextBestAction() as any;
-  const allCourses = dashboard?.courses || [];
+  const nextBest = useNextBestAction();
+  const { primary, isLoading: isActionLoading } = nextBest;
+  const {
+    data: coursesData,
+    isLoading: isCoursesLoading,
+    isError: isCoursesError,
+    refetch: refetchCourses,
+  } = useAllCourses();
+
+  const allCourses = filterProductionEligible((coursesData ?? []) as any[]).filter(
+    (c: any) => !c.is_archived,
+  );
+  const inProgressCourses = allCourses.filter((c: any) => c.status === "in_progress");
+
+  const isLoading = isActionLoading || isCoursesLoading;
+  const hasEngineError = !isLoading && !primary;
+  const action: any = primary ?? {
+    type: "all_clear",
+    title: "Tudo em dia",
+    description: "Não há nenhuma ação urgente agora.",
+    reason: "",
+    cta: "Escolher conteúdo",
+    metadata: {},
+  };
   const priority = action.type;
   const data = action.metadata || {};
+
 
   // Se já começou com um planejado ou recomendação, vamos preencher o selectedContent
   useEffect(() => {
