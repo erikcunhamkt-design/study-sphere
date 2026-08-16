@@ -35,6 +35,8 @@ import { RecordacaoAtivaHub } from "@/features/study-sessions/recordacao-ativa-h
 import { AddContentDialog } from "@/routes/app.index";
 import { StudyMethodsHub } from "@/features/study-sessions/components/study-methods-hub";
 import { COURSE_STATUS_LABELS } from "@/features/studies/utils";
+import { useAllCourses } from "@/features/studies/hooks/use-courses";
+import { filterProductionEligible } from "@/lib/eligibility";
 
 export const Route = createFileRoute("/app/estudar")({
   validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; courseId?: string; mode?: "review" | "training" } => {
@@ -76,10 +78,33 @@ function EstudarPage() {
   } | null>(courseId ? { id: courseId, name: "", status: "not_started", type: 'course' } : null);
   const methodsHubRef = useRef<HTMLDivElement>(null);
 
-  const { primary: action, isLoading, dashboard } = useNextBestAction() as any;
-  const allCourses = dashboard?.courses || [];
+  const nextBest = useNextBestAction();
+  const { primary, isLoading: isActionLoading } = nextBest;
+  const {
+    data: coursesData,
+    isLoading: isCoursesLoading,
+    isError: isCoursesError,
+    refetch: refetchCourses,
+  } = useAllCourses();
+
+  const allCourses = filterProductionEligible((coursesData ?? []) as any[]).filter(
+    (c: any) => !c.is_archived,
+  );
+  const inProgressCourses = allCourses.filter((c: any) => c.status === "in_progress");
+
+  const isLoading = isActionLoading || isCoursesLoading;
+  const hasEngineError = !isLoading && !primary;
+  const action: any = primary ?? {
+    type: "all_clear",
+    title: "Tudo em dia",
+    description: "Não há nenhuma ação urgente agora.",
+    reason: "",
+    cta: "Escolher conteúdo",
+    metadata: {},
+  };
   const priority = action.type;
   const data = action.metadata || {};
+
 
   // Se já começou com um planejado ou recomendação, vamos preencher o selectedContent
   useEffect(() => {
@@ -157,12 +182,34 @@ function EstudarPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-4">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         <p className="text-sm text-muted-foreground animate-pulse">Organizando seus estudos...</p>
       </div>
     );
   }
+
+  if (isCoursesError || hasEngineError) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-8 px-4 md:px-0">
+        <header className="space-y-3">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Estudar</h1>
+        </header>
+        <div className="rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 space-y-4">
+          <h2 className="text-2xl font-black tracking-tighter">Não foi possível carregar seus estudos</h2>
+          <p className="text-sm font-medium text-muted-foreground/60">Tente novamente.</p>
+          <Button
+            onClick={() => refetchCourses()}
+            size="lg"
+            className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold"
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-16 pb-20 px-4 md:px-0">
@@ -292,7 +339,58 @@ function EstudarPage() {
               </Button>
             </div>
           </div>
-        ) : null}
+        ) : allCourses.length > 0 ? (
+          /* FALLBACK CONTEXTUAL: há conteúdo, nenhuma urgência (all_clear / explore / metadata ausente) */
+          <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-10 transition-all hover:border-primary/20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+              <div className="space-y-4">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest">
+                  <Zap className="h-3 w-3" /> {action.type === 'all_clear' ? 'TUDO EM DIA' : 'SUA PRÓXIMA AÇÃO'}
+                </span>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tighter leading-tight max-w-xl">
+                  {action.description || "Escolha um conteúdo para estudar."}
+                </h2>
+                {action.reason && (
+                  <p className="text-sm font-medium text-muted-foreground/60">{action.reason}</p>
+                )}
+              </div>
+              <Button
+                onClick={() => {
+                  const target = inProgressCourses[0] ?? allCourses[0];
+                  handleContentSelect(target);
+                }}
+                size="lg"
+                className="h-14 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-black shadow-[0_0_40px_-10px_rgba(217,0,110,0.3)]"
+              >
+                {inProgressCourses.length > 0 ? "Continuar estudando" : "Escolher conteúdo"}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* FALLBACK FINAL: sem conteúdo algum */
+          <div className="group relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/20 p-8 md:p-12 text-center transition-all hover:border-primary/20">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
+            <div className="relative z-10 space-y-6">
+              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-2">
+                <Zap className="h-8 w-8 fill-primary/20" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black tracking-tighter">Comece aqui</h2>
+                <p className="text-muted-foreground/60 max-w-md mx-auto font-medium">
+                  Adicione seu primeiro conteúdo para começar a construir sua memória com o Dominus.
+                </p>
+              </div>
+              <Button
+                onClick={() => setIsAddDialogOpen(true)}
+                size="lg"
+                className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold"
+              >
+                Adicionar conteúdo <Plus className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* 2. COMO ESTUDAR (CONTEXTUAL) */}
@@ -311,7 +409,7 @@ function EstudarPage() {
       )}
 
       {/* 3. CONTINUE (SESSÕES EM ANDAMENTO - APENAS SE HOUVER) */}
-      {!selectedContent && priority !== "resume" && data.courses && data.courses.filter((c: any) => c.status === "in_progress").length > 0 && (
+      {!selectedContent && priority !== "resume" && inProgressCourses.length > 0 && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Continue de onde parou</h3>
@@ -319,7 +417,7 @@ function EstudarPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.courses.filter((c: any) => c.status === "in_progress").slice(0, 3).map((course: any) => (
+            {inProgressCourses.slice(0, 3).map((course: any) => (
               <button 
                 key={course.id}
                 onClick={() => handleContentSelect(course)}
