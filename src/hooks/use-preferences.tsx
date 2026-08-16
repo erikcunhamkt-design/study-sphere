@@ -24,6 +24,9 @@ export interface Profile {
   avatar_url: string | null;
   timezone: string;
   onboarding_completed: boolean;
+  onboarding_state: string | null;
+  onboarding_started_at: string | null;
+  first_cycle_completed_at: string | null;
 }
 
 export function useProfile() {
