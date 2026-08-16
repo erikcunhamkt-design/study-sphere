@@ -11,6 +11,7 @@ import { isProductionEligible } from "@/lib/eligibility";
 import { NextAction, NextActionRecommendation, NextActionType } from "../types";
 import { WEIGHTS, formatReason } from "../utils/engine-utils";
 import { differenceInMinutes } from "date-fns";
+import { safeArray, logIntegrityIssue } from "@/lib/data-integrity";
 
 export function useNextBestAction(): NextActionRecommendation {
   const { user } = useAuth();
@@ -46,7 +47,8 @@ export function useNextBestAction(): NextActionRecommendation {
     const now = new Date();
 
     // --- P0: RESUME_SESSION ---
-    const validInProgress = inProgressSessions?.filter(s => {
+    const validInProgress = safeArray<any>(inProgressSessions, "engine.inProgressSessions").filter(s => {
+      if (!s?.id) { logIntegrityIssue("invalid_session", { source: "resume" }); return false; }
       // Regra 5: Sessão concluída não pode aparecer como resume
       if (s.ended_at) return false;
       // Regra 6 & 25: Ignorar dados de teste
@@ -61,11 +63,11 @@ export function useNextBestAction(): NextActionRecommendation {
 
     if (validInProgress && validInProgress.length > 0) {
       const session = validInProgress[0];
-      const lesson = allLessons?.find(l => l.id === session.lesson_id);
+      const lesson = safeArray<any>(allLessons, "engine.lessons").find(l => l.id === session.lesson_id);
       
       // Regra 25 & 26: Verificar ownership e material (isProductionEligible no lesson)
       if (lesson && isProductionEligible(lesson)) {
-        const course = courses?.find(c => c.id === lesson.course_id);
+        const course = safeArray<any>(courses, "engine.courses").find(c => c.id === lesson.course_id);
         
         if (course && isProductionEligible(course)) {
           const title = lesson.title || (session as any).planned_title || "Sessão em andamento";
@@ -89,7 +91,7 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P1: REVIEW_DUE ---
-    const dueConcepts = dashboard?.concepts?.filter(c => c.isDue && !(c as any).is_archived) || [];
+    const dueConcepts = safeArray<any>(dashboard?.concepts, "engine.dashboard.concepts").filter(c => c?.isDue && !c?.is_archived);
     const dueCount = dueConcepts.length;
     
     if (dueCount > 0) {
@@ -123,7 +125,10 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P2: REINFORCE (Attention Needed) ---
-    const attentionList = dashboard?.attentionNeeded?.filter(a => isProductionEligible(a.concept as any) && !(a.concept as any).is_archived) || [];
+    const attentionList = safeArray<any>(dashboard?.attentionNeeded, "engine.dashboard.attentionNeeded").filter(a => {
+      if (!a?.concept?.id) { logIntegrityIssue("missing_concept", { source: "attentionNeeded" }); return false; }
+      return isProductionEligible(a.concept as any) && !(a.concept as any).is_archived;
+    });
     const attention = attentionList[0];
     
     if (attention) {
@@ -162,7 +167,7 @@ export function useNextBestAction(): NextActionRecommendation {
     }
 
     // --- P4/P5: CONTINUE / FIRST_STUDY ---
-    const activeCourses = (courses ?? []).filter(c => !c.is_archived && isProductionEligible(c));
+    const activeCourses = safeArray<any>(courses, "engine.courses").filter(c => !c.is_archived && isProductionEligible(c));
     const inProgressCourse = activeCourses.find(c => c.status === 'in_progress');
     
     if (inProgressCourse) {

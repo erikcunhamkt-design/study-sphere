@@ -9,6 +9,8 @@ export function useApplyFsrsReview() {
     onSuccess: (_, variables) => {
       void qc.invalidateQueries({ queryKey: ["memory-state", variables.conceptId] });
       void qc.invalidateQueries({ queryKey: ["due-reviews"] });
+      void qc.invalidateQueries({ queryKey: ["performance-dashboard"] });
+      void qc.invalidateQueries({ queryKey: ["domain-model"] });
     },
   });
 }
@@ -20,6 +22,8 @@ export function useRebuildMemoryState() {
     onSuccess: (_, conceptId) => {
       void qc.invalidateQueries({ queryKey: ["memory-state", conceptId] });
       void qc.invalidateQueries({ queryKey: ["due-reviews"] });
+      void qc.invalidateQueries({ queryKey: ["performance-dashboard"] });
+      void qc.invalidateQueries({ queryKey: ["domain-model"] });
     },
   });
 }

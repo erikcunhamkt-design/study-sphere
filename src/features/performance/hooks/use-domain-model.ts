@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { calculateDomainMastery, type DomainMetrics } from "../utils/domain-interpretation";
 import { mapToHumanState, checkMetacognitiveMismatch } from "../utils/memory-interpretation";
+import { safeArray, logIntegrityIssue } from "@/lib/data-integrity";
 
 export function useDomainModel() {
   const { user } = useAuth();
@@ -22,11 +23,15 @@ export function useDomainModel() {
           name,
           courses (
             id,
+            is_archived,
             lessons (
               id,
+              is_archived,
               concepts (
                 id,
-                title
+                title,
+                is_archived,
+                is_test_data
               )
             )
           )
@@ -36,7 +41,7 @@ export function useDomainModel() {
 
       if (areasError) throw areasError;
       
-      const areas = (rawAreas as any[]) || [];
+      const areas = safeArray<any>(rawAreas, "domain.study_areas");
 
       // 2. Fetch all memory states for the user to join in memory
       const { data: memoryStates, error: msError } = await supabase
@@ -47,17 +52,35 @@ export function useDomainModel() {
 
       if (msError) throw msError;
 
-      const msMap = new Map((memoryStates || []).map(ms => [ms.concept_id, ms]));
+      const msMap = new Map<string, any>(
+        safeArray<any>(memoryStates, "domain.memory_states")
+          .filter((ms) => {
+            if (!ms?.concept_id) {
+              logIntegrityIssue("missing_concept", { source: "memory_states", id: ms?.id });
+              return false;
+            }
+            return true;
+          })
+          .map((ms) => [ms.concept_id, ms] as [string, any]),
+      );
       const now = new Date();
 
       // 3. Process each area
-      const domainMap = areas.map(area => {
+      const domainMap = areas.map((area: any) => {
         const allConcepts: any[] = [];
         
-        // Safely traverse the hierarchy
-        (area.courses || []).forEach((course: any) => {
-          (course.lessons || []).forEach((lesson: any) => {
-            (lesson.concepts || []).forEach((concept: any) => {
+        // Safely traverse the hierarchy (ignora elos inválidos e arquivados)
+        safeArray<any>(area?.courses, "domain.courses").forEach((course: any) => {
+          if (course?.is_archived) return;
+          safeArray<any>(course?.lessons, "domain.lessons").forEach((lesson: any) => {
+            if (lesson?.is_archived) return;
+            safeArray<any>(lesson?.concepts, "domain.concepts").forEach((concept: any) => {
+              if (!concept?.id) {
+                logIntegrityIssue("missing_concept", { lessonId: lesson?.id });
+                return;
+              }
+              if (concept.is_archived || concept.is_test_data) return;
+
               const memory = msMap.get(concept.id);
               const humanState = memory ? mapToHumanState({
                 reps: memory.reps || 0,

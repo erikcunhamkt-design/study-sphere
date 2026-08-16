@@ -135,6 +135,8 @@ export function useRecordRecallAttempt() {
       void qc.invalidateQueries({ queryKey: ["memory-state"] });
       void qc.invalidateQueries({ queryKey: ["due-reviews"] });
       void qc.invalidateQueries({ queryKey: ["review-semantic-stats"] });
+      void qc.invalidateQueries({ queryKey: ["performance-dashboard"] });
+      void qc.invalidateQueries({ queryKey: ["domain-model"] });
     },
   });
 }
