@@ -50,8 +50,13 @@ export function useOnboarding() {
     },
   });
 
-  /** Avança o estado e registra o evento correspondente numa única chamada. */
+  /**
+   * Avança o estado e registra o evento correspondente numa única chamada.
+   * Idempotente: se o estado já passou por esse ponto (reload, nova tentativa),
+   * nada é gravado — evita eventos duplicados.
+   */
   async function reach(next: OnboardingState, event?: OnboardingEvent) {
+    if (maxState(state, next) === state) return;
     try {
       await advance.mutateAsync(next);
       if (event) await track.mutateAsync({ event });
