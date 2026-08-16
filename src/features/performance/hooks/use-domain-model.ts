@@ -23,11 +23,15 @@ export function useDomainModel() {
           name,
           courses (
             id,
+            is_archived,
             lessons (
               id,
+              is_archived,
               concepts (
                 id,
-                title
+                title,
+                is_archived,
+                is_test_data
               )
             )
           )
