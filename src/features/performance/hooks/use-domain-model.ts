@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { calculateDomainMastery, type DomainMetrics } from "../utils/domain-interpretation";
 import { mapToHumanState, checkMetacognitiveMismatch } from "../utils/memory-interpretation";
+import { safeArray, logIntegrityIssue } from "@/lib/data-integrity";
 
 export function useDomainModel() {
   const { user } = useAuth();
