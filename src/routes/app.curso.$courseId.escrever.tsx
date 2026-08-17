@@ -99,6 +99,20 @@ function CourseFreeWritingPage() {
         </Button>
       </header>
 
+      <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-muted-foreground/60">
+        <span>Selecione um texto para formatar</span>
+        <span aria-hidden className="text-muted-foreground/30">
+          ·
+        </span>
+        <span>
+          Digite{" "}
+          <kbd className="rounded border border-border/40 bg-surface/60 px-1.5 py-0.5 font-mono text-[10px]">
+            /
+          </kbd>{" "}
+          para títulos, listas, imagens e mais
+        </span>
+      </p>
+
       <ClientOnlyLessonEditor courseId={courseId} />
     </div>
   );
