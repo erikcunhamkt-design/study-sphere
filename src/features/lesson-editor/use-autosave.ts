@@ -184,6 +184,19 @@ export function useLessonAutosave({
     [performSave],
   );
 
+  /**
+   * "Tentar novamente" explícito depois que as retentativas automáticas se
+   * esgotaram (status "erro"). Pula o debounce — é uma ação deliberada do
+   * usuário, não uma edição — e reusa o mesmo conteúdo/versão que falharam.
+   */
+  const retryNow = useCallback(
+    (content: LessonDocument, schemaVersion: number) => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      return performSave(content, schemaVersion, expectedVersionRef.current);
+    },
+    [performSave],
+  );
+
   /** Chamado quando o usuário resolve o conflito escolhendo manter a própria versão. */
   const resolveConflictKeepMine = useCallback(
     async (newExpectedVersion: number) => {
@@ -216,6 +229,7 @@ export function useLessonAutosave({
     expectedVersion,
     conflict,
     scheduleSave,
+    retryNow,
     resolveConflictKeepMine,
     resolveConflictDiscardMine,
     schemaVersion: initialSchemaVersion,

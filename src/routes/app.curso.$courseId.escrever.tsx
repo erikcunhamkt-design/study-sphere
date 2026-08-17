@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, PenLine } from "lucide-react";
 import { ClientOnlyLessonEditor } from "@/features/lesson-editor/client-only-lesson-editor";
 import { useCourse } from "@/features/studies/hooks/use-courses";
 
@@ -33,7 +33,7 @@ function CourseFreeWritingPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6 px-4 md:px-0">
+      <div className="max-w-3xl mx-auto space-y-6 px-4 md:px-0">
         <Skeleton className="h-6 w-56" />
         <Skeleton className="h-64 w-full rounded-xl" />
       </div>
@@ -57,7 +57,7 @@ function CourseFreeWritingPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-24 px-4 md:px-0">
+    <div className="max-w-3xl mx-auto space-y-8 pb-24 px-4 md:px-0">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -80,17 +80,24 @@ function CourseFreeWritingPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-foreground">Escrita livre</h1>
-          <p className="text-sm text-muted-foreground/70 font-medium">{course.name}</p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+            <PenLine className="h-5 w-5" aria-hidden />
+          </span>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">
+              Escrita livre
+            </h1>
+            <p className="text-sm text-muted-foreground/70 font-medium">{course.name}</p>
+          </div>
         </div>
-        <Button asChild variant="ghost" className="rounded-full font-bold">
+        <Button asChild variant="ghost" className="rounded-full font-bold shrink-0">
           <Link to="/app/curso/$courseId" params={{ courseId }}>
             <ArrowLeft className="mr-1.5 h-4 w-4" /> Voltar ao curso
           </Link>
         </Button>
-      </div>
+      </header>
 
       <ClientOnlyLessonEditor courseId={courseId} />
     </div>

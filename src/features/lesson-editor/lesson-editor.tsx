@@ -195,7 +195,15 @@ function LessonEditorLoaded({
     schema: lessonEditorSchema,
     // Textos internos do BlockNote (placeholders, painéis de mídia) em
     // português — pendência de i18n registrada na auditoria da Fase 03.2.
-    dictionary: pt,
+    // Em modo curso (sem lessonId), o placeholder do bloco vazio troca o
+    // genérico "Digite texto ou use '/'..." por um convite mais direto —
+    // não existe "estudante" lendo, é o autor sozinho com a página em branco.
+    dictionary: anchor.lessonId
+      ? pt
+      : {
+          ...pt,
+          placeholders: { ...pt.placeholders, default: "Comece escrevendo…" },
+        },
     // Upload validado por categoria (MIME + tamanho) antes da rede; o
     // documento guarda o caminho do storage, e resolveFileUrl troca por
     // URL assinada na exibição (o bucket é privado).
@@ -314,7 +322,15 @@ function LessonEditorLoaded({
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <AutosaveStatusIndicator status={autosave.status} />
+          <AutosaveStatusIndicator
+            status={autosave.status}
+            onRetry={() =>
+              void autosave.retryNow(
+                editor.document as unknown as LessonDocument,
+                CURRENT_SCHEMA_VERSION,
+              )
+            }
+          />
           {otherTabOpen ? (
             <span className="inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
               <Users className="h-3.5 w-3.5" aria-hidden />
