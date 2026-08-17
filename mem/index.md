@@ -15,3 +15,4 @@
 - [Dominus Navigation](mem://reference/dominus-navigation) — Sidebar architecture and navigation flow.
 - [No cockpit term](mem://constraints/no-cockpit-term) — Constraint on user-facing copy.
 - [Primeira experiência guiada](mem://features/first-experience-onboarding) — Onboarding sem tutorial, estados do primeiro ciclo e regras de copy.
+- [Novo Estudo](mem://features/novo-estudo-flow) — Criação de estudo em tela única, persistência atômica e entrada direta na sessão Aprender.
