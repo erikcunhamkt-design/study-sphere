@@ -87,7 +87,7 @@ import {
 } from "@/features/course-view/lesson-state";
 import type { CourseModule, Lesson } from "@/features/studies/types";
 
-export const Route = createFileRoute("/app/curso/$courseId")({
+export const Route = createFileRoute("/app/curso/$courseId/")({
   component: CoursePage,
 });
 

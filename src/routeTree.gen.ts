@@ -23,10 +23,10 @@ import { Route as AppEstudarRouteImport } from './routes/app.estudar'
 import { Route as AppNovoEstudoRouteImport } from './routes/app.novo-estudo'
 import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
 import { Route as AppRevisarRouteImport } from './routes/app/revisar'
-import { Route as AppCursoCourseIdRouteImport } from './routes/app.curso.$courseId'
 import { Route as AppLabEditorRouteImport } from './routes/app.lab.editor'
 import { Route as AppMeusEstudosIndexRouteImport } from './routes/app.meus-estudos.index'
 import { Route as AppBibliotecaBaralhoDeckIdRouteImport } from './routes/app.biblioteca.baralho.$deckId'
+import { Route as AppCursoCourseIdIndexRouteImport } from './routes/app.curso.$courseId.index'
 import { Route as AppCursoCourseIdEscreverRouteImport } from './routes/app.curso.$courseId.escrever'
 import { Route as AppMeusEstudosAreaIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.index'
 import { Route as AppMeusEstudosAreaIdCursosCourseIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.cursos.$courseId.index'
@@ -103,11 +103,6 @@ const AppRevisarRoute = AppRevisarRouteImport.update({
   path: '/revisar',
   getParentRoute: () => AppRoute,
 } as any)
-const AppCursoCourseIdRoute = AppCursoCourseIdRouteImport.update({
-  id: '/curso/$courseId',
-  path: '/curso/$courseId',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppLabEditorRoute = AppLabEditorRouteImport.update({
   id: '/lab/editor',
   path: '/lab/editor',
@@ -124,11 +119,16 @@ const AppBibliotecaBaralhoDeckIdRoute =
     path: '/baralho/$deckId',
     getParentRoute: () => AppBibliotecaRoute,
   } as any)
+const AppCursoCourseIdIndexRoute = AppCursoCourseIdIndexRouteImport.update({
+  id: '/curso/$courseId/',
+  path: '/curso/$courseId/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCursoCourseIdEscreverRoute =
   AppCursoCourseIdEscreverRouteImport.update({
-    id: '/escrever',
-    path: '/escrever',
-    getParentRoute: () => AppCursoCourseIdRoute,
+    id: '/curso/$courseId/escrever',
+    path: '/curso/$courseId/escrever',
+    getParentRoute: () => AppRoute,
   } as any)
 const AppMeusEstudosAreaIdIndexRoute =
   AppMeusEstudosAreaIdIndexRouteImport.update({
@@ -172,11 +172,11 @@ export interface FileRoutesByFullPath {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
-  '/app/curso/$courseId': typeof AppCursoCourseIdRouteWithChildren
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
   '/app/curso/$courseId/escrever': typeof AppCursoCourseIdEscreverRoute
+  '/app/curso/$courseId/': typeof AppCursoCourseIdIndexRoute
   '/app/meus-estudos/$areaId/': typeof AppMeusEstudosAreaIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -196,11 +196,11 @@ export interface FileRoutesByTo {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app': typeof AppIndexRoute
-  '/app/curso/$courseId': typeof AppCursoCourseIdRouteWithChildren
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
   '/app/curso/$courseId/escrever': typeof AppCursoCourseIdEscreverRoute
+  '/app/curso/$courseId': typeof AppCursoCourseIdIndexRoute
   '/app/meus-estudos/$areaId': typeof AppMeusEstudosAreaIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -222,11 +222,11 @@ export interface FileRoutesById {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
-  '/app/curso/$courseId': typeof AppCursoCourseIdRouteWithChildren
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
   '/app/curso/$courseId/escrever': typeof AppCursoCourseIdEscreverRoute
+  '/app/curso/$courseId/': typeof AppCursoCourseIdIndexRoute
   '/app/meus-estudos/$areaId/': typeof AppMeusEstudosAreaIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -249,11 +249,11 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/revisar'
     | '/app/'
-    | '/app/curso/$courseId'
     | '/app/lab/editor'
     | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
     | '/app/curso/$courseId/escrever'
+    | '/app/curso/$courseId/'
     | '/app/meus-estudos/$areaId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
@@ -273,11 +273,11 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/revisar'
     | '/app'
-    | '/app/curso/$courseId'
     | '/app/lab/editor'
     | '/app/meus-estudos'
     | '/app/biblioteca/baralho/$deckId'
     | '/app/curso/$courseId/escrever'
+    | '/app/curso/$courseId'
     | '/app/meus-estudos/$areaId'
     | '/app/meus-estudos/$areaId/cursos/$courseId'
     | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId'
@@ -298,11 +298,11 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/revisar'
     | '/app/'
-    | '/app/curso/$courseId'
     | '/app/lab/editor'
     | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
     | '/app/curso/$courseId/escrever'
+    | '/app/curso/$courseId/'
     | '/app/meus-estudos/$areaId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
@@ -418,13 +418,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRevisarRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/curso/$courseId': {
-      id: '/app/curso/$courseId'
-      path: '/curso/$courseId'
-      fullPath: '/app/curso/$courseId'
-      preLoaderRoute: typeof AppCursoCourseIdRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/lab/editor': {
       id: '/app/lab/editor'
       path: '/lab/editor'
@@ -446,12 +439,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBibliotecaBaralhoDeckIdRouteImport
       parentRoute: typeof AppBibliotecaRoute
     }
+    '/app/curso/$courseId/': {
+      id: '/app/curso/$courseId/'
+      path: '/curso/$courseId'
+      fullPath: '/app/curso/$courseId/'
+      preLoaderRoute: typeof AppCursoCourseIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/curso/$courseId/escrever': {
       id: '/app/curso/$courseId/escrever'
-      path: '/escrever'
+      path: '/curso/$courseId/escrever'
       fullPath: '/app/curso/$courseId/escrever'
       preLoaderRoute: typeof AppCursoCourseIdEscreverRouteImport
-      parentRoute: typeof AppCursoCourseIdRoute
+      parentRoute: typeof AppRoute
     }
     '/app/meus-estudos/$areaId/': {
       id: '/app/meus-estudos/$areaId/'
@@ -496,17 +496,6 @@ const AppBibliotecaRouteWithChildren = AppBibliotecaRoute._addFileChildren(
   AppBibliotecaRouteChildren,
 )
 
-interface AppCursoCourseIdRouteChildren {
-  AppCursoCourseIdEscreverRoute: typeof AppCursoCourseIdEscreverRoute
-}
-
-const AppCursoCourseIdRouteChildren: AppCursoCourseIdRouteChildren = {
-  AppCursoCourseIdEscreverRoute: AppCursoCourseIdEscreverRoute,
-}
-
-const AppCursoCourseIdRouteWithChildren =
-  AppCursoCourseIdRoute._addFileChildren(AppCursoCourseIdRouteChildren)
-
 interface AppRouteChildren {
   AppBibliotecaRoute: typeof AppBibliotecaRouteWithChildren
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
@@ -516,9 +505,10 @@ interface AppRouteChildren {
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
   AppRevisarRoute: typeof AppRevisarRoute
   AppIndexRoute: typeof AppIndexRoute
-  AppCursoCourseIdRoute: typeof AppCursoCourseIdRouteWithChildren
   AppLabEditorRoute: typeof AppLabEditorRoute
   AppMeusEstudosIndexRoute: typeof AppMeusEstudosIndexRoute
+  AppCursoCourseIdEscreverRoute: typeof AppCursoCourseIdEscreverRoute
+  AppCursoCourseIdIndexRoute: typeof AppCursoCourseIdIndexRoute
   AppMeusEstudosAreaIdIndexRoute: typeof AppMeusEstudosAreaIdIndexRoute
   AppMeusEstudosAreaIdCursosCourseIdIndexRoute: typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
   AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute: typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -534,9 +524,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppPlanejamentoRoute: AppPlanejamentoRoute,
   AppRevisarRoute: AppRevisarRoute,
   AppIndexRoute: AppIndexRoute,
-  AppCursoCourseIdRoute: AppCursoCourseIdRouteWithChildren,
   AppLabEditorRoute: AppLabEditorRoute,
   AppMeusEstudosIndexRoute: AppMeusEstudosIndexRoute,
+  AppCursoCourseIdEscreverRoute: AppCursoCourseIdEscreverRoute,
+  AppCursoCourseIdIndexRoute: AppCursoCourseIdIndexRoute,
   AppMeusEstudosAreaIdIndexRoute: AppMeusEstudosAreaIdIndexRoute,
   AppMeusEstudosAreaIdCursosCourseIdIndexRoute:
     AppMeusEstudosAreaIdCursosCourseIdIndexRoute,
