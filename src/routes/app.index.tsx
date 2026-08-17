@@ -56,11 +56,11 @@ export function AddContentDialog({ open, onOpenChange }: { open: boolean, onOpen
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <AddOptionCard 
             icon={BookOpen}
-            title="Curso"
-            description="Estruture seu estudo em módulos e aulas."
+            title="Estudo"
+            description="Nome, conteúdo e (se quiser) módulos — em uma tela só."
             onClick={() => {
               onOpenChange(false);
-              navigate({ to: "/app/meus-estudos" });
+              navigate({ to: "/app/novo-estudo" });
             }}
           />
           <AddOptionCard 
