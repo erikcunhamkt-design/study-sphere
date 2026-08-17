@@ -382,11 +382,13 @@ function EstudarPage() {
                 </p>
               </div>
               <Button
-                onClick={() => setIsAddDialogOpen(true)}
+                asChild
                 size="lg"
                 className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white font-bold"
               >
-                Adicionar conteúdo <Plus className="ml-2 h-4 w-4" />
+                <Link to="/app/novo-estudo">
+                  Novo estudo <Plus className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>
