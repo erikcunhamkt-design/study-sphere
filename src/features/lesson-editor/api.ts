@@ -11,7 +11,7 @@ import {
 } from "./types";
 
 const DOCUMENT_COLUMNS =
-  "id, lesson_id, user_id, content, schema_version, version, created_at, updated_at";
+  "id, lesson_id, user_id, content, schema_version, version, created_at, updated_at, published_content, published_version, published_at";
 
 export async function fetchLessonDocument(
   userId: string,

@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppRevisarRouteImport } from './routes/app/revisar'
 import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
+import { Route as AppNovoEstudoRouteImport } from './routes/app.novo-estudo'
 import { Route as AppEstudarRouteImport } from './routes/app.estudar'
 import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
@@ -73,6 +74,11 @@ const AppRevisarRoute = AppRevisarRouteImport.update({
 const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
   id: '/planejamento',
   path: '/planejamento',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNovoEstudoRoute = AppNovoEstudoRouteImport.update({
+  id: '/novo-estudo',
+  path: '/novo-estudo',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEstudarRoute = AppEstudarRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
+  '/app/novo-estudo': typeof AppNovoEstudoRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
+  '/app/novo-estudo': typeof AppNovoEstudoRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app': typeof AppIndexRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/desempenho': typeof AppDesempenhoRoute
   '/app/estudar': typeof AppEstudarRoute
+  '/app/novo-estudo': typeof AppNovoEstudoRoute
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/desempenho'
     | '/app/estudar'
+    | '/app/novo-estudo'
     | '/app/planejamento'
     | '/app/revisar'
     | '/app/'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/desempenho'
     | '/app/estudar'
+    | '/app/novo-estudo'
     | '/app/planejamento'
     | '/app/revisar'
     | '/app'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/desempenho'
     | '/app/estudar'
+    | '/app/novo-estudo'
     | '/app/planejamento'
     | '/app/revisar'
     | '/app/'
@@ -344,6 +356,13 @@ declare module '@tanstack/react-router' {
       path: '/planejamento'
       fullPath: '/app/planejamento'
       preLoaderRoute: typeof AppPlanejamentoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/novo-estudo': {
+      id: '/app/novo-estudo'
+      path: '/novo-estudo'
+      fullPath: '/app/novo-estudo'
+      preLoaderRoute: typeof AppNovoEstudoRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/estudar': {
@@ -443,6 +462,7 @@ interface AppRouteChildren {
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
   AppDesempenhoRoute: typeof AppDesempenhoRoute
   AppEstudarRoute: typeof AppEstudarRoute
+  AppNovoEstudoRoute: typeof AppNovoEstudoRoute
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
   AppRevisarRoute: typeof AppRevisarRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -459,6 +479,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConfiguracoesRoute: AppConfiguracoesRoute,
   AppDesempenhoRoute: AppDesempenhoRoute,
   AppEstudarRoute: AppEstudarRoute,
+  AppNovoEstudoRoute: AppNovoEstudoRoute,
   AppPlanejamentoRoute: AppPlanejamentoRoute,
   AppRevisarRoute: AppRevisarRoute,
   AppIndexRoute: AppIndexRoute,
