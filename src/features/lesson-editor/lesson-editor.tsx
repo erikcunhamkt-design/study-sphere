@@ -280,8 +280,17 @@ function LessonEditorLoaded({
     return <InvalidRemoteDocument anchor={anchor} doc={doc} issues={issues} />;
   }
 
+  // Em modo aula, o editor divide a tela com as abas Flashcards/Questões —
+  // o card (borda + fundo) ajuda a demarcar onde uma seção termina e outra
+  // começa. Em modo curso não existe mais nada na página: o mesmo card, ali
+  // sozinho, lê como "uma caixinha perdida no meio do vazio". Sem anchor
+  // de aula, o texto flui direto na página — sem borda, sem fundo próprio.
+  const editorWrapperClassName = anchor.lessonId
+    ? "lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4"
+    : "lab-editor-bn-theme";
+
   const editorBlock = (
-    <div className="lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4">
+    <div className={editorWrapperClassName}>
       <BlockNoteView
         editor={editor}
         theme={theme}

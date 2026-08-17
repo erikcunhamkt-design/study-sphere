@@ -301,7 +301,12 @@ function CoursePage() {
   }
 
   const hasLessons = lessons.length > 0;
-  const isEmpty = !hasLessons && !hasFreeWriting;
+  // Um módulo recém-criado (via Organizar) ainda sem aulas precisa continuar
+  // visível — "vazio" é só quando não existe NADA (nem módulo, nem aula,
+  // nem escrita livre). Checar só lessons.length aqui escondia módulos
+  // reais atrás da tela de "curso vazio".
+  const hasStructure = modules.length > 0;
+  const isEmpty = !hasStructure && !hasFreeWriting;
   const totalModuleCount = modules.length + archivedModules.length;
   const totalLessonCount = lessons.length + archivedLessons.length;
 
@@ -436,7 +441,7 @@ function CoursePage() {
             </Button>
           </div>
         </section>
-      ) : !hasLessons ? null : hasModules ? (
+      ) : !hasStructure ? null : hasModules ? (
         <section className="space-y-3">
           <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">
             Módulos
