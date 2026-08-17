@@ -40,7 +40,7 @@ export function ConflictDialog({
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Esta aula foi editada em outro lugar</AlertDialogTitle>
+          <AlertDialogTitle>Este conteúdo foi editado em outro lugar</AlertDialogTitle>
           <AlertDialogDescription>
             {remoteUpdatedAt
               ? `A versão salva mais recentemente é de ${remoteUpdatedAt} (outra aba ou dispositivo). `

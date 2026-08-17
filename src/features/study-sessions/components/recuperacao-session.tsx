@@ -70,7 +70,7 @@ export function RecuperacaoSession({ lessonId, courseId, onDone, resumingSession
   const { data: questions, isLoading: isLoadingQuestions } = useQuestions();
   const { data: lesson } = useLesson(lessonId);
   const { data: course } = useCourse(courseId || lesson?.course_id);
-  const { data: lessonDoc } = useLessonDocument(lessonId);
+  const { data: lessonDoc } = useLessonDocument({ lessonId });
 
   const createSession = useCreateStudySession();
   const finishSession = useFinishStudySession(session?.id ?? "", session?.started_at ?? "");

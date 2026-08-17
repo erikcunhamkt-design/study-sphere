@@ -4,8 +4,9 @@ import type { LessonDocument } from "./document-schema";
  * Recuperação local de rascunhos — IndexedDB, não localStorage. Documentos
  * podem chegar perto de 5 MB; localStorage é síncrono (bloqueia a thread
  * principal) e tem limite de ~5MB por origem somando tudo, então não serve
- * para isto. Chave é escopada por usuário+aula para nunca vazar rascunho
- * entre contas no mesmo navegador.
+ * para isto. Chave é escopada por usuário+contexto (aula ou curso, ver
+ * document-anchor.ts) para nunca vazar rascunho entre contas no mesmo
+ * navegador.
  */
 
 const DB_NAME = "studyos-lesson-drafts";
@@ -20,8 +21,8 @@ export interface LessonDraft {
   savedAt: string;
 }
 
-function draftKey(userId: string, lessonId: string): string {
-  return `${userId}:${lessonId}`;
+function draftKey(userId: string, contextKey: string): string {
+  return `${userId}:${contextKey}`;
 }
 
 function openDb(): Promise<IDBDatabase> {
@@ -62,19 +63,19 @@ async function withStore<T>(
 
 export async function saveDraft(
   userId: string,
-  lessonId: string,
+  contextKey: string,
   draft: LessonDraft,
 ): Promise<void> {
-  await withStore("readwrite", (store) => store.put(draft, draftKey(userId, lessonId)));
+  await withStore("readwrite", (store) => store.put(draft, draftKey(userId, contextKey)));
 }
 
-export async function getDraft(userId: string, lessonId: string): Promise<LessonDraft | null> {
+export async function getDraft(userId: string, contextKey: string): Promise<LessonDraft | null> {
   const result = await withStore<LessonDraft | undefined>("readonly", (store) =>
-    store.get(draftKey(userId, lessonId)),
+    store.get(draftKey(userId, contextKey)),
   );
   return result ?? null;
 }
 
-export async function deleteDraft(userId: string, lessonId: string): Promise<void> {
-  await withStore("readwrite", (store) => store.delete(draftKey(userId, lessonId)));
+export async function deleteDraft(userId: string, contextKey: string): Promise<void> {
+  await withStore("readwrite", (store) => store.delete(draftKey(userId, contextKey)));
 }

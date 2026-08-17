@@ -24,7 +24,9 @@ function EditorLoadingState() {
   );
 }
 
-export function ClientOnlyLessonEditor({ lessonId }: { lessonId: string }) {
+type ClientOnlyLessonEditorProps = { lessonId: string } | { courseId: string };
+
+export function ClientOnlyLessonEditor(props: ClientOnlyLessonEditorProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -35,9 +37,11 @@ export function ClientOnlyLessonEditor({ lessonId }: { lessonId: string }) {
     return <EditorLoadingState />;
   }
 
+  const anchor = "lessonId" in props ? { lessonId: props.lessonId } : { courseId: props.courseId };
+
   return (
     <Suspense fallback={<EditorLoadingState />}>
-      <LessonEditor lessonId={lessonId} />
+      <LessonEditor anchor={anchor} />
     </Suspense>
   );
 }

@@ -5,8 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
  * privado e tem teto duro de 50 MB + allowlist de MIME no servidor; esta
  * camada valida ANTES do upload, por categoria, com limites mais justos e
  * mensagens em português. O documento persiste o CAMINHO do objeto
- * ({user_id}/{lesson_id}/{uuid}-{nome}), nunca a URL assinada — ela
- * expira; a resolução para exibição acontece em resolveMediaUrl.
+ * ({user_id}/{contexto}/{uuid}-{nome}, onde contexto é a aula ou o curso —
+ * ver document-anchor.ts), nunca a URL assinada — ela expira; a resolução
+ * para exibição acontece em resolveMediaUrl.
  */
 
 export const MEDIA_BUCKET = "lesson-media";
@@ -77,18 +78,18 @@ export function sanitizeFileName(name: string): string {
   return safe.slice(-80) || "arquivo";
 }
 
-export function buildMediaPath(userId: string, lessonId: string, fileName: string): string {
-  return `${userId}/${lessonId}/${crypto.randomUUID()}-${sanitizeFileName(fileName)}`;
+export function buildMediaPath(userId: string, contextKey: string, fileName: string): string {
+  return `${userId}/${contextKey}/${crypto.randomUUID()}-${sanitizeFileName(fileName)}`;
 }
 
 /**
  * Handler para o `uploadFile` do BlockNote: valida, sobe para o bucket e
  * devolve o caminho do objeto (que o bloco guarda em props.url).
  */
-export function createMediaUploader(userId: string, lessonId: string) {
+export function createMediaUploader(userId: string, contextKey: string) {
   return async function uploadMedia(file: File): Promise<string> {
     validateMediaFile(file);
-    const path = buildMediaPath(userId, lessonId, file.name);
+    const path = buildMediaPath(userId, contextKey, file.name);
     const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, file, {
       contentType: file.type,
     });

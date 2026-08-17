@@ -24,6 +24,7 @@ import { useQuestions } from "@/features/questions/hooks";
 import type { FlashcardContent } from "@/features/flashcards/schema";
 import * as api from "./api";
 import { ConflictDialog } from "./conflict-dialog";
+import { anchorKey, type DocumentAnchor } from "./document-anchor";
 import { validateLessonDocument, type LessonDocument } from "./document-schema";
 import { deleteDraft, getDraft } from "./drafts-db";
 import { FlashcardBridgeContext } from "./flashcard-bridge";
@@ -40,10 +41,10 @@ import { useLessonAutosave } from "./use-autosave";
 
 const CURRENT_SCHEMA_VERSION = 1;
 
-export function LessonEditor({ lessonId }: { lessonId: string }) {
+export function LessonEditor({ anchor }: { anchor: DocumentAnchor }) {
   const { user } = useAuth();
   const { resolvedTheme } = useTheme();
-  const { data: doc, isLoading, isError } = useLessonDocument(lessonId);
+  const { data: doc, isLoading, isError } = useLessonDocument(anchor);
   const [reloadNonce, setReloadNonce] = useState(0);
 
   if (isLoading) {
@@ -60,7 +61,7 @@ export function LessonEditor({ lessonId }: { lessonId: string }) {
   if (isError) {
     return (
       <p className="text-sm text-destructive">
-        Não foi possível carregar o caderno desta aula. Tente novamente em instantes.
+        Não foi possível carregar este conteúdo. Tente novamente em instantes.
       </p>
     );
   }
@@ -72,7 +73,7 @@ export function LessonEditor({ lessonId }: { lessonId: string }) {
       // — nunca a cada autosave normal, senão o editor remontaria (e
       // perderia foco/cursor) a cada salvamento bem-sucedido.
       key={`${doc?.id ?? "new"}-${reloadNonce}`}
-      lessonId={lessonId}
+      anchor={anchor}
       document={doc}
       userId={user?.id}
       theme={resolvedTheme}
@@ -85,17 +86,17 @@ type LocalDraftState =
   { kind: "recoverable"; content: LessonDocument; isStale: boolean } | { kind: "invalid" } | null;
 
 function InvalidRemoteDocument({
-  lessonId,
+  anchor,
   doc,
   issues,
 }: {
-  lessonId: string;
+  anchor: DocumentAnchor;
   doc: LessonDocumentRow;
   issues: string[];
 }) {
   const [showDiagnostic, setShowDiagnostic] = useState(false);
   const [discarding, setDiscarding] = useState(false);
-  const saveMutation = useSaveLessonDocument(lessonId);
+  const saveMutation = useSaveLessonDocument(anchor);
 
   async function handleDiscard() {
     setDiscarding(true);
@@ -104,7 +105,7 @@ function InvalidRemoteDocument({
       // ser pulado dentro da janela de 5 minutos, e a promessa de que o
       // conteúdo anterior fica no histórico precisa valer sempre
       // (observação registrada na auditoria da Fase 03.1).
-      await api.checkpointLessonDocument(lessonId);
+      await api.checkpointLessonDocument(anchor);
       await saveMutation.mutateAsync({
         content: [],
         schemaVersion: CURRENT_SCHEMA_VERSION,
@@ -124,8 +125,7 @@ function InvalidRemoteDocument({
   return (
     <div className="space-y-3 rounded-xl border border-destructive/50 bg-destructive/5 p-4">
       <p className="text-sm font-medium text-destructive">
-        O conteúdo salvo desta aula está em um formato inesperado e não pode ser aberto com
-        segurança.
+        O conteúdo salvo aqui está em um formato inesperado e não pode ser aberto com segurança.
       </p>
       <p className="text-sm text-muted-foreground">
         Isso evita abrir ou sobrescrever dados corrompidos sem você perceber. Você pode conferir o
@@ -150,18 +150,19 @@ function InvalidRemoteDocument({
 }
 
 function LessonEditorLoaded({
-  lessonId,
+  anchor,
   document: doc,
   userId,
   theme,
   onRequestReload,
 }: {
-  lessonId: string;
+  anchor: DocumentAnchor;
   document: LessonDocumentRow | null | undefined;
   userId: string | undefined;
   theme: "light" | "dark";
   onRequestReload: () => void;
 }) {
+  const contextKey = anchorKey(anchor);
   const [localDraft, setLocalDraft] = useState<LocalDraftState>(null);
   const [otherTabOpen, setOtherTabOpen] = useState(false);
   const [flashcardPrefill, setFlashcardPrefill] = useState<{
@@ -175,7 +176,7 @@ function LessonEditorLoaded({
   const initialVersion = doc?.version ?? 0;
 
   const autosave = useLessonAutosave({
-    lessonId,
+    anchor,
     initialVersion,
     initialSchemaVersion: CURRENT_SCHEMA_VERSION,
   });
@@ -201,7 +202,7 @@ function LessonEditorLoaded({
     uploadFile: async (file: File) => {
       if (!userId) throw new Error("Usuário não autenticado");
       try {
-        return await createMediaUploader(userId, lessonId)(file);
+        return await createMediaUploader(userId, contextKey)(file);
       } catch (err) {
         if (err instanceof MediaValidationError) {
           toast.error(err.message);
@@ -221,9 +222,9 @@ function LessonEditorLoaded({
   }, editor);
 
   useEffect(() => {
-    const handle = watchLessonTabPresence(lessonId, setOtherTabOpen);
+    const handle = watchLessonTabPresence(contextKey, setOtherTabOpen);
     return () => handle.close();
-  }, [lessonId]);
+  }, [contextKey]);
 
   // Verifica rascunho local uma única vez, ao montar. Valida a estrutura
   // (rascunho corrompido nunca é carregado) e a versão-base (rascunho de
@@ -233,7 +234,7 @@ function LessonEditorLoaded({
     if (checkedDraftOnce.current || !userId) return;
     checkedDraftOnce.current = true;
     void (async () => {
-      const draft = await getDraft(userId, lessonId);
+      const draft = await getDraft(userId, contextKey);
       if (!draft) return;
 
       const validation = validateLessonDocument(draft.content);
@@ -248,7 +249,7 @@ function LessonEditorLoaded({
         isStale: draft.baseVersion !== initialVersion,
       });
     })();
-  }, [userId, lessonId, initialVersion]);
+  }, [userId, contextKey, initialVersion]);
 
   function applyLocalDraft() {
     if (localDraft?.kind !== "recoverable") return;
@@ -262,7 +263,7 @@ function LessonEditorLoaded({
 
   async function discardLocalDraftState() {
     setLocalDraft(null);
-    if (userId) await deleteDraft(userId, lessonId);
+    if (userId) await deleteDraft(userId, contextKey);
   }
 
   async function handleLoadRemote() {
@@ -276,8 +277,29 @@ function LessonEditorLoaded({
           (issue) => `${issue.path.join(".") || "(raiz)"}: ${issue.message}`,
         )
       : [];
-    return <InvalidRemoteDocument lessonId={lessonId} doc={doc} issues={issues} />;
+    return <InvalidRemoteDocument anchor={anchor} doc={doc} issues={issues} />;
   }
+
+  const editorBlock = (
+    <div className="lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4">
+      <BlockNoteView
+        editor={editor}
+        theme={theme}
+        formattingToolbar={false}
+        slashMenu={false}
+        sideMenu={false}
+      >
+        <LabEditorFormattingToolbar />
+        <LessonEditorSideMenuController />
+        <SuggestionMenuController
+          triggerCharacter="/"
+          getItems={async (query) =>
+            filterSuggestionItems(getLessonEditorSlashMenuItems(editor), query)
+          }
+        />
+      </BlockNoteView>
+    </div>
+  );
 
   return (
     <div className="space-y-3">
@@ -287,13 +309,16 @@ function LessonEditorLoaded({
           {otherTabOpen ? (
             <span className="inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
               <Users className="h-3.5 w-3.5" aria-hidden />
-              Esta aula está aberta em outra aba
+              Este conteúdo está aberto em outra aba
             </span>
           ) : null}
         </div>
         <div className="flex items-center gap-2">
-          <PublishButton lessonId={lessonId} doc={doc} />
-          <HistoryPanel lessonId={lessonId} documentId={doc?.id} onRestored={onRequestReload} />
+          {/* Publicar distingue rascunho do que "os estudantes veem" — um
+              conceito de audiência que não existe na escrita livre de um
+              curso (ninguém além do autor lê aquele conteúdo). */}
+          {anchor.lessonId ? <PublishButton anchor={anchor} doc={doc} /> : null}
+          <HistoryPanel anchor={anchor} documentId={doc?.id} onRestored={onRequestReload} />
         </div>
       </div>
 
@@ -301,10 +326,10 @@ function LessonEditorLoaded({
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-400/50 bg-amber-50 px-3 py-2 text-sm dark:border-amber-400/30 dark:bg-amber-950/40">
           <span>
             {localDraft.kind === "invalid"
-              ? "Encontramos um rascunho local desta aula, mas o conteúdo dele está corrompido e não pode ser recuperado."
+              ? "Encontramos um rascunho local deste conteúdo, mas ele está corrompido e não pode ser recuperado."
               : localDraft.isStale
-                ? "Encontramos um rascunho local de uma versão anterior desta aula — o conteúdo salvo mudou desde então."
-                : "Encontramos alterações não salvas de uma sessão anterior nesta aula."}
+                ? "Encontramos um rascunho local de uma versão anterior deste conteúdo — o conteúdo salvo mudou desde então."
+                : "Encontramos alterações não salvas de uma sessão anterior aqui."}
           </span>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={discardLocalDraftState}>
@@ -319,66 +344,19 @@ function LessonEditorLoaded({
         </div>
       ) : null}
 
-      <Tabs defaultValue="conteudo" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
-          <TabsTrigger value="flashcards">Flashcards</TabsTrigger>
-          <TabsTrigger value="questoes">Questões</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="conteudo" className="mt-4 space-y-3">
-          <div className="lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4">
-            <FlashcardBridgeContext.Provider
-              value={{
-                lessonId,
-                onCreateFlashcard: ({ sourceBlockId, frontText, frontContent }) =>
-                  setFlashcardPrefill({ lessonId, sourceBlockId, front: frontText, frontContent }),
-              }}
-            >
-              <BlockNoteView
-                editor={editor}
-                theme={theme}
-                formattingToolbar={false}
-                slashMenu={false}
-                sideMenu={false}
-              >
-                <LabEditorFormattingToolbar />
-                <LessonEditorSideMenuController />
-                <SuggestionMenuController
-                  triggerCharacter="/"
-                  getItems={async (query) =>
-                    filterSuggestionItems(getLessonEditorSlashMenuItems(editor), query)
-                  }
-                />
-              </BlockNoteView>
-            </FlashcardBridgeContext.Provider>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="flashcards" className="mt-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Flashcards da Aula</h3>
-              <Button size="sm" onClick={() => setFlashcardPrefill({ lessonId, sourceBlockId: null, front: "", frontContent: null })}>
-                Novo Cartão
-              </Button>
-            </div>
-            <LessonFlashcardList lessonId={lessonId} />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="questoes" className="mt-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Questões da Aula</h3>
-              <Button size="sm" onClick={() => setCreatingQuestion(true)}>
-                Nova Questão
-              </Button>
-            </div>
-            <LessonQuestionList lessonId={lessonId} />
-          </div>
-        </TabsContent>
-      </Tabs>
+      {anchor.lessonId ? (
+        <LessonWorkspaceTabs
+          lessonId={anchor.lessonId}
+          editorBlock={editorBlock}
+          onCreateFlashcard={(prefill) => setFlashcardPrefill(prefill)}
+          onNewFlashcard={(lessonId) =>
+            setFlashcardPrefill({ lessonId, sourceBlockId: null, front: "", frontContent: null })
+          }
+          onNewQuestion={() => setCreatingQuestion(true)}
+        />
+      ) : (
+        editorBlock
+      )}
 
       <ConflictDialog
         open={!!autosave.conflict}
@@ -387,47 +365,144 @@ function LessonEditorLoaded({
         onLoadRemote={() => void handleLoadRemote()}
       />
 
-      <FlashcardFormDialog
-        open={!!flashcardPrefill}
-        onOpenChange={(open) => !open && setFlashcardPrefill(null)}
-        prefill={flashcardPrefill ?? undefined}
-      />
+      {anchor.lessonId ? (
+        <>
+          <FlashcardFormDialog
+            open={!!flashcardPrefill}
+            onOpenChange={(open) => !open && setFlashcardPrefill(null)}
+            prefill={flashcardPrefill ?? undefined}
+          />
 
-      <QuestionFormDialog
-        open={creatingQuestion}
-        onOpenChange={setCreatingQuestion}
-        prefill={{ lessonId }}
-      />
+          <QuestionFormDialog
+            open={creatingQuestion}
+            onOpenChange={setCreatingQuestion}
+            prefill={{ lessonId: anchor.lessonId }}
+          />
+        </>
+      ) : null}
     </div>
+  );
+}
+
+/**
+ * Só existe em modo aula (anchor.lessonId): agrupa Conteúdo/Flashcards/
+ * Questões, que dependem de um lessonId real (FK de flashcards/questions).
+ * A escrita livre de um curso nunca chega aqui — não tem para onde essas
+ * abas apontarem.
+ */
+function LessonWorkspaceTabs({
+  lessonId,
+  editorBlock,
+  onCreateFlashcard,
+  onNewFlashcard,
+  onNewQuestion,
+}: {
+  lessonId: string;
+  editorBlock: React.ReactNode;
+  onCreateFlashcard: (prefill: {
+    lessonId: string;
+    sourceBlockId: string;
+    front: string;
+    frontContent: FlashcardContent | null;
+  }) => void;
+  onNewFlashcard: (lessonId: string) => void;
+  onNewQuestion: () => void;
+}) {
+  return (
+    <Tabs defaultValue="conteudo" className="w-full">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
+        <TabsTrigger value="flashcards">Flashcards</TabsTrigger>
+        <TabsTrigger value="questoes">Questões</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="conteudo" className="mt-4 space-y-3">
+        <FlashcardBridgeContext.Provider
+          value={{
+            lessonId,
+            onCreateFlashcard: ({ sourceBlockId, frontText, frontContent }) =>
+              onCreateFlashcard({ lessonId, sourceBlockId, front: frontText, frontContent }),
+          }}
+        >
+          {editorBlock}
+        </FlashcardBridgeContext.Provider>
+      </TabsContent>
+
+      <TabsContent value="flashcards" className="mt-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Flashcards da Aula</h3>
+            <Button size="sm" onClick={() => onNewFlashcard(lessonId)}>
+              Novo Cartão
+            </Button>
+          </div>
+          <LessonFlashcardList lessonId={lessonId} />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="questoes" className="mt-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Questões da Aula</h3>
+            <Button size="sm" onClick={onNewQuestion}>
+              Nova Questão
+            </Button>
+          </div>
+          <LessonQuestionList lessonId={lessonId} />
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 }
 
 function LessonFlashcardList({ lessonId }: { lessonId: string }) {
   const { data: cards, isLoading } = useFlashcards();
-  const lessonCards = useMemo(() => cards?.filter(c => c.lesson_id === lessonId) ?? [], [cards, lessonId]);
+  const lessonCards = useMemo(
+    () => cards?.filter((c) => c.lesson_id === lessonId) ?? [],
+    [cards, lessonId],
+  );
 
   if (isLoading) return <Skeleton className="h-20 w-full" />;
-  if (lessonCards.length === 0) return <p className="text-xs text-muted-foreground text-center py-8">Nenhum cartão para esta aula.</p>;
+  if (lessonCards.length === 0)
+    return (
+      <p className="text-xs text-muted-foreground text-center py-8">
+        Nenhum cartão para esta aula.
+      </p>
+    );
 
   return <FlashcardList cards={lessonCards} />;
 }
 
 function LessonQuestionList({ lessonId }: { lessonId: string }) {
   const { data: questions, isLoading } = useQuestions();
-  const lessonQuestions = useMemo(() => questions?.filter(q => q.lesson_id === lessonId) ?? [], [questions, lessonId]);
+  const lessonQuestions = useMemo(
+    () => questions?.filter((q) => q.lesson_id === lessonId) ?? [],
+    [questions, lessonId],
+  );
 
   if (isLoading) return <Skeleton className="h-20 w-full" />;
-  if (lessonQuestions.length === 0) return <p className="text-xs text-muted-foreground text-center py-8">Nenhuma questão para esta aula.</p>;
+  if (lessonQuestions.length === 0)
+    return (
+      <p className="text-xs text-muted-foreground text-center py-8">
+        Nenhuma questão para esta aula.
+      </p>
+    );
 
   return <QuestionList questions={lessonQuestions} />;
 }
 
-function PublishButton({ lessonId, doc }: { lessonId: string; doc: LessonDocumentRow | null | undefined }) {
-  const publish = usePublishLessonDocument(lessonId);
-  
+function PublishButton({
+  anchor,
+  doc,
+}: {
+  anchor: DocumentAnchor;
+  doc: LessonDocumentRow | null | undefined;
+}) {
+  const publish = usePublishLessonDocument(anchor);
+
   const isUpToDate = doc && doc.published_version === doc.version;
   const hasContent = doc && doc.content && doc.content.length > 0;
-  
+
   // Validação: Pelo menos um bloco real com conteúdo (Gate 1 - Etapa 4)
   const hasRealContent = useMemo(() => {
     if (!doc?.content || !Array.isArray(doc.content)) return false;
@@ -440,7 +515,9 @@ function PublishButton({ lessonId, doc }: { lessonId: string; doc: LessonDocumen
 
   const handlePublish = async () => {
     if (!hasRealContent) {
-      toast.error("Não é possível publicar: adicione pelo menos um conteúdo real antes de publicar esta aula.");
+      toast.error(
+        "Não é possível publicar: adicione pelo menos um conteúdo real antes de publicar esta aula.",
+      );
       return;
     }
 
@@ -457,14 +534,16 @@ function PublishButton({ lessonId, doc }: { lessonId: string; doc: LessonDocumen
 
   return (
     <div className="flex flex-col items-end gap-1.5">
-      <Button 
-        size="sm" 
+      <Button
+        size="sm"
         variant={isUpToDate ? "outline" : "default"}
         disabled={publish.isPending || isUpToDate || !hasContent}
         onClick={handlePublish}
         className={cn(
           "h-8 px-3 text-[10px] font-black uppercase tracking-widest transition-all",
-          !isUpToDate && hasContent && "bg-primary hover:bg-primary/90 text-white shadow-[0_0_15px_-3px_rgba(217,0,110,0.4)]"
+          !isUpToDate &&
+            hasContent &&
+            "bg-primary hover:bg-primary/90 text-white shadow-[0_0_15px_-3px_rgba(217,0,110,0.4)]",
         )}
       >
         {publish.isPending ? (
@@ -476,16 +555,26 @@ function PublishButton({ lessonId, doc }: { lessonId: string; doc: LessonDocumen
         )}
         {isUpToDate ? "Publicado" : "Publicar Alterações"}
       </Button>
-      
+
       <p className="text-[9px] font-bold tracking-tight uppercase">
         {isUpToDate ? (
           <span className="text-emerald-500/60">
-            Publicado em {doc.published_at ? new Date(doc.published_at).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '—'}
+            Publicado em{" "}
+            {doc.published_at
+              ? new Date(doc.published_at).toLocaleString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "—"}
           </span>
         ) : doc.published_version ? (
-          <span className="text-amber-500/60">Alterações não publicadas (Alunos vêem v{doc.published_version})</span>
+          <span className="text-amber-500/60">
+            Alterações não publicadas (Alunos vêem v{doc.published_version})
+          </span>
         ) : (
-          <span className="text-muted-foreground/40 text-[8px]">Aguardando primeira publicação</span>
+          <span className="text-muted-foreground/40 text-[8px]">
+            Aguardando primeira publicação
+          </span>
         )}
       </p>
     </div>

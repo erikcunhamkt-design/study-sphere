@@ -175,7 +175,7 @@ function DashboardPage() {
             action.type === 'review' ? "/app/revisar" :
             action.type === 'test_memory' ? "/app/estudar" :
             action.type === 'reinforce' ? "/app/desempenho" :
-            action.type === 'continue' || action.type === 'first_study' ? "/app/meus-estudos/$areaId/cursos/$courseId" :
+            action.type === 'continue' || action.type === 'first_study' ? "/app/curso/$courseId" :
             undefined
           }
           search={
@@ -188,7 +188,6 @@ function DashboardPage() {
           }
           params={
             (action.type === 'continue' || action.type === 'first_study') ? {
-              areaId: action.metadata?.course?.study_area_id || action.metadata?.study_area_id,
               courseId: action.targetId
             } : undefined
           }

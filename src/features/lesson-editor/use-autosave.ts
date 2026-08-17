@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/hooks/use-auth";
+import { anchorKey, type DocumentAnchor } from "./document-anchor";
 import { deleteDraft, getDraft, saveDraft } from "./drafts-db";
 import { validateLessonDocument, type LessonDocument } from "./document-schema";
 import { useSaveLessonDocument } from "./hooks";
@@ -21,7 +22,7 @@ export interface ConflictInfo {
 }
 
 interface UseLessonAutosaveOptions {
-  lessonId: string;
+  anchor: DocumentAnchor;
   initialVersion: number;
   initialSchemaVersion: number;
 }
@@ -41,12 +42,13 @@ interface UseLessonAutosaveOptions {
  * apagado quando não sobra nenhum conteúdo mais novo pendente.
  */
 export function useLessonAutosave({
-  lessonId,
+  anchor,
   initialVersion,
   initialSchemaVersion,
 }: UseLessonAutosaveOptions) {
   const { user } = useAuth();
-  const saveMutation = useSaveLessonDocument(lessonId);
+  const contextKey = anchorKey(anchor);
+  const saveMutation = useSaveLessonDocument(anchor);
 
   const [status, setStatus] = useState<AutosaveStatus>("idle");
   const [expectedVersion, setExpectedVersion] = useState(initialVersion);
@@ -94,7 +96,7 @@ export function useLessonAutosave({
         }
 
         inFlightRef.current = false;
-        if (user) await deleteDraft(user.id, lessonId);
+        if (user) await deleteDraft(user.id, contextKey);
       } catch (err) {
         if (err instanceof LessonDocumentConflictError) {
           inFlightRef.current = false;
@@ -133,7 +135,7 @@ export function useLessonAutosave({
         inFlightRef.current = false;
       }
     },
-    [user, lessonId, saveMutation],
+    [user, contextKey, saveMutation],
   );
 
   const performSave = useCallback(
@@ -152,7 +154,7 @@ export function useLessonAutosave({
         return;
       }
 
-      await saveDraft(user.id, lessonId, {
+      await saveDraft(user.id, contextKey, {
         content,
         schemaVersion,
         baseVersion: expectedVersionForSave,
@@ -168,7 +170,7 @@ export function useLessonAutosave({
       retryCount.current = 0;
       await attemptSave(content, schemaVersion, expectedVersionForSave);
     },
-    [user, lessonId, attemptSave],
+    [user, contextKey, attemptSave],
   );
 
   const scheduleSave = useCallback(
@@ -206,8 +208,8 @@ export function useLessonAutosave({
     if (!user) return;
     setConflict(null);
     setStatus("idle");
-    await deleteDraft(user.id, lessonId);
-  }, [user, lessonId]);
+    await deleteDraft(user.id, contextKey);
+  }, [user, contextKey]);
 
   return {
     status,

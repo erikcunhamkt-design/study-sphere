@@ -645,9 +645,10 @@ export type Database = {
       lesson_documents: {
         Row: {
           content: Json
+          course_id: string | null
           created_at: string
           id: string
-          lesson_id: string
+          lesson_id: string | null
           published_at: string | null
           published_content: Json | null
           published_version: number | null
@@ -658,9 +659,10 @@ export type Database = {
         }
         Insert: {
           content: Json
+          course_id?: string | null
           created_at?: string
           id?: string
-          lesson_id: string
+          lesson_id?: string | null
           published_at?: string | null
           published_content?: Json | null
           published_version?: number | null
@@ -671,9 +673,10 @@ export type Database = {
         }
         Update: {
           content?: Json
+          course_id?: string | null
           created_at?: string
           id?: string
-          lesson_id?: string
+          lesson_id?: string | null
           published_at?: string | null
           published_content?: Json | null
           published_version?: number | null
@@ -688,6 +691,13 @@ export type Database = {
             columns: ["lesson_id", "user_id"]
             isOneToOne: false
             referencedRelation: "lessons"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "lesson_documents_course_user_fkey"
+            columns: ["course_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id", "user_id"]
           },
           {
@@ -1347,7 +1357,7 @@ export type Database = {
         Returns: string
       }
       checkpoint_lesson_document: {
-        Args: { p_lesson_id: string }
+        Args: { p_course_id?: string | null; p_lesson_id: string | null }
         Returns: Json
       }
       finish_exam_attempt: {
@@ -1363,7 +1373,10 @@ export type Database = {
         Args: { p_document_id: string }
         Returns: undefined
       }
-      publish_lesson_document: { Args: { p_lesson_id: string }; Returns: Json }
+      publish_lesson_document: {
+        Args: { p_course_id?: string | null; p_lesson_id: string | null }
+        Returns: Json
+      }
       rebuild_memory_state_from_history: {
         Args: { p_concept_id: string; p_user_id: string }
         Returns: string
@@ -1395,14 +1408,15 @@ export type Database = {
       }
       reorder_study_areas: { Args: { p_ids: string[] }; Returns: undefined }
       restore_lesson_document_version: {
-        Args: { p_lesson_id: string; p_version: number }
+        Args: { p_course_id?: string | null; p_lesson_id: string | null; p_version: number }
         Returns: Json
       }
       save_lesson_document: {
         Args: {
           p_content: Json
+          p_course_id?: string | null
           p_expected_version: number
-          p_lesson_id: string
+          p_lesson_id: string | null
           p_schema_version: number
         }
         Returns: Json

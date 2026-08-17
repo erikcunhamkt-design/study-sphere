@@ -39,19 +39,19 @@ import { useAllCourses } from "@/features/studies/hooks/use-courses";
 import { filterProductionEligible } from "@/lib/eligibility";
 
 export const Route = createFileRoute("/app/estudar")({
-  validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; courseId?: string; mode?: "review" | "training" } => {
-    const plannedId = typeof search.plannedId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.plannedId) 
-      ? search.plannedId 
+  validateSearch: (search: Record<string, unknown>): { plannedId?: string; method?: StudyMethod; deckId?: string; courseId?: string; lessonId?: string; mode?: "review" | "training" } => {
+    const plannedId = typeof search.plannedId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.plannedId)
+      ? search.plannedId
       : undefined;
-    
-    const deckId = typeof search.deckId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.deckId) 
-      ? search.deckId 
+
+    const deckId = typeof search.deckId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.deckId)
+      ? search.deckId
       : undefined;
 
     const mode = (search.mode === "review" || search.mode === "training")
       ? (search.mode as "review" | "training")
       : undefined;
-    
+
     const method = typeof search.method === "string" && ["pomodoro", "feynman", "blurting", "cornell", "flashcards", "exame", "livre", "aprender"].includes(search.method)
       ? (search.method as StudyMethod)
       : undefined;
@@ -60,13 +60,19 @@ export const Route = createFileRoute("/app/estudar")({
       ? search.courseId
       : undefined;
 
-    return { plannedId, method, deckId, courseId, mode };
+    // Aula específica dentro de um curso (ex.: clicar numa aula no Curso V1) — repassada ao
+    // LivreSession como initialLessonId. Ausente: comportamento por courseId/deckId inalterado.
+    const lessonId = typeof search.lessonId === "string" && /^[0-9a-fA-F-]{36}$/.test(search.lessonId)
+      ? search.lessonId
+      : undefined;
+
+    return { plannedId, method, deckId, courseId, lessonId, mode };
   },
   component: EstudarPage,
 });
 
 function EstudarPage() {
-  const { plannedId, method: initialMethod, deckId, courseId, mode } = Route.useSearch();
+  const { plannedId, method: initialMethod, deckId, courseId, lessonId, mode } = Route.useSearch();
   const [activeMethod, setActiveMethod] = useState<StudyMethod | null>(initialMethod ?? null);
   const [resumingSession, setResumingSession] = useState<StudySessionRow | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -75,7 +81,13 @@ function EstudarPage() {
     name: string;
     status: string;
     type: 'course' | 'lesson';
-  } | null>(courseId ? { id: courseId, name: "", status: "not_started", type: 'course' } : null);
+  } | null>(
+    lessonId
+      ? { id: lessonId, name: "", status: "not_started", type: 'lesson' }
+      : courseId
+        ? { id: courseId, name: "", status: "not_started", type: 'course' }
+        : null,
+  );
   const methodsHubRef = useRef<HTMLDivElement>(null);
 
   const nextBest = useNextBestAction();

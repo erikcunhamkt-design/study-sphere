@@ -23,6 +23,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { DocumentAnchor } from "./document-anchor";
 import {
   useCheckpointLessonDocument,
   useLessonDocumentVersions,
@@ -37,7 +38,7 @@ const REASON_LABELS: Record<VersionReason, string> = {
 };
 
 interface HistoryPanelProps {
-  lessonId: string;
+  anchor: DocumentAnchor;
   documentId: string | undefined;
   /**
    * Chamado após uma restauração bem-sucedida. O editor é montado com o
@@ -56,12 +57,12 @@ interface HistoryPanelProps {
  * Painel lateral, não uma barra fixa: só aparece quando aberto, não cobre
  * o texto do caderno.
  */
-export function HistoryPanel({ lessonId, documentId, onRestored }: HistoryPanelProps) {
+export function HistoryPanel({ anchor, documentId, onRestored }: HistoryPanelProps) {
   const [open, setOpen] = useState(false);
   const [pendingRestore, setPendingRestore] = useState<LessonDocumentVersionRow | null>(null);
   const { data: versions, isLoading } = useLessonDocumentVersions(documentId);
-  const checkpoint = useCheckpointLessonDocument(lessonId);
-  const restore = useRestoreLessonDocumentVersion(lessonId);
+  const checkpoint = useCheckpointLessonDocument(anchor);
+  const restore = useRestoreLessonDocumentVersion(anchor);
 
   async function handleCheckpoint() {
     try {

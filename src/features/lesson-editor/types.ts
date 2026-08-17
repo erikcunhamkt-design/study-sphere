@@ -2,7 +2,9 @@ import type { LessonDocument } from "./document-schema";
 
 export interface LessonDocumentRow {
   id: string;
-  lesson_id: string;
+  /** Exatamente um entre lesson_id/course_id é não nulo — ver DocumentAnchor. */
+  lesson_id: string | null;
+  course_id: string | null;
   user_id: string;
   content: LessonDocument;
   schema_version: number;

@@ -88,6 +88,16 @@ export function useCourseOverview(courseId: string | undefined) {
     () => (tree.lessons ?? []).filter((l) => !l.is_archived),
     [tree.lessons],
   );
+
+  // Expostos só para o modo Organizar (restaurar) — nunca aparecem na leitura normal do curso.
+  const archivedModules = useMemo(
+    () => (tree.modules ?? []).filter((m) => m.is_archived),
+    [tree.modules],
+  );
+  const archivedLessons = useMemo(
+    () => (tree.lessons ?? []).filter((l) => l.is_archived),
+    [tree.lessons],
+  );
   const lessonIds = useMemo(() => lessons.map((l) => l.id), [lessons]);
 
   const publishedQuery = usePublishedLessonIds(lessonIds);
@@ -162,6 +172,8 @@ export function useCourseOverview(courseId: string | undefined) {
     course: courseQuery.data,
     modules: moduleViews,
     lessons: allLessonViews,
+    archivedModules,
+    archivedLessons,
     hasModules,
     progress,
     continueTarget,

@@ -146,7 +146,9 @@ export function LivreSession({ resumingSession, onDone, plannedId, method = "liv
     }
   }, [initialLessonId, initialCourseId, isLoadingLessons, courseLessons, session, optimisticStart, resumingSession]);
 
-  const { data: lessonDoc } = useLessonDocument(effectiveLessonId || "");
+  const { data: lessonDoc } = useLessonDocument(
+    effectiveLessonId ? { lessonId: effectiveLessonId } : undefined,
+  );
   
 
   // Se o lessonId foi setado via efeito de curso, inicia a sessão assim que o estado estabilizar

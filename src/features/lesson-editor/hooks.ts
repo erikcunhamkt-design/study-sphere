@@ -2,11 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@/hooks/use-auth";
 import * as api from "./api";
+import { anchorKey, type DocumentAnchor } from "./document-anchor";
 import type { LessonDocument } from "./document-schema";
 import { LessonDocumentConflictError } from "./types";
 
-export function lessonDocumentKey(userId: string | undefined, lessonId: string | undefined) {
-  return ["lesson-document", userId, lessonId] as const;
+export function lessonDocumentKey(userId: string | undefined, anchor: DocumentAnchor | undefined) {
+  return ["lesson-document", userId, anchor ? anchorKey(anchor) : undefined] as const;
 }
 
 export function lessonDocumentVersionsKey(
@@ -16,12 +17,12 @@ export function lessonDocumentVersionsKey(
   return ["lesson-document-versions", userId, documentId] as const;
 }
 
-export function useLessonDocument(lessonId: string | undefined) {
+export function useLessonDocument(anchor: DocumentAnchor | undefined) {
   const { user } = useAuth();
   return useQuery({
-    enabled: !!user && !!lessonId,
-    queryKey: lessonDocumentKey(user?.id, lessonId),
-    queryFn: () => api.fetchLessonDocument(user!.id, lessonId!),
+    enabled: !!user && !!anchor,
+    queryKey: lessonDocumentKey(user?.id, anchor),
+    queryFn: () => api.fetchLessonDocument(user!.id, anchor!),
   });
 }
 
@@ -39,7 +40,7 @@ export function useLessonDocumentVersions(documentId: string | undefined) {
  * Em conflito (LessonDocumentConflictError), NÃO reinvalida silenciosamente
  * — quem chama decide o que fazer (ver useAutosaveLessonDocument).
  */
-export function useSaveLessonDocument(lessonId: string) {
+export function useSaveLessonDocument(anchor: DocumentAnchor) {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
@@ -51,9 +52,9 @@ export function useSaveLessonDocument(lessonId: string) {
       content: LessonDocument;
       schemaVersion: number;
       expectedVersion: number;
-    }) => api.saveLessonDocument(lessonId, content, schemaVersion, expectedVersion),
+    }) => api.saveLessonDocument(anchor, content, schemaVersion, expectedVersion),
     onSuccess: (result) => {
-      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) });
+      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, anchor) });
       if (result.snapshot_created) {
         qc.invalidateQueries({
           queryKey: lessonDocumentVersionsKey(user?.id, result.document_id),
@@ -64,48 +65,48 @@ export function useSaveLessonDocument(lessonId: string) {
       if (err instanceof LessonDocumentConflictError) {
         // A versão remota avançou; a UI de conflito decide (ver Etapa de
         // conflito), não tentamos de novo silenciosamente aqui.
-        qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) });
+        qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, anchor) });
       }
     },
   });
 }
 
-export function useCheckpointLessonDocument(lessonId: string) {
+export function useCheckpointLessonDocument(anchor: DocumentAnchor) {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: () => api.checkpointLessonDocument(lessonId),
+    mutationFn: () => api.checkpointLessonDocument(anchor),
     onSuccess: (result) => {
-      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) });
+      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, anchor) });
       qc.invalidateQueries({ queryKey: lessonDocumentVersionsKey(user?.id, result.document_id) });
     },
   });
 }
 
-export function useRestoreLessonDocumentVersion(lessonId: string) {
+export function useRestoreLessonDocumentVersion(anchor: DocumentAnchor) {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (version: number) => api.restoreLessonDocumentVersion(lessonId, version),
+    mutationFn: (version: number) => api.restoreLessonDocumentVersion(anchor, version),
     // Retorna as invalidações para que mutateAsync só resolva depois que o
     // documento restaurado foi re-buscado — quem remonta o editor no
     // sucesso (HistoryPanel.onRestored) precisa encontrar o conteúdo novo
     // no cache, não o antigo.
     onSuccess: (result) =>
       Promise.all([
-        qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) }),
+        qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, anchor) }),
         qc.invalidateQueries({ queryKey: lessonDocumentVersionsKey(user?.id, result.document_id) }),
       ]),
   });
 }
 
-export function usePublishLessonDocument(lessonId: string) {
+export function usePublishLessonDocument(anchor: DocumentAnchor) {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: () => api.publishLessonDocument(lessonId),
+    mutationFn: () => api.publishLessonDocument(anchor),
     onSuccess: (result) => {
-      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, lessonId) });
+      qc.invalidateQueries({ queryKey: lessonDocumentKey(user?.id, anchor) });
       qc.invalidateQueries({
         queryKey: lessonDocumentVersionsKey(user?.id, result.document_id),
       });

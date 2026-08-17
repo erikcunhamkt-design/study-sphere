@@ -15,15 +15,16 @@ function randomTabId(): string {
 }
 
 /**
- * Detecção best-effort de outra aba com a mesma aula aberta, via
- * BroadcastChannel (um canal por aula — plano §10.10). É só um aviso: a
- * proteção real contra sobrescrita continua sendo o expected_version no
- * save (ver use-autosave.ts); este canal nunca decide nada sozinho, só
- * informa a UI. Ambientes sem BroadcastChannel (ex.: alguns testes) só
- * deixam de detectar — não quebram.
+ * Detecção best-effort de outra aba com o mesmo documento aberto (aula ou
+ * escrita livre de um curso), via BroadcastChannel (um canal por
+ * documento — plano §10.10). É só um aviso: a proteção real contra
+ * sobrescrita continua sendo o expected_version no save (ver
+ * use-autosave.ts); este canal nunca decide nada sozinho, só informa a
+ * UI. Ambientes sem BroadcastChannel (ex.: alguns testes) só deixam de
+ * detectar — não quebram.
  */
 export function watchLessonTabPresence(
-  lessonId: string,
+  contextKey: string,
   onChange: (otherTabOpen: boolean) => void,
 ): TabPresenceHandle {
   if (typeof BroadcastChannel === "undefined") {
@@ -31,7 +32,7 @@ export function watchLessonTabPresence(
   }
 
   const tabId = randomTabId();
-  const channel = new BroadcastChannel(`studyos-lesson:${lessonId}`);
+  const channel = new BroadcastChannel(`studyos-lesson:${contextKey}`);
   const knownTabs = new Set<string>();
 
   function notify() {

@@ -9,46 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
-import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as CadastroRouteImport } from './routes/cadastro'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppRevisarRouteImport } from './routes/app/revisar'
-import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
-import { Route as AppNovoEstudoRouteImport } from './routes/app.novo-estudo'
-import { Route as AppEstudarRouteImport } from './routes/app.estudar'
-import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
-import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
-import { Route as AppMeusEstudosIndexRouteImport } from './routes/app.meus-estudos.index'
+import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
+import { Route as AppDesempenhoRouteImport } from './routes/app.desempenho'
+import { Route as AppEstudarRouteImport } from './routes/app.estudar'
+import { Route as AppNovoEstudoRouteImport } from './routes/app.novo-estudo'
+import { Route as AppPlanejamentoRouteImport } from './routes/app.planejamento'
+import { Route as AppRevisarRouteImport } from './routes/app/revisar'
+import { Route as AppCursoCourseIdRouteImport } from './routes/app.curso.$courseId'
 import { Route as AppLabEditorRouteImport } from './routes/app.lab.editor'
-import { Route as AppMeusEstudosAreaIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.index'
+import { Route as AppMeusEstudosIndexRouteImport } from './routes/app.meus-estudos.index'
 import { Route as AppBibliotecaBaralhoDeckIdRouteImport } from './routes/app.biblioteca.baralho.$deckId'
+import { Route as AppCursoCourseIdEscreverRouteImport } from './routes/app.curso.$courseId.escrever'
+import { Route as AppMeusEstudosAreaIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.index'
 import { Route as AppMeusEstudosAreaIdCursosCourseIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.cursos.$courseId.index'
 import { Route as AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRouteImport } from './routes/app.meus-estudos.$areaId.cursos.$courseId.modulos.$moduleId.index'
 import { Route as AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdAulasLessonIdRouteImport } from './routes/app.meus-estudos.$areaId.cursos.$courseId.modulos.$moduleId.aulas.$lessonId'
 
-const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
-  id: '/redefinir-senha',
-  path: '/redefinir-senha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
-  id: '/recuperar-senha',
-  path: '/recuperar-senha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CadastroRoute = CadastroRouteImport.update({
-  id: '/cadastro',
-  path: '/cadastro',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -56,9 +43,24 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -66,29 +68,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppRevisarRoute = AppRevisarRouteImport.update({
-  id: '/revisar',
-  path: '/revisar',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
-  id: '/planejamento',
-  path: '/planejamento',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppNovoEstudoRoute = AppNovoEstudoRouteImport.update({
-  id: '/novo-estudo',
-  path: '/novo-estudo',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppEstudarRoute = AppEstudarRouteImport.update({
-  id: '/estudar',
-  path: '/estudar',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDesempenhoRoute = AppDesempenhoRouteImport.update({
-  id: '/desempenho',
-  path: '/desempenho',
+const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
   getParentRoute: () => AppRoute,
 } as any)
 const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
@@ -96,14 +78,34 @@ const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
   path: '/configuracoes',
   getParentRoute: () => AppRoute,
 } as any)
-const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
-  id: '/biblioteca',
-  path: '/biblioteca',
+const AppDesempenhoRoute = AppDesempenhoRouteImport.update({
+  id: '/desempenho',
+  path: '/desempenho',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMeusEstudosIndexRoute = AppMeusEstudosIndexRouteImport.update({
-  id: '/meus-estudos/',
-  path: '/meus-estudos/',
+const AppEstudarRoute = AppEstudarRouteImport.update({
+  id: '/estudar',
+  path: '/estudar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNovoEstudoRoute = AppNovoEstudoRouteImport.update({
+  id: '/novo-estudo',
+  path: '/novo-estudo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlanejamentoRoute = AppPlanejamentoRouteImport.update({
+  id: '/planejamento',
+  path: '/planejamento',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRevisarRoute = AppRevisarRouteImport.update({
+  id: '/revisar',
+  path: '/revisar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCursoCourseIdRoute = AppCursoCourseIdRouteImport.update({
+  id: '/curso/$courseId',
+  path: '/curso/$courseId',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLabEditorRoute = AppLabEditorRouteImport.update({
@@ -111,17 +113,28 @@ const AppLabEditorRoute = AppLabEditorRouteImport.update({
   path: '/lab/editor',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMeusEstudosAreaIdIndexRoute =
-  AppMeusEstudosAreaIdIndexRouteImport.update({
-    id: '/meus-estudos/$areaId/',
-    path: '/meus-estudos/$areaId/',
-    getParentRoute: () => AppRoute,
-  } as any)
+const AppMeusEstudosIndexRoute = AppMeusEstudosIndexRouteImport.update({
+  id: '/meus-estudos/',
+  path: '/meus-estudos/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppBibliotecaBaralhoDeckIdRoute =
   AppBibliotecaBaralhoDeckIdRouteImport.update({
     id: '/baralho/$deckId',
     path: '/baralho/$deckId',
     getParentRoute: () => AppBibliotecaRoute,
+  } as any)
+const AppCursoCourseIdEscreverRoute =
+  AppCursoCourseIdEscreverRouteImport.update({
+    id: '/escrever',
+    path: '/escrever',
+    getParentRoute: () => AppCursoCourseIdRoute,
+  } as any)
+const AppMeusEstudosAreaIdIndexRoute =
+  AppMeusEstudosAreaIdIndexRouteImport.update({
+    id: '/meus-estudos/$areaId/',
+    path: '/meus-estudos/$areaId/',
+    getParentRoute: () => AppRoute,
   } as any)
 const AppMeusEstudosAreaIdCursosCourseIdIndexRoute =
   AppMeusEstudosAreaIdCursosCourseIdIndexRouteImport.update({
@@ -159,9 +172,11 @@ export interface FileRoutesByFullPath {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
+  '/app/curso/$courseId': typeof AppCursoCourseIdRouteWithChildren
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
+  '/app/curso/$courseId/escrever': typeof AppCursoCourseIdEscreverRoute
   '/app/meus-estudos/$areaId/': typeof AppMeusEstudosAreaIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -181,9 +196,11 @@ export interface FileRoutesByTo {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app': typeof AppIndexRoute
+  '/app/curso/$courseId': typeof AppCursoCourseIdRouteWithChildren
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
+  '/app/curso/$courseId/escrever': typeof AppCursoCourseIdEscreverRoute
   '/app/meus-estudos/$areaId': typeof AppMeusEstudosAreaIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -205,9 +222,11 @@ export interface FileRoutesById {
   '/app/planejamento': typeof AppPlanejamentoRoute
   '/app/revisar': typeof AppRevisarRoute
   '/app/': typeof AppIndexRoute
+  '/app/curso/$courseId': typeof AppCursoCourseIdRouteWithChildren
   '/app/lab/editor': typeof AppLabEditorRoute
   '/app/meus-estudos/': typeof AppMeusEstudosIndexRoute
   '/app/biblioteca/baralho/$deckId': typeof AppBibliotecaBaralhoDeckIdRoute
+  '/app/curso/$courseId/escrever': typeof AppCursoCourseIdEscreverRoute
   '/app/meus-estudos/$areaId/': typeof AppMeusEstudosAreaIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/': typeof AppMeusEstudosAreaIdCursosCourseIdIndexRoute
   '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/': typeof AppMeusEstudosAreaIdCursosCourseIdModulosModuleIdIndexRoute
@@ -230,9 +249,11 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/revisar'
     | '/app/'
+    | '/app/curso/$courseId'
     | '/app/lab/editor'
     | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
+    | '/app/curso/$courseId/escrever'
     | '/app/meus-estudos/$areaId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
@@ -252,9 +273,11 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/revisar'
     | '/app'
+    | '/app/curso/$courseId'
     | '/app/lab/editor'
     | '/app/meus-estudos'
     | '/app/biblioteca/baralho/$deckId'
+    | '/app/curso/$courseId/escrever'
     | '/app/meus-estudos/$areaId'
     | '/app/meus-estudos/$areaId/cursos/$courseId'
     | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId'
@@ -275,9 +298,11 @@ export interface FileRouteTypes {
     | '/app/planejamento'
     | '/app/revisar'
     | '/app/'
+    | '/app/curso/$courseId'
     | '/app/lab/editor'
     | '/app/meus-estudos/'
     | '/app/biblioteca/baralho/$deckId'
+    | '/app/curso/$courseId/escrever'
     | '/app/meus-estudos/$areaId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/'
     | '/app/meus-estudos/$areaId/cursos/$courseId/modulos/$moduleId/'
@@ -295,32 +320,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/redefinir-senha': {
-      id: '/redefinir-senha'
-      path: '/redefinir-senha'
-      fullPath: '/redefinir-senha'
-      preLoaderRoute: typeof RedefinirSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recuperar-senha': {
-      id: '/recuperar-senha'
-      path: '/recuperar-senha'
-      fullPath: '/recuperar-senha'
-      preLoaderRoute: typeof RecuperarSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cadastro': {
-      id: '/cadastro'
-      path: '/cadastro'
-      fullPath: '/cadastro'
-      preLoaderRoute: typeof CadastroRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -330,11 +334,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recuperar-senha': {
+      id: '/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/recuperar-senha'
+      preLoaderRoute: typeof RecuperarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -344,39 +369,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/revisar': {
-      id: '/app/revisar'
-      path: '/revisar'
-      fullPath: '/app/revisar'
-      preLoaderRoute: typeof AppRevisarRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/planejamento': {
-      id: '/app/planejamento'
-      path: '/planejamento'
-      fullPath: '/app/planejamento'
-      preLoaderRoute: typeof AppPlanejamentoRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/novo-estudo': {
-      id: '/app/novo-estudo'
-      path: '/novo-estudo'
-      fullPath: '/app/novo-estudo'
-      preLoaderRoute: typeof AppNovoEstudoRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/estudar': {
-      id: '/app/estudar'
-      path: '/estudar'
-      fullPath: '/app/estudar'
-      preLoaderRoute: typeof AppEstudarRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/desempenho': {
-      id: '/app/desempenho'
-      path: '/desempenho'
-      fullPath: '/app/desempenho'
-      preLoaderRoute: typeof AppDesempenhoRouteImport
+    '/app/biblioteca': {
+      id: '/app/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/app/biblioteca'
+      preLoaderRoute: typeof AppBibliotecaRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/configuracoes': {
@@ -386,18 +383,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConfiguracoesRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/biblioteca': {
-      id: '/app/biblioteca'
-      path: '/biblioteca'
-      fullPath: '/app/biblioteca'
-      preLoaderRoute: typeof AppBibliotecaRouteImport
+    '/app/desempenho': {
+      id: '/app/desempenho'
+      path: '/desempenho'
+      fullPath: '/app/desempenho'
+      preLoaderRoute: typeof AppDesempenhoRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/meus-estudos/': {
-      id: '/app/meus-estudos/'
-      path: '/meus-estudos'
-      fullPath: '/app/meus-estudos/'
-      preLoaderRoute: typeof AppMeusEstudosIndexRouteImport
+    '/app/estudar': {
+      id: '/app/estudar'
+      path: '/estudar'
+      fullPath: '/app/estudar'
+      preLoaderRoute: typeof AppEstudarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/novo-estudo': {
+      id: '/app/novo-estudo'
+      path: '/novo-estudo'
+      fullPath: '/app/novo-estudo'
+      preLoaderRoute: typeof AppNovoEstudoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/planejamento': {
+      id: '/app/planejamento'
+      path: '/planejamento'
+      fullPath: '/app/planejamento'
+      preLoaderRoute: typeof AppPlanejamentoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/revisar': {
+      id: '/app/revisar'
+      path: '/revisar'
+      fullPath: '/app/revisar'
+      preLoaderRoute: typeof AppRevisarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/curso/$courseId': {
+      id: '/app/curso/$courseId'
+      path: '/curso/$courseId'
+      fullPath: '/app/curso/$courseId'
+      preLoaderRoute: typeof AppCursoCourseIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/lab/editor': {
@@ -407,11 +432,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLabEditorRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/meus-estudos/$areaId/': {
-      id: '/app/meus-estudos/$areaId/'
-      path: '/meus-estudos/$areaId'
-      fullPath: '/app/meus-estudos/$areaId/'
-      preLoaderRoute: typeof AppMeusEstudosAreaIdIndexRouteImport
+    '/app/meus-estudos/': {
+      id: '/app/meus-estudos/'
+      path: '/meus-estudos'
+      fullPath: '/app/meus-estudos/'
+      preLoaderRoute: typeof AppMeusEstudosIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/biblioteca/baralho/$deckId': {
@@ -420,6 +445,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/biblioteca/baralho/$deckId'
       preLoaderRoute: typeof AppBibliotecaBaralhoDeckIdRouteImport
       parentRoute: typeof AppBibliotecaRoute
+    }
+    '/app/curso/$courseId/escrever': {
+      id: '/app/curso/$courseId/escrever'
+      path: '/escrever'
+      fullPath: '/app/curso/$courseId/escrever'
+      preLoaderRoute: typeof AppCursoCourseIdEscreverRouteImport
+      parentRoute: typeof AppCursoCourseIdRoute
+    }
+    '/app/meus-estudos/$areaId/': {
+      id: '/app/meus-estudos/$areaId/'
+      path: '/meus-estudos/$areaId'
+      fullPath: '/app/meus-estudos/$areaId/'
+      preLoaderRoute: typeof AppMeusEstudosAreaIdIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/meus-estudos/$areaId/cursos/$courseId/': {
       id: '/app/meus-estudos/$areaId/cursos/$courseId/'
@@ -457,6 +496,17 @@ const AppBibliotecaRouteWithChildren = AppBibliotecaRoute._addFileChildren(
   AppBibliotecaRouteChildren,
 )
 
+interface AppCursoCourseIdRouteChildren {
+  AppCursoCourseIdEscreverRoute: typeof AppCursoCourseIdEscreverRoute
+}
+
+const AppCursoCourseIdRouteChildren: AppCursoCourseIdRouteChildren = {
+  AppCursoCourseIdEscreverRoute: AppCursoCourseIdEscreverRoute,
+}
+
+const AppCursoCourseIdRouteWithChildren =
+  AppCursoCourseIdRoute._addFileChildren(AppCursoCourseIdRouteChildren)
+
 interface AppRouteChildren {
   AppBibliotecaRoute: typeof AppBibliotecaRouteWithChildren
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
@@ -466,6 +516,7 @@ interface AppRouteChildren {
   AppPlanejamentoRoute: typeof AppPlanejamentoRoute
   AppRevisarRoute: typeof AppRevisarRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppCursoCourseIdRoute: typeof AppCursoCourseIdRouteWithChildren
   AppLabEditorRoute: typeof AppLabEditorRoute
   AppMeusEstudosIndexRoute: typeof AppMeusEstudosIndexRoute
   AppMeusEstudosAreaIdIndexRoute: typeof AppMeusEstudosAreaIdIndexRoute
@@ -483,6 +534,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPlanejamentoRoute: AppPlanejamentoRoute,
   AppRevisarRoute: AppRevisarRoute,
   AppIndexRoute: AppIndexRoute,
+  AppCursoCourseIdRoute: AppCursoCourseIdRouteWithChildren,
   AppLabEditorRoute: AppLabEditorRoute,
   AppMeusEstudosIndexRoute: AppMeusEstudosIndexRoute,
   AppMeusEstudosAreaIdIndexRoute: AppMeusEstudosAreaIdIndexRoute,

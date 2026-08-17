@@ -115,7 +115,7 @@ export function LessonContentViewer({
   onProgress,
   canEdit 
 }: LessonContentViewerProps) {
-  const { data: doc, isLoading, isError } = useLessonDocument(lessonId);
+  const { data: doc, isLoading, isError } = useLessonDocument({ lessonId });
 
   // O estudante consome published_content
   const realContent = useMemo(() => getRealContent(doc?.published_content as LessonDocument), [doc?.published_content]);
