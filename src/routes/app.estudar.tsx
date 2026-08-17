@@ -213,11 +213,18 @@ function EstudarPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-16 pb-20 px-4 md:px-0">
-      <header className="space-y-3">
-        <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Estudar</h1>
-        <p className="text-lg md:text-xl text-muted-foreground/40 font-medium tracking-tight">
-          Escolha onde continuar ou deixe o Dominus indicar seu próximo passo.
-        </p>
+      <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-3">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">Estudar</h1>
+          <p className="text-lg md:text-xl text-muted-foreground/40 font-medium tracking-tight">
+            Escolha onde continuar ou deixe o Dominus indicar seu próximo passo.
+          </p>
+        </div>
+        <Button asChild variant="outline" className="rounded-full font-bold self-start md:self-auto">
+          <Link to="/app/novo-estudo">
+            <Plus className="mr-1.5 h-4 w-4" /> Novo estudo
+          </Link>
+        </Button>
       </header>
 
       {/* 1. PRÓXIMO PASSO (HERO) */}
