@@ -4,7 +4,7 @@ import type { FlashcardContent, FlashcardRating } from "./schema";
 import type { FlashcardReviewRow, FlashcardRow, SubmitFlashcardReviewResult } from "./types";
 
 const FLASHCARD_COLUMNS =
-  "id, user_id, lesson_id, deck_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, is_test_data, created_at, updated_at";
+  "id, user_id, lesson_id, course_id, concept_id, deck_id, source_block_id, front, back, state, learning_step, interval_days, ease, reps, lapses, due_at, is_archived, is_test_data, created_at, updated_at";
 
 export async function fetchFlashcards(userId: string): Promise<FlashcardRow[]> {
   const { data, error } = await supabase
@@ -32,7 +32,10 @@ export async function fetchDueFlashcards(userId: string): Promise<FlashcardRow[]
   return (data ?? []) as unknown as FlashcardRow[];
 }
 
-export async function fetchFlashcardsByDeck(userId: string, deckId: string): Promise<FlashcardRow[]> {
+export async function fetchFlashcardsByDeck(
+  userId: string,
+  deckId: string,
+): Promise<FlashcardRow[]> {
   const { data, error } = await supabase
     .from("flashcards")
     .select(FLASHCARD_COLUMNS)
@@ -46,7 +49,10 @@ export async function fetchFlashcardsByDeck(userId: string, deckId: string): Pro
 }
 
 /** Fila de revisão de um baralho específico. */
-export async function fetchDueFlashcardsByDeck(userId: string, deckId: string): Promise<FlashcardRow[]> {
+export async function fetchDueFlashcardsByDeck(
+  userId: string,
+  deckId: string,
+): Promise<FlashcardRow[]> {
   const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("flashcards")
@@ -62,8 +68,9 @@ export async function fetchDueFlashcardsByDeck(userId: string, deckId: string): 
 }
 
 export interface CreateFlashcardInput {
-
   lessonId: string | null;
+  courseId?: string | null;
+  conceptId?: string | null;
   deckId: string | null;
   sourceBlockId: string | null;
   front: FlashcardContent;
@@ -79,6 +86,8 @@ export async function createFlashcard(
     .insert({
       user_id: userId,
       lesson_id: input.lessonId,
+      course_id: input.courseId ?? null,
+      concept_id: input.conceptId ?? null,
       deck_id: input.deckId,
       source_block_id: input.sourceBlockId,
       front: input.front as unknown as Json,

@@ -1,9 +1,10 @@
 import { createContext, useContext } from "react";
 
 import type { FlashcardContent } from "@/features/flashcards/schema";
+import type { DocumentAnchor } from "./document-anchor";
 
 /**
- * Ponte estreita entre o editor da aula e o recurso de flashcards da
+ * Ponte estreita entre o editor da aula/curso e o recurso de flashcards da
  * Fase 04, sem acoplar os dois pacotes de features um no outro
  * diretamente. O item "Criar flashcard" do side menu (renderizado por
  * dentro do BlockNoteView, possivelmente via portal) precisa acionar um
@@ -17,7 +18,7 @@ import type { FlashcardContent } from "@/features/flashcards/schema";
  * flashcards). Tipo é seguro nos dois sentidos.
  */
 export interface FlashcardBridgeValue {
-  lessonId: string;
+  anchor: DocumentAnchor;
   onCreateFlashcard: (params: {
     sourceBlockId: string;
     frontText: string;

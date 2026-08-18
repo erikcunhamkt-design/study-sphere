@@ -166,7 +166,7 @@ function LessonEditorLoaded({
   const [localDraft, setLocalDraft] = useState<LocalDraftState>(null);
   const [otherTabOpen, setOtherTabOpen] = useState(false);
   const [flashcardPrefill, setFlashcardPrefill] = useState<{
-    lessonId: string | null;
+    anchor: DocumentAnchor;
     sourceBlockId: string | null;
     front: string;
     frontContent: FlashcardContent | null;
@@ -288,14 +288,11 @@ function LessonEditorLoaded({
     return <InvalidRemoteDocument anchor={anchor} doc={doc} issues={issues} />;
   }
 
-  // Em modo aula, o editor divide a tela com as abas Flashcards/Questões —
-  // o card (borda + fundo) ajuda a demarcar onde uma seção termina e outra
-  // começa. Em modo curso não existe mais nada na página: o mesmo card, ali
-  // sozinho, lê como "uma caixinha perdida no meio do vazio". Sem anchor
-  // de aula, o texto flui direto na página — sem borda, sem fundo próprio.
-  const editorWrapperClassName = anchor.lessonId
-    ? "lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4"
-    : "lab-editor-bn-theme";
+  // O card (borda + fundo) ajuda a demarcar onde o editor termina e as
+  // abas de Flashcards/Questões começam — visível sempre que essas abas
+  // existem, em aula ou em curso (LessonWorkspaceTabs, abaixo).
+  const editorWrapperClassName =
+    "lab-editor-bn-theme rounded-xl border border-border bg-surface p-2 sm:p-4";
 
   const editorBlock = (
     <div className={editorWrapperClassName}>
@@ -369,19 +366,15 @@ function LessonEditorLoaded({
         </div>
       ) : null}
 
-      {anchor.lessonId ? (
-        <LessonWorkspaceTabs
-          lessonId={anchor.lessonId}
-          editorBlock={editorBlock}
-          onCreateFlashcard={(prefill) => setFlashcardPrefill(prefill)}
-          onNewFlashcard={(lessonId) =>
-            setFlashcardPrefill({ lessonId, sourceBlockId: null, front: "", frontContent: null })
-          }
-          onNewQuestion={() => setCreatingQuestion(true)}
-        />
-      ) : (
-        editorBlock
-      )}
+      <LessonWorkspaceTabs
+        anchor={anchor}
+        editorBlock={editorBlock}
+        onCreateFlashcard={(prefill) => setFlashcardPrefill(prefill)}
+        onNewFlashcard={() =>
+          setFlashcardPrefill({ anchor, sourceBlockId: null, front: "", frontContent: null })
+        }
+        onNewQuestion={() => setCreatingQuestion(true)}
+      />
 
       <ConflictDialog
         open={!!autosave.conflict}
@@ -390,49 +383,47 @@ function LessonEditorLoaded({
         onLoadRemote={() => void handleLoadRemote()}
       />
 
-      {anchor.lessonId ? (
-        <>
-          <FlashcardFormDialog
-            open={!!flashcardPrefill}
-            onOpenChange={(open) => !open && setFlashcardPrefill(null)}
-            prefill={flashcardPrefill ?? undefined}
-          />
+      <FlashcardFormDialog
+        open={!!flashcardPrefill}
+        onOpenChange={(open) => !open && setFlashcardPrefill(null)}
+        prefill={flashcardPrefill ?? undefined}
+      />
 
-          <QuestionFormDialog
-            open={creatingQuestion}
-            onOpenChange={setCreatingQuestion}
-            prefill={{ lessonId: anchor.lessonId }}
-          />
-        </>
-      ) : null}
+      <QuestionFormDialog
+        open={creatingQuestion}
+        onOpenChange={setCreatingQuestion}
+        prefill={{ anchor }}
+      />
     </div>
   );
 }
 
 /**
- * Só existe em modo aula (anchor.lessonId): agrupa Conteúdo/Flashcards/
- * Questões, que dependem de um lessonId real (FK de flashcards/questions).
- * A escrita livre de um curso nunca chega aqui — não tem para onde essas
- * abas apontarem.
+ * Agrupa Conteúdo/Flashcards/Questões — existe tanto em modo aula quanto
+ * em modo curso (Escrita Livre), sempre ancorado no mesmo DocumentAnchor
+ * que o documento em si. lessonId/courseId de cada item vem do anchor da
+ * página, nunca de um seletor dentro dos diálogos de criação.
  */
 function LessonWorkspaceTabs({
-  lessonId,
+  anchor,
   editorBlock,
   onCreateFlashcard,
   onNewFlashcard,
   onNewQuestion,
 }: {
-  lessonId: string;
+  anchor: DocumentAnchor;
   editorBlock: React.ReactNode;
   onCreateFlashcard: (prefill: {
-    lessonId: string;
+    anchor: DocumentAnchor;
     sourceBlockId: string;
     front: string;
     frontContent: FlashcardContent | null;
   }) => void;
-  onNewFlashcard: (lessonId: string) => void;
+  onNewFlashcard: () => void;
   onNewQuestion: () => void;
 }) {
+  const workspaceLabel = typeof anchor.lessonId === "string" ? "da Aula" : "do Curso";
+
   return (
     <Tabs defaultValue="conteudo" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
@@ -444,9 +435,9 @@ function LessonWorkspaceTabs({
       <TabsContent value="conteudo" className="mt-4 space-y-3">
         <FlashcardBridgeContext.Provider
           value={{
-            lessonId,
+            anchor,
             onCreateFlashcard: ({ sourceBlockId, frontText, frontContent }) =>
-              onCreateFlashcard({ lessonId, sourceBlockId, front: frontText, frontContent }),
+              onCreateFlashcard({ anchor, sourceBlockId, front: frontText, frontContent }),
           }}
         >
           {editorBlock}
@@ -456,64 +447,66 @@ function LessonWorkspaceTabs({
       <TabsContent value="flashcards" className="mt-4">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium">Flashcards da Aula</h3>
-            <Button size="sm" onClick={() => onNewFlashcard(lessonId)}>
+            <h3 className="text-sm font-medium">Flashcards {workspaceLabel}</h3>
+            <Button size="sm" onClick={onNewFlashcard}>
               Novo Cartão
             </Button>
           </div>
-          <LessonFlashcardList lessonId={lessonId} />
+          <LessonFlashcardList anchor={anchor} />
         </div>
       </TabsContent>
 
       <TabsContent value="questoes" className="mt-4">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium">Questões da Aula</h3>
+            <h3 className="text-sm font-medium">Questões {workspaceLabel}</h3>
             <Button size="sm" onClick={onNewQuestion}>
               Nova Questão
             </Button>
           </div>
-          <LessonQuestionList lessonId={lessonId} />
+          <LessonQuestionList anchor={anchor} />
         </div>
       </TabsContent>
     </Tabs>
   );
 }
 
-function LessonFlashcardList({ lessonId }: { lessonId: string }) {
+function LessonFlashcardList({ anchor }: { anchor: DocumentAnchor }) {
   const { data: cards, isLoading } = useFlashcards();
-  const lessonCards = useMemo(
-    () => cards?.filter((c) => c.lesson_id === lessonId) ?? [],
-    [cards, lessonId],
+  const scopedCards = useMemo(
+    () =>
+      cards?.filter((c) =>
+        typeof anchor.lessonId === "string"
+          ? c.lesson_id === anchor.lessonId
+          : c.course_id === anchor.courseId,
+      ) ?? [],
+    [cards, anchor],
   );
 
   if (isLoading) return <Skeleton className="h-20 w-full" />;
-  if (lessonCards.length === 0)
-    return (
-      <p className="text-xs text-muted-foreground text-center py-8">
-        Nenhum cartão para esta aula.
-      </p>
-    );
+  if (scopedCards.length === 0)
+    return <p className="text-xs text-muted-foreground text-center py-8">Nenhum cartão ainda.</p>;
 
-  return <FlashcardList cards={lessonCards} />;
+  return <FlashcardList cards={scopedCards} />;
 }
 
-function LessonQuestionList({ lessonId }: { lessonId: string }) {
+function LessonQuestionList({ anchor }: { anchor: DocumentAnchor }) {
   const { data: questions, isLoading } = useQuestions();
-  const lessonQuestions = useMemo(
-    () => questions?.filter((q) => q.lesson_id === lessonId) ?? [],
-    [questions, lessonId],
+  const scopedQuestions = useMemo(
+    () =>
+      questions?.filter((q) =>
+        typeof anchor.lessonId === "string"
+          ? q.lesson_id === anchor.lessonId
+          : q.course_id === anchor.courseId,
+      ) ?? [],
+    [questions, anchor],
   );
 
   if (isLoading) return <Skeleton className="h-20 w-full" />;
-  if (lessonQuestions.length === 0)
-    return (
-      <p className="text-xs text-muted-foreground text-center py-8">
-        Nenhuma questão para esta aula.
-      </p>
-    );
+  if (scopedQuestions.length === 0)
+    return <p className="text-xs text-muted-foreground text-center py-8">Nenhuma questão ainda.</p>;
 
-  return <QuestionList questions={lessonQuestions} />;
+  return <QuestionList questions={scopedQuestions} />;
 }
 
 function PublishButton({

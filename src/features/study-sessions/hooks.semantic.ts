@@ -1,12 +1,20 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useDueReviews } from "./hooks.due";
+import { useDueReviews, useNeverEvaluatedConcepts } from "./hooks.due";
 
 export type ReviewSemanticState = "loading" | "due" | "new_user" | "no_recovery" | "no_due";
 
 export function useReviewSemanticState() {
-  const { data: dueReviews, isLoading: isLoadingDue } = useDueReviews(100);
-  
+  const { data: due, isLoading: isLoadingDue } = useDueReviews(100);
+  const { data: neverEvaluated, isLoading: isLoadingNeverEvaluated } = useNeverEvaluatedConcepts();
+  // Conceitos due de verdade primeiro, depois os que nunca foram testados
+  // (due: null) — mesma fila, ReviewSession não diferencia a origem.
+  const dueReviews = useMemo(
+    () => [...(due ?? []), ...(neverEvaluated ?? [])],
+    [due, neverEvaluated],
+  );
+
   const { data: stats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["review-semantic-stats"],
     queryFn: async () => {
@@ -43,11 +51,12 @@ export function useReviewSemanticState() {
     },
   });
 
-  const isLoading = isLoadingDue || isLoadingStats;
+  const isLoading = isLoadingDue || isLoadingNeverEvaluated || isLoadingStats;
 
-  if (isLoading) return { state: "loading" as ReviewSemanticState, dueReviews: [], isLoading: true };
+  if (isLoading)
+    return { state: "loading" as ReviewSemanticState, dueReviews: [], isLoading: true };
 
-  if (dueReviews && dueReviews.length > 0) {
+  if (dueReviews.length > 0) {
     return { state: "due" as ReviewSemanticState, dueReviews, isLoading: false };
   }
 

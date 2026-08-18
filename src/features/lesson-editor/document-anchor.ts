@@ -12,3 +12,14 @@ export type DocumentAnchor =
 export function anchorKey(anchor: DocumentAnchor): string {
   return anchor.lessonId ? `lesson-${anchor.lessonId}` : `course-${anchor.courseId}`;
 }
+
+/**
+ * Como DocumentAnchor, mas permite "nenhum dos dois" — um Flashcard/
+ * Questão pode nascer avulso (biblioteca), de uma aula ou de um curso,
+ * diferente de um lesson_document que sempre tem exatamente uma âncora.
+ * Um DocumentAnchor real é atribuível aqui sem conversão (string é
+ * atribuível a string | null) — usado como prefill de criação nos
+ * diálogos de Flashcard/Questão.
+ */
+export type CreationAnchor =
+  { lessonId: string | null; courseId?: never } | { lessonId?: never; courseId: string };

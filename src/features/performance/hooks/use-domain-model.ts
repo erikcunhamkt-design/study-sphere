@@ -14,11 +14,15 @@ export function useDomainModel() {
     queryFn: async () => {
       if (!user) throw new Error("Não autenticado");
 
-      // 1. Fetch Hierarchy: Areas -> Courses -> Lessons -> Concepts
+      // 1. Fetch Hierarchy: Areas -> Courses -> Lessons -> Concepts, e
+      // também Areas -> Courses -> Concepts diretamente (concept.course_id,
+      // Escrita Livre) — um concept nunca tem os dois (CHECK no banco),
+      // então os dois braços nunca colidem no mesmo id.
       // PostgREST hierarchy fetch
       const { data: rawAreas, error: areasError } = await supabase
         .from("study_areas")
-        .select(`
+        .select(
+          `
           id,
           name,
           courses (
@@ -33,14 +37,21 @@ export function useDomainModel() {
                 is_archived,
                 is_test_data
               )
+            ),
+            concepts (
+              id,
+              title,
+              is_archived,
+              is_test_data
             )
           )
-        `)
+        `,
+        )
         .eq("user_id", user.id)
         .eq("is_archived", false);
 
       if (areasError) throw areasError;
-      
+
       const areas = safeArray<any>(rawAreas, "domain.study_areas");
 
       // 2. Fetch all memory states for the user to join in memory
@@ -68,61 +79,74 @@ export function useDomainModel() {
       // 3. Process each area
       const domainMap = areas.map((area: any) => {
         const allConcepts: any[] = [];
-        
-        // Safely traverse the hierarchy (ignora elos inválidos e arquivados)
-        safeArray<any>(area?.courses, "domain.courses").forEach((course: any) => {
-          if (course?.is_archived) return;
-          safeArray<any>(course?.lessons, "domain.lessons").forEach((lesson: any) => {
-            if (lesson?.is_archived) return;
-            safeArray<any>(lesson?.concepts, "domain.concepts").forEach((concept: any) => {
-              if (!concept?.id) {
-                logIntegrityIssue("missing_concept", { lessonId: lesson?.id });
-                return;
-              }
-              if (concept.is_archived || concept.is_test_data) return;
 
-              const memory = msMap.get(concept.id);
-              const humanState = memory ? mapToHumanState({
+        function pushConcept(concept: any, contextId: string | undefined) {
+          if (!concept?.id) {
+            logIntegrityIssue("missing_concept", { contextId });
+            return;
+          }
+          if (concept.is_archived || concept.is_test_data) return;
+
+          const memory = msMap.get(concept.id);
+          const humanState = memory
+            ? mapToHumanState({
                 reps: memory.reps || 0,
                 stability: memory.stability || 0,
                 difficulty: memory.difficulty || 0,
                 lastResult: memory.last_result as any,
                 lapses: memory.lapses || 0,
-                isDue: memory.due ? new Date(memory.due) <= now : false
-              }) : mapToHumanState({
+                isDue: memory.due ? new Date(memory.due) <= now : false,
+              })
+            : mapToHumanState({
                 reps: 0,
                 stability: 0,
                 difficulty: 0,
                 lastResult: null,
                 lapses: 0,
-                isDue: false
+                isDue: false,
               });
 
-              allConcepts.push({
-                ...concept,
-                memory,
-                humanState
-              });
-            });
+          allConcepts.push({
+            ...concept,
+            memory,
+            humanState,
           });
+        }
+
+        // Safely traverse the hierarchy (ignora elos inválidos e arquivados)
+        safeArray<any>(area?.courses, "domain.courses").forEach((course: any) => {
+          if (course?.is_archived) return;
+          safeArray<any>(course?.lessons, "domain.lessons").forEach((lesson: any) => {
+            if (lesson?.is_archived) return;
+            safeArray<any>(lesson?.concepts, "domain.concepts").forEach((concept: any) =>
+              pushConcept(concept, lesson?.id),
+            );
+          });
+          // Concepts ancorados diretamente no curso (Escrita Livre) — sem
+          // aula, mas ainda dentro da mesma Study Area.
+          safeArray<any>(course?.concepts, "domain.concepts").forEach((concept: any) =>
+            pushConcept(concept, course?.id),
+          );
         });
 
-        const evaluated = allConcepts.filter(c => c.memory && (c.memory.reps || 0) > 0);
-        
+        const evaluated = allConcepts.filter((c) => c.memory && (c.memory.reps || 0) > 0);
+
         // Regra de Atenção: falhas recentes ou desalinhamento metacognitivo
         // Importante: "due" gera alerta visual, mas não é falha cognitiva por si só
-        const attention = allConcepts.filter(c => {
+        const attention = allConcepts.filter((c) => {
           if (!c.memory) return false;
-          const isFailing = c.memory.last_result === 'incorrect' || c.memory.last_result === 'partial';
+          const isFailing =
+            c.memory.last_result === "incorrect" || c.memory.last_result === "partial";
           const hasMismatch = (c.memory.last_confidence || 0) >= 3 && isFailing;
           return isFailing || hasMismatch;
         });
 
-        const hasMismatch = evaluated.some(c => 
-          (c.memory.last_confidence || 0) >= 3 && 
-          (c.memory.last_result === 'incorrect' || c.memory.last_result === 'partial')
+        const hasMismatch = evaluated.some(
+          (c) =>
+            (c.memory.last_confidence || 0) >= 3 &&
+            (c.memory.last_result === "incorrect" || c.memory.last_result === "partial"),
         );
-        
+
         const totalStability = evaluated.reduce((sum, c) => sum + (c.memory.stability || 0), 0);
         const avgStability = evaluated.length > 0 ? totalStability / evaluated.length : 0;
 
@@ -130,9 +154,10 @@ export function useDomainModel() {
           totalConcepts: allConcepts.length,
           evaluatedConcepts: evaluated.length,
           attentionConcepts: attention.length,
-          dueConcepts: allConcepts.filter(c => c.memory?.due && new Date(c.memory.due) <= now).length,
+          dueConcepts: allConcepts.filter((c) => c.memory?.due && new Date(c.memory.due) <= now)
+            .length,
           avgStability,
-          hasMismatch
+          hasMismatch,
         };
 
         const mastery = calculateDomainMastery(metrics);
@@ -142,11 +167,11 @@ export function useDomainModel() {
           name: area.name,
           mastery,
           metrics,
-          concepts: allConcepts
+          concepts: allConcepts,
         };
       });
 
       return domainMap;
-    }
+    },
   });
 }

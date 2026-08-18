@@ -32,15 +32,17 @@ import {
 import { useCreateFlashcard, useUpdateFlashcardContent } from "./hooks";
 import { useDecks } from "@/features/decks/hooks";
 import type { FlashcardRow } from "./types";
+import type { CreationAnchor } from "@/features/lesson-editor/document-anchor";
+import { createCourseConcept } from "@/features/lesson-editor/course-concept";
 
 const AVULSO_VALUE = "__avulso__";
 
 interface FlashcardFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Preenche a criação a partir de uma conversão bloco→cartão (Pergunta de revisão). */
+  /** Preenche a criação a partir de uma conversão bloco→cartão (Pergunta de revisão) ou de um "Novo Cartão" em aula/curso. */
   prefill?: {
-    lessonId: string | null;
+    anchor: CreationAnchor;
     sourceBlockId: string | null;
     front: string;
     /** Conteúdo inline rico do bloco original, quando validável — usado se o usuário não editar a frente. */
@@ -71,6 +73,12 @@ export function FlashcardFormDialog({
   const [originalFront, setOriginalFront] = useState<OriginalFrontContent | null>(null);
   const submittingRef = useRef(false);
 
+  // Curso: âncora fixa vinda da Escrita Livre, nunca um seletor — o
+  // cartão nasce vinculado ao curso (e a um Concept criado em silêncio no
+  // submit) e a aba "Aula" some, porque um cartão de curso nunca tem aula.
+  const courseId = flashcard ? flashcard.course_id : (prefill?.anchor.courseId ?? null);
+  const isCourseAnchored = courseId !== null;
+
   const { data: lessons } = useAllLessons();
   const { data: decks } = useDecks();
   const activeLessons = (lessons ?? []).filter((l) => !l.is_archived);
@@ -94,7 +102,7 @@ export function FlashcardFormDialog({
       const flatFront = prefill?.front ?? "";
       setFront(flatFront);
       setBack("");
-      setLessonId(prefill?.lessonId ?? null);
+      setLessonId(prefill?.anchor.lessonId ?? null);
       setDeckId(null);
       setOriginalFront(
         prefill?.frontContent ? { text: flatFront, content: prefill.frontContent } : null,
@@ -110,7 +118,7 @@ export function FlashcardFormDialog({
     if (submittingRef.current) return;
 
     const parsed = flashcardFormSchema.safeParse({
-      lessonId,
+      lessonId: isCourseAnchored ? null : lessonId,
       deckId,
       sourceBlockId: prefill?.sourceBlockId ?? null,
       front: resolveFrontContentForSubmit(front, originalFront),
@@ -137,8 +145,17 @@ export function FlashcardFormDialog({
 
         toast.success("Cartão atualizado");
       } else {
+        // Curso: cria o Concept em silêncio antes do cartão — nunca pedido
+        // ao usuário, nunca exposto como "conceito" na UI.
+        const conceptId =
+          isCourseAnchored && courseId
+            ? await createCourseConcept(courseId, textFromInlineContent(parsed.data.front))
+            : null;
+
         await createFlashcard.mutateAsync({
           lessonId: parsed.data.lessonId,
+          courseId,
+          conceptId,
           deckId: (parsed.data as any).deckId,
           sourceBlockId: parsed.data.sourceBlockId,
           front: parsed.data.front,
@@ -203,26 +220,28 @@ export function FlashcardFormDialog({
             </p>
           ) : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="flashcard-lesson">Aula (opcional)</Label>
-            <Select
-              value={lessonId ?? AVULSO_VALUE}
-              onValueChange={(v) => setLessonId(v === AVULSO_VALUE ? null : v)}
-            >
-              <SelectTrigger id="flashcard-lesson">
-                <SelectValue placeholder="Avulso (sem aula)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={AVULSO_VALUE}>Avulso (sem aula)</SelectItem>
-                {activeLessons.map((l) => (
-                  <SelectItem key={l.id} value={l.id}>
-                    {l.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
+          {isCourseAnchored ? null : (
+            <div className="space-y-2">
+              <Label htmlFor="flashcard-lesson">Aula (opcional)</Label>
+              <Select
+                value={lessonId ?? AVULSO_VALUE}
+                onValueChange={(v) => setLessonId(v === AVULSO_VALUE ? null : v)}
+              >
+                <SelectTrigger id="flashcard-lesson">
+                  <SelectValue placeholder="Avulso (sem aula)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={AVULSO_VALUE}>Avulso (sem aula)</SelectItem>
+                  {activeLessons.map((l) => (
+                    <SelectItem key={l.id} value={l.id}>
+                      {l.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="flashcard-deck">Baralho (opcional)</Label>
             <Select
@@ -237,9 +256,9 @@ export function FlashcardFormDialog({
                 {activeDecks.map((d) => (
                   <SelectItem key={d.id} value={d.id}>
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-2 h-2 rounded-full" 
-                        style={{ backgroundColor: d.color ?? "#3b82f6" }} 
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: d.color ?? "#3b82f6" }}
                       />
                       {d.name}
                     </div>

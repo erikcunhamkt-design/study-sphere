@@ -13,7 +13,7 @@ import type {
 } from "./types";
 
 const QUESTION_COLUMNS =
-  "id, user_id, lesson_id, type, statement, options, correct_option_index, expected_answer, is_archived, created_at, updated_at";
+  "id, user_id, lesson_id, course_id, concept_id, type, statement, options, correct_option_index, expected_answer, is_archived, created_at, updated_at";
 
 export async function fetchQuestions(userId: string): Promise<QuestionRow[]> {
   const { data, error } = await supabase
@@ -27,6 +27,8 @@ export async function fetchQuestions(userId: string): Promise<QuestionRow[]> {
 
 export interface QuestionInput {
   lessonId: string | null;
+  courseId?: string | null;
+  conceptId?: string | null;
   type: QuestionType;
   statement: string;
   options: string[];
@@ -38,6 +40,8 @@ function questionInputToRow(userId: string, input: QuestionInput) {
   return {
     user_id: userId,
     lesson_id: input.lessonId,
+    course_id: input.courseId ?? null,
+    concept_id: input.conceptId ?? null,
     type: input.type,
     statement: input.statement,
     options: input.options as unknown as Json,

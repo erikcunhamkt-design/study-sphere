@@ -1,13 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { 
-  Plus, 
-  Search,
-  Layers,
-  ListChecks,
-  GraduationCap,
-  ExternalLink
-} from "lucide-react";
+import { Plus, Search, Layers, ListChecks, GraduationCap, ExternalLink } from "lucide-react";
 import { z } from "zod";
 
 import { PageHeader } from "@/components/layout/page-shell";
@@ -35,7 +28,10 @@ import { useStudyMaterials } from "@/features/study-materials/hooks";
 import type { StudyMaterialRow } from "@/features/study-materials/types";
 
 export const librarySearchSchema = z.object({
-  tab: z.enum(["flashcards", "decks", "questions", "exams", "materials"]).optional().default("flashcards"),
+  tab: z
+    .enum(["flashcards", "decks", "questions", "exams", "materials"])
+    .optional()
+    .default("flashcards"),
 });
 
 export const Route = createFileRoute("/app/biblioteca")({
@@ -62,39 +58,31 @@ function LibraryPage() {
   const { data: exams = [] } = useExams();
   const { data: materials = [] } = useStudyMaterials();
 
-  const unlinkedFlashcards = flashcards.filter(
-    (c) => c.lesson_id === null && !c.is_archived
-  );
-  const unlinkedQuestions = questions.filter(
-    (q) => q.lesson_id === null && !q.is_archived
-  );
-  const activeExams = exams.filter(
-    (e) => !e.is_archived
-  );
-  const unlinkedMaterials = materials.filter(
-    (m) => m.course_id === null && !m.is_archived
-  );
+  const unlinkedFlashcards = flashcards.filter((c) => c.lesson_id === null && !c.is_archived);
+  const unlinkedQuestions = questions.filter((q) => q.lesson_id === null && !q.is_archived);
+  const activeExams = exams.filter((e) => !e.is_archived);
+  const unlinkedMaterials = materials.filter((m) => m.course_id === null && !m.is_archived);
 
-  const filteredFlashcards = unlinkedFlashcards.filter((c) => 
-    JSON.stringify(c.front).toLowerCase().includes(search.toLowerCase()) ||
-    JSON.stringify(c.back).toLowerCase().includes(search.toLowerCase())
+  const filteredFlashcards = unlinkedFlashcards.filter(
+    (c) =>
+      JSON.stringify(c.front).toLowerCase().includes(search.toLowerCase()) ||
+      JSON.stringify(c.back).toLowerCase().includes(search.toLowerCase()),
   );
 
   const filteredQuestions = unlinkedQuestions.filter((q) =>
-    q.statement.toLowerCase().includes(search.toLowerCase())
+    q.statement.toLowerCase().includes(search.toLowerCase()),
   );
 
   const filteredExams = activeExams.filter((e) =>
-    e.title.toLowerCase().includes(search.toLowerCase())
+    e.title.toLowerCase().includes(search.toLowerCase()),
   );
-  const filteredMaterials = unlinkedMaterials.filter((m) =>
-    m.title.toLowerCase().includes(search.toLowerCase()) ||
-    m.url.toLowerCase().includes(search.toLowerCase())
+  const filteredMaterials = unlinkedMaterials.filter(
+    (m) =>
+      m.title.toLowerCase().includes(search.toLowerCase()) ||
+      m.url.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const filteredDecks = decks.filter((d) =>
-    d.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredDecks = decks.filter((d) => d.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="space-y-6">
@@ -116,14 +104,14 @@ function LibraryPage() {
         </div>
       </div>
 
-      <Tabs 
-        value={tab} 
+      <Tabs
+        value={tab}
         onValueChange={(val) => navigate({ search: { tab: val as any }, replace: true })}
         className="w-full"
       >
         <div className="flex items-center justify-between border-b border-border pb-1">
           <TabsList className="bg-transparent h-auto p-0 gap-6 overflow-x-auto no-scrollbar">
-            <TabsTrigger 
+            <TabsTrigger
               value="flashcards"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
@@ -132,7 +120,7 @@ function LibraryPage() {
                 {unlinkedFlashcards.length}
               </span>
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="decks"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
@@ -141,7 +129,7 @@ function LibraryPage() {
                 {decks.length}
               </span>
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="questions"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
@@ -150,7 +138,7 @@ function LibraryPage() {
                 {unlinkedQuestions.length}
               </span>
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="exams"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
@@ -159,7 +147,7 @@ function LibraryPage() {
                 {activeExams.length}
               </span>
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="materials"
               className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2 h-auto whitespace-nowrap"
             >
@@ -206,7 +194,9 @@ function LibraryPage() {
             <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
               <Layers className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
               <p className="text-muted-foreground">Nenhum flashcard avulso encontrado.</p>
-              <Button variant="link" onClick={() => setFlashcardFormOpen(true)}>Criar primeiro flashcard</Button>
+              <Button variant="link" onClick={() => setFlashcardFormOpen(true)}>
+                Criar primeiro flashcard
+              </Button>
             </div>
           )}
         </TabsContent>
@@ -218,7 +208,9 @@ function LibraryPage() {
             <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
               <Layers className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
               <p className="text-muted-foreground">Nenhum baralho encontrado.</p>
-              <Button variant="link" onClick={() => setDeckFormOpen(true)}>Criar primeiro baralho</Button>
+              <Button variant="link" onClick={() => setDeckFormOpen(true)}>
+                Criar primeiro baralho
+              </Button>
             </div>
           )}
         </TabsContent>
@@ -230,75 +222,76 @@ function LibraryPage() {
             <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
               <ListChecks className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
               <p className="text-muted-foreground">Nenhuma questão avulsa encontrada.</p>
-              <Button variant="link" onClick={() => setQuestionFormOpen(true)}>Criar primeira questão</Button>
+              <Button variant="link" onClick={() => setQuestionFormOpen(true)}>
+                Criar primeira questão
+              </Button>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="exams" className="pt-6">
           {filteredExams.length > 0 ? (
-            <ExamList 
-              exams={filteredExams} 
-              onStart={(exam) => navigate({ 
-                to: "/app/estudar",
-                search: { method: "exame" }
-              })} 
-
+            <ExamList
+              exams={filteredExams}
+              onStart={(exam) =>
+                navigate({
+                  to: "/app/estudar",
+                  search: { method: "exame" },
+                })
+              }
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
               <GraduationCap className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
               <p className="text-muted-foreground">Nenhum simulado avulso encontrado.</p>
-              <Button variant="link" onClick={() => setExamFormOpen(true)}>Criar primeiro simulado</Button>
+              <Button variant="link" onClick={() => setExamFormOpen(true)}>
+                Criar primeiro simulado
+              </Button>
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="materials" className="pt-6">
           {filteredMaterials.length > 0 ? (
-            <MaterialList 
-              materials={filteredMaterials} 
-              onEdit={(m) => setEditingMaterial(m)} 
-            />
+            <MaterialList materials={filteredMaterials} onEdit={(m) => setEditingMaterial(m)} />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl">
               <ExternalLink className="h-10 w-10 text-muted-foreground mb-4 opacity-20" />
               <p className="text-muted-foreground">Nenhum material avulso encontrado.</p>
-              <Button variant="link" onClick={() => setMaterialFormOpen(true)}>Criar primeiro material</Button>
+              <Button variant="link" onClick={() => setMaterialFormOpen(true)}>
+                Criar primeiro material
+              </Button>
             </div>
           )}
         </TabsContent>
       </Tabs>
 
-      <FlashcardFormDialog 
-        open={flashcardFormOpen} 
+      <FlashcardFormDialog
+        open={flashcardFormOpen}
         onOpenChange={setFlashcardFormOpen}
         prefill={{
-          lessonId: null,
+          anchor: { lessonId: null },
           sourceBlockId: null,
           front: "",
-          frontContent: null
+          frontContent: null,
         }}
       />
-      <DeckFormDialog 
-        open={deckFormOpen || !!editingDeck} 
+      <DeckFormDialog
+        open={deckFormOpen || !!editingDeck}
         onOpenChange={(open) => {
           setDeckFormOpen(open);
           if (!open) setEditingDeck(null);
         }}
         deck={editingDeck}
       />
-      <QuestionFormDialog 
-        open={questionFormOpen} 
+      <QuestionFormDialog
+        open={questionFormOpen}
         onOpenChange={setQuestionFormOpen}
-        prefill={{ lessonId: null }}
+        prefill={{ anchor: { lessonId: null } }}
       />
-      <ExamFormDialog 
-        open={examFormOpen} 
-        onOpenChange={setExamFormOpen}
-      />
-      <MaterialFormDialog 
-        open={materialFormOpen || !!editingMaterial} 
+      <ExamFormDialog open={examFormOpen} onOpenChange={setExamFormOpen} />
+      <MaterialFormDialog
+        open={materialFormOpen || !!editingMaterial}
         onOpenChange={(open) => {
           setMaterialFormOpen(open);
           if (!open) setEditingMaterial(null);

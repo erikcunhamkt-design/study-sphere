@@ -6,6 +6,8 @@ export interface FlashcardRow {
   id: string;
   user_id: string;
   lesson_id: string | null;
+  course_id: string | null;
+  concept_id: string | null;
   deck_id: string | null;
   source_block_id: string | null;
   front: FlashcardContent;

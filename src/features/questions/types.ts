@@ -4,6 +4,8 @@ export interface QuestionRow {
   id: string;
   user_id: string;
   lesson_id: string | null;
+  course_id: string | null;
+  concept_id: string | null;
   type: QuestionType;
   statement: string;
   options: string[];

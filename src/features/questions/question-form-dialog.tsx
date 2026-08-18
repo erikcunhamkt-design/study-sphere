@@ -26,6 +26,8 @@ import { useAllLessons } from "@/features/studies/hooks/use-lessons";
 import { validateQuestionForm, type QuestionType } from "./schema";
 import { useCreateQuestion, useUpdateQuestion } from "./hooks";
 import type { QuestionRow } from "./types";
+import type { CreationAnchor } from "@/features/lesson-editor/document-anchor";
+import { createCourseConcept } from "@/features/lesson-editor/course-concept";
 
 const AVULSO_VALUE = "__avulso__";
 const MIN_OPTIONS = 2;
@@ -35,10 +37,15 @@ interface QuestionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   question?: QuestionRow;
-  prefill?: { lessonId: string | null };
+  prefill?: { anchor: CreationAnchor };
 }
 
-export function QuestionFormDialog({ open, onOpenChange, question, prefill }: QuestionFormDialogProps) {
+export function QuestionFormDialog({
+  open,
+  onOpenChange,
+  question,
+  prefill,
+}: QuestionFormDialogProps) {
   const isEditing = !!question;
   const statementId = useId();
 
@@ -49,6 +56,12 @@ export function QuestionFormDialog({ open, onOpenChange, question, prefill }: Qu
   const [correctOptionIndex, setCorrectOptionIndex] = useState<number | null>(null);
   const [expectedAnswer, setExpectedAnswer] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  // Curso: âncora fixa vinda da Escrita Livre — editar preserva o vínculo
+  // (mesmo Concept), criar gera um Concept novo em silêncio no submit.
+  const courseId = question ? question.course_id : (prefill?.anchor.courseId ?? null);
+  const conceptId = question ? question.concept_id : null;
+  const isCourseAnchored = courseId !== null;
 
   const { data: lessons } = useAllLessons();
   const activeLessons = (lessons ?? []).filter((l) => !l.is_archived);
@@ -68,7 +81,7 @@ export function QuestionFormDialog({ open, onOpenChange, question, prefill }: Qu
       setExpectedAnswer(question.expected_answer ?? "");
     } else {
       setType("multipla_escolha");
-      setLessonId(prefill?.lessonId ?? null);
+      setLessonId(prefill?.anchor.lessonId ?? null);
       setStatement("");
       setOptions(["", ""]);
       setCorrectOptionIndex(null);
@@ -100,16 +113,18 @@ export function QuestionFormDialog({ open, onOpenChange, question, prefill }: Qu
     e.preventDefault();
     if (createQuestion.isPending || updateQuestion.isPending) return;
 
+    const effectiveLessonId = isCourseAnchored ? null : lessonId;
+
     const formValue =
       type === "multipla_escolha"
         ? {
             type,
-            lessonId,
+            lessonId: effectiveLessonId,
             statement,
             options: options.map((o) => o.trim()),
             correctOptionIndex: correctOptionIndex ?? -1,
           }
-        : { type, lessonId, statement, expectedAnswer };
+        : { type, lessonId: effectiveLessonId, statement, expectedAnswer };
 
     const parsed = validateQuestionForm(formValue);
     if (!parsed.success) {
@@ -139,10 +154,19 @@ export function QuestionFormDialog({ open, onOpenChange, question, prefill }: Qu
 
     try {
       if (isEditing && question) {
-        await updateQuestion.mutateAsync(input);
+        // Curso: preserva o mesmo Concept — editar nunca troca a que
+        // conceito a questão está ligada, só o conteúdo.
+        await updateQuestion.mutateAsync({ ...input, courseId, conceptId });
         toast.success("Questão atualizada");
       } else {
-        await createQuestion.mutateAsync(input);
+        // Curso: cria o Concept em silêncio antes da questão — nunca
+        // pedido ao usuário, nunca exposto como "conceito" na UI.
+        const newConceptId =
+          isCourseAnchored && courseId
+            ? await createCourseConcept(courseId, input.statement)
+            : null;
+
+        await createQuestion.mutateAsync({ ...input, courseId, conceptId: newConceptId });
         toast.success("Questão criada");
       }
       onOpenChange(false);
@@ -264,25 +288,27 @@ export function QuestionFormDialog({ open, onOpenChange, question, prefill }: Qu
             </p>
           ) : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="question-lesson">Aula (opcional)</Label>
-            <Select
-              value={lessonId ?? AVULSO_VALUE}
-              onValueChange={(v) => setLessonId(v === AVULSO_VALUE ? null : v)}
-            >
-              <SelectTrigger id="question-lesson">
-                <SelectValue placeholder="Avulsa (sem aula)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={AVULSO_VALUE}>Avulsa (sem aula)</SelectItem>
-                {activeLessons.map((l) => (
-                  <SelectItem key={l.id} value={l.id}>
-                    {l.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {isCourseAnchored ? null : (
+            <div className="space-y-2">
+              <Label htmlFor="question-lesson">Aula (opcional)</Label>
+              <Select
+                value={lessonId ?? AVULSO_VALUE}
+                onValueChange={(v) => setLessonId(v === AVULSO_VALUE ? null : v)}
+              >
+                <SelectTrigger id="question-lesson">
+                  <SelectValue placeholder="Avulsa (sem aula)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={AVULSO_VALUE}>Avulsa (sem aula)</SelectItem>
+                  {activeLessons.map((l) => (
+                    <SelectItem key={l.id} value={l.id}>
+                      {l.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <DialogFooter>
             <Button type="submit" disabled={isPending}>
