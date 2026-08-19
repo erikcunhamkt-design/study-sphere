@@ -109,7 +109,6 @@ export type Database = {
       }
       concepts: {
         Row: {
-          course_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -121,7 +120,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          course_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -133,7 +131,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          course_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -146,18 +143,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "concepts_course_user_fkey"
-            columns: ["course_id", "user_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id", "user_id"]
-          },
-          {
-            foreignKeyName: "concepts_lesson_user_fkey"
-            columns: ["lesson_id", "user_id"]
+            foreignKeyName: "concepts_lesson_id_fkey"
+            columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "lessons"
-            referencedColumns: ["id", "user_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "concepts_user_id_fkey"
@@ -513,7 +503,6 @@ export type Database = {
         Row: {
           back: Json
           concept_id: string | null
-          course_id: string | null
           created_at: string
           deck_id: string | null
           due_at: string | null
@@ -535,7 +524,6 @@ export type Database = {
         Insert: {
           back: Json
           concept_id?: string | null
-          course_id?: string | null
           created_at?: string
           deck_id?: string | null
           due_at?: string | null
@@ -557,7 +545,6 @@ export type Database = {
         Update: {
           back?: Json
           concept_id?: string | null
-          course_id?: string | null
           created_at?: string
           deck_id?: string | null
           due_at?: string | null
@@ -583,13 +570,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "concepts"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "flashcards_course_user_fkey"
-            columns: ["course_id", "user_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id", "user_id"]
           },
           {
             foreignKeyName: "flashcards_deck_fkey"
@@ -707,17 +687,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "lesson_documents_lesson_user_fkey"
-            columns: ["lesson_id", "user_id"]
-            isOneToOne: false
-            referencedRelation: "lessons"
-            referencedColumns: ["id", "user_id"]
-          },
-          {
             foreignKeyName: "lesson_documents_course_user_fkey"
             columns: ["course_id", "user_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "lesson_documents_lesson_user_fkey"
+            columns: ["lesson_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
             referencedColumns: ["id", "user_id"]
           },
           {
@@ -1089,7 +1069,6 @@ export type Database = {
           concept_id: string | null
           concept_tag: string | null
           correct_option_index: number | null
-          course_id: string | null
           created_at: string
           expected_answer: string | null
           id: string
@@ -1106,7 +1085,6 @@ export type Database = {
           concept_id?: string | null
           concept_tag?: string | null
           correct_option_index?: number | null
-          course_id?: string | null
           created_at?: string
           expected_answer?: string | null
           id?: string
@@ -1123,7 +1101,6 @@ export type Database = {
           concept_id?: string | null
           concept_tag?: string | null
           correct_option_index?: number | null
-          course_id?: string | null
           created_at?: string
           expected_answer?: string | null
           id?: string
@@ -1137,20 +1114,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "questions_concept_user_fkey"
-            columns: ["concept_id", "user_id"]
-            isOneToOne: false
-            referencedRelation: "concepts"
-            referencedColumns: ["id", "user_id"]
-          },
-          {
-            foreignKeyName: "questions_course_user_fkey"
-            columns: ["course_id", "user_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id", "user_id"]
-          },
           {
             foreignKeyName: "questions_lesson_user_fkey"
             columns: ["lesson_id", "user_id"]
@@ -1394,12 +1357,8 @@ export type Database = {
         Returns: string
       }
       checkpoint_lesson_document: {
-        Args: { p_course_id?: string | null; p_lesson_id: string | null }
+        Args: { p_course_id?: string; p_lesson_id: string }
         Returns: Json
-      }
-      create_course_concept: {
-        Args: { p_course_id: string; p_title: string }
-        Returns: string
       }
       finish_exam_attempt: {
         Args: { p_exam_attempt_id: string }
@@ -1415,7 +1374,7 @@ export type Database = {
         Returns: undefined
       }
       publish_lesson_document: {
-        Args: { p_course_id?: string | null; p_lesson_id: string | null }
+        Args: { p_course_id?: string; p_lesson_id: string }
         Returns: Json
       }
       rebuild_memory_state_from_history: {
@@ -1449,15 +1408,15 @@ export type Database = {
       }
       reorder_study_areas: { Args: { p_ids: string[] }; Returns: undefined }
       restore_lesson_document_version: {
-        Args: { p_course_id?: string | null; p_lesson_id: string | null; p_version: number }
+        Args: { p_course_id?: string; p_lesson_id: string; p_version: number }
         Returns: Json
       }
       save_lesson_document: {
         Args: {
           p_content: Json
-          p_course_id?: string | null
+          p_course_id?: string
           p_expected_version: number
-          p_lesson_id: string | null
+          p_lesson_id: string
           p_schema_version: number
         }
         Returns: Json
